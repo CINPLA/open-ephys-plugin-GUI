@@ -340,9 +340,10 @@ void TrackingStimulator::setRepetitionsTrainDuration(int chan, priority whatFirs
 
 void TrackingStimulator::process(AudioSampleBuffer&)
 {
-//    setTimestamp(events,CoreServices::getGlobalTimestamp());
     if (!m_simulateTrajectory)
+    {
         checkForEvents();
+    }
     else
     {
         // simulate events at 60Hz
@@ -431,6 +432,7 @@ void TrackingStimulator::process(AudioSampleBuffer&)
 
 void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
 {
+    std::cout << "In tracker stim: handle event" << std::endl;
     if ((eventInfo->getName()).compare("Tracking data") == 0)
     {
         BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
@@ -439,8 +441,6 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
             cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
         }
 
-        uint8 nodeId = evtptr->getSourceID();
-        const int64 timestamp = *(rawData);
         const float* message = (float*)(rawData+sizeof(int64));
 
         if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
@@ -456,29 +456,21 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
         }
         m_positionIsUpdated = true;
     }
+    // Sync
+    if (eventInfo->getChannelType() == EventChannel::TTL) // && eventInfo == eventChannelArray[triggerEvent])
+    {
+        TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
+        int eventId = ttl->getState() ? 1 : 0;
 
-    //TODO fix this
-
-//    // Sync!
-//    if (eventType == TTL)
-//    {
-//        //  std::cout << "Received an event!" << std::endl;
-
-//        const uint8* dataptr = event.getRawData();
-
-//        // int eventNodeId = *(dataptr+1);
-//        const int eventId       = *(dataptr + 2);
-//        const int eventChannel  = *(dataptr + 3);
-
-//        if (eventId == 1
-//                && eventChannel == m_TTLSyncChan)
-//        {
-//            syncStimulation(m_StimSyncChan);
-//            CoreServices::sendStatusMessage("Sent trigger sync event!");
-//        }
-//    }
-
-
+        std::cout << "In tracker stim" << std::endl;
+        if (ttl->getChannel() ==  m_TTLSyncChan && eventId == 1)
+        {
+            {
+                syncStimulation(m_StimSyncChan);
+                CoreServices::sendStatusMessage("Sent trigger sync event!");
+            }
+        }
+    }
 }
 
 int TrackingStimulator::isPositionWithinCircles(float x, float y)
