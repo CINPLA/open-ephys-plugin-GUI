@@ -114,10 +114,7 @@ int TrackingNode::port()
 
 void TrackingNode::process(AudioSampleBuffer&)
 {
-    //    checkForEvents(events);
     int inBufferNow = msgQueue.getInBuffer();
-    int64 timestamp = CoreServices::getGlobalTimestamp();
-    setTimestampAndSamples(timestamp, 0);
 
     if(m_positionIsUpdated && inBufferNow > 0) {
 
@@ -133,13 +130,14 @@ void TrackingNode::process(AudioSampleBuffer&)
 				// since the event saving messes timestamps up append it to the message
                 uint8_t msg_with_ts[BUFFER_MSG_SIZE];
                 float position[4];
+                setTimestampAndSamples(tsptr, 0);
 
 				memcpy(msg_with_ts, &tsptr, sizeof(tsptr));
                 memcpy(&msg_with_ts[sizeof(tsptr)], msg, msgQueue.getMessageSize());
 
                 //setTimestamp(events, tsptr);
                 const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
-                BinaryEventPtr event = BinaryEvent::createBinaryEvent(chan, timestamp,
+                BinaryEventPtr event = BinaryEvent::createBinaryEvent(chan, tsptr,
                                                                       msg_with_ts, 24);
                 addEvent(chan, event, 0);
                 countin1sec++;
@@ -223,11 +221,7 @@ void TrackingNode::receiveMessage(std::vector<float> message)
             m_msgInfo = true;
         }
 
-        int64 ts;       
-		if (CoreServices::getRecordingStatus())
-			ts = Time::currentTimeMillis() - m_startingRecTimeMillis;
-		else
-			ts = Time::currentTimeMillis() - m_startingAcqTimeMillis;
+        int64 ts = CoreServices::getGlobalTimestamp();
 
         msgQueue.enqueueMsg((char*) &(m_message[0]), ts);
 
