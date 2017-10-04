@@ -113,15 +113,15 @@ int TrackingNode::port()
 }
 
 void TrackingNode::process(AudioSampleBuffer&)
-{    
-//    checkForEvents(events);
+{
+    //    checkForEvents(events);
     int inBufferNow = msgQueue.getInBuffer();
     int64 timestamp = CoreServices::getGlobalTimestamp();
     setTimestampAndSamples(timestamp, 0);
 
     if(m_positionIsUpdated && inBufferNow > 0) {
 
-//        lock.enter();
+        lock.enter();
         for (int i=0; i < inBufferNow; i++)
         {
 
@@ -148,7 +148,7 @@ void TrackingNode::process(AudioSampleBuffer&)
                 std::cout << "Queue is empty!" << std::endl;
 
         }
-//        lock.exit();
+        lock.exit();
         m_positionIsUpdated = false;
     }
 
@@ -156,6 +156,7 @@ void TrackingNode::process(AudioSampleBuffer&)
 
 void TrackingNode::receiveMessage(std::vector<float> message)
 {
+    lock.enter();
     if (CoreServices::getRecordingStatus())
     {
         if (!m_isRecordingTimeLogged)
@@ -190,14 +191,14 @@ void TrackingNode::receiveMessage(std::vector<float> message)
 		//	msgQueue.clear();
 		//	m_cleared_queues++;
 		//	String mess = "Cleared input queue " + String(m_cleared_queues) + " times. Received: " + String(m_received_msg);
-		//	CoreServices::sendStatusMessage(mess);
-		//}
+        //	CoreServices::sendStatusMessage(mess);
+        //}
     }
 	else
 	{
 		m_isRecordingTimeLogged = false;
         //msgQueue.clear();
-		//CoreServices::sendStatusMessage("Clearing Queue in stop recording");
+        //CoreServices::sendStatusMessage("Clearing Queue in stop recording");
 	}
         
 
@@ -248,6 +249,8 @@ void TrackingNode::receiveMessage(std::vector<float> message)
         //msgQueue.clear();
 		//CoreServices::sendStatusMessage("Clearing Queue in stop acq");
 	}
+
+    lock.exit();
 
 }
 
