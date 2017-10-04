@@ -33,8 +33,8 @@ TrackingNode::TrackingNode()
     , m_startingRecTimeMillis(0)
     , m_startingAcqTimeMillis(0)
     , eventId(0)
-	, m_positionIsUpdated(false)
-	, m_port(27020)
+    , m_positionIsUpdated(false)
+    , m_port(27020)
     , m_isRecordingTimeLogged(false)
     , m_isAcquisitionTimeLogged(false)
     , m_msgInfo(false)
@@ -54,12 +54,12 @@ TrackingNode::TrackingNode()
 {
     setProcessorType (PROCESSOR_TYPE_SOURCE);
     sendSampleCount = false;
-	try {
+    try {
         TrackingServer::getInstance(m_port)->addProcessor(this);
-	} catch(std::runtime_error) {
-		DBG("Unable to bind port");
-	}
-//    memset(m_buffer, 0, BUFFER_SIZE);
+    } catch(std::runtime_error) {
+        DBG("Unable to bind port");
+    }
+    //    memset(m_buffer, 0, BUFFER_SIZE);
 }
 
 TrackingNode::~TrackingNode()
@@ -98,13 +98,13 @@ String TrackingNode::address()
 
 void TrackingNode::setPort(int port)
 {
-	try{
-    TrackingServer::getInstance(m_port)->removeProcessor(this);
-    m_port = port;
-    TrackingServer::getInstance(port)->addProcessor(this);
-	} catch(std::runtime_error){
-		DBG("Unable to bind port");
-	}
+    try{
+        TrackingServer::getInstance(m_port)->removeProcessor(this);
+        m_port = port;
+        TrackingServer::getInstance(port)->addProcessor(this);
+    } catch(std::runtime_error){
+        DBG("Unable to bind port");
+    }
 }
 
 int TrackingNode::port()
@@ -116,39 +116,43 @@ void TrackingNode::process(AudioSampleBuffer&)
 {
     int inBufferNow = msgQueue.getInBuffer();
 
-    if(m_positionIsUpdated && inBufferNow > 0) {
-
-        lock.enter();
-        for (int i=0; i < inBufferNow; i++)
-        {
-
-			int64 tsptr = 0;
-            char* msg = msgQueue.dequeueMsg(&tsptr);
-
-            if (msg != nullptr)
-            {
-				// since the event saving messes timestamps up append it to the message
-                uint8_t msg_with_ts[BUFFER_MSG_SIZE];
-                float position[4];
-                setTimestampAndSamples(tsptr, 0);
-
-				memcpy(msg_with_ts, &tsptr, sizeof(tsptr));
-                memcpy(&msg_with_ts[sizeof(tsptr)], msg, msgQueue.getMessageSize());
-
-                //setTimestamp(events, tsptr);
-                const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
-                BinaryEventPtr event = BinaryEvent::createBinaryEvent(chan, tsptr,
-                                                                      msg_with_ts, 24);
-                addEvent(chan, event, 0);
-                countin1sec++;
-            }
-            else
-                std::cout << "Queue is empty!" << std::endl;
-
-        }
-        lock.exit();
-        m_positionIsUpdated = false;
+    if (!m_positionIsUpdated || inBufferNow <= 0)
+    {
+        return;
     }
+
+    lock.enter();
+
+    for (int i = 0; i < inBufferNow; i++)
+    {
+        int64 tsptr = 0;
+        char* msg = msgQueue.dequeueMsg(&tsptr);
+
+        if (msg == nullptr)
+        {
+            std::cout << "Queue is empty!" << std::endl;
+            continue;
+        }
+
+        // since the event saving messes timestamps up append it to the message
+        uint8_t msg_with_ts[BUFFER_MSG_SIZE];
+        float position[4];
+        setTimestampAndSamples(tsptr, 0);
+
+        memcpy(msg_with_ts, &tsptr, sizeof(tsptr));
+        memcpy(&msg_with_ts[sizeof(tsptr)], msg, msgQueue.getMessageSize());
+
+        //setTimestamp(events, tsptr);
+        const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
+        BinaryEventPtr event = BinaryEvent::createBinaryEvent(chan, tsptr,
+                                                              msg_with_ts, 24);
+        addEvent(chan, event, 0);
+        countin1sec++;
+
+
+    }
+    lock.exit();
+    m_positionIsUpdated = false;
 
 }
 
@@ -163,44 +167,44 @@ void TrackingNode::receiveMessage(std::vector<float> message)
             m_startingRecTimeMillis =  Time::currentTimeMillis();
             m_isRecordingTimeLogged = true;
             std::cout << "Starting Rec Ts: " << m_startingRecTimeMillis << std::endl;
-     		CoreServices::sendStatusMessage("Clearing Queue in rectimelog " + String(m_startingRecTimeMillis));
+            CoreServices::sendStatusMessage("Clearing Queue in rectimelog " + String(m_startingRecTimeMillis));
             msgQueue.clear();
         }
 
-		//m_positionIsUpdated = true;
-		//m_message = message;
+        //m_positionIsUpdated = true;
+        //m_message = message;
 
-		//// fill buffer with new messages (assume all messages has the same size)
-		//if (!m_msgInfo)
-		//{
-		//	msgQueue.setMsgInfo(sizeof(float)* m_message.size());
-		//	m_msgInfo = true;
-		//}
+        //// fill buffer with new messages (assume all messages has the same size)
+        //if (!m_msgInfo)
+        //{
+        //    msgQueue.setMsgInfo(sizeof(float)* m_message.size());
+        //    m_msgInfo = true;
+        //}
 
-		//int64 ts;
-		//ts = Time::currentTimeMillis() - m_startingRecTimeMillis;
-		//msgQueue.enqueueMsg((char*)&(m_message[0]), ts);
+        //int64 ts;
+        //ts = Time::currentTimeMillis() - m_startingRecTimeMillis;
+        //msgQueue.enqueueMsg((char*)&(m_message[0]), ts);
 
-		//bool correct = msgQueue.checkQueuesConsistency();
-		//m_received_msg++;
+        //bool correct = msgQueue.checkQueuesConsistency();
+        //m_received_msg++;
 
-		//if (!correct)
-		//{
-		//	msgQueue.clear();
-		//	m_cleared_queues++;
-		//	String mess = "Cleared input queue " + String(m_cleared_queues) + " times. Received: " + String(m_received_msg);
-        //	CoreServices::sendStatusMessage(mess);
+        //if (!correct)
+        //{
+        //    msgQueue.clear();
+        //    m_cleared_queues++;
+        //    String mess = "Cleared input queue " + String(m_cleared_queues) + " times. Received: " + String(m_received_msg);
+        //    CoreServices::sendStatusMessage(mess);
         //}
     }
-	else
-	{
-		m_isRecordingTimeLogged = false;
+    else
+    {
+        m_isRecordingTimeLogged = false;
         //msgQueue.clear();
         //CoreServices::sendStatusMessage("Clearing Queue in stop recording");
-	}
-        
+    }
 
-	if (CoreServices::getAcquisitionStatus()) // && !CoreServices::getRecordingStatus())
+
+    if (CoreServices::getAcquisitionStatus()) // && !CoreServices::getRecordingStatus())
     {
         if (!m_isAcquisitionTimeLogged)
         {
@@ -208,7 +212,7 @@ void TrackingNode::receiveMessage(std::vector<float> message)
             m_isAcquisitionTimeLogged = true;
             std::cout << "Starting Acq Ts: " << m_startingAcqTimeMillis << std::endl;
             msgQueue.clear();
-			CoreServices::sendStatusMessage("Clearing Queue in acqtimelog " + String(m_startingAcqTimeMillis));
+            CoreServices::sendStatusMessage("Clearing Queue in acqtimelog " + String(m_startingAcqTimeMillis));
         }
 
         m_positionIsUpdated = true;
@@ -237,12 +241,12 @@ void TrackingNode::receiveMessage(std::vector<float> message)
         }
 
     }
-	else
-	{
-		m_isAcquisitionTimeLogged = false;
+    else
+    {
+        m_isAcquisitionTimeLogged = false;
         //msgQueue.clear();
-		//CoreServices::sendStatusMessage("Clearing Queue in stop acq");
-	}
+        //CoreServices::sendStatusMessage("Clearing Queue in stop acq");
+    }
 
     lock.exit();
 
