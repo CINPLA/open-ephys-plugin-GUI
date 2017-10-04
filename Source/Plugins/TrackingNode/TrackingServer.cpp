@@ -16,35 +16,29 @@ using std::cout;
 using std::endl;
 
 // TODO: make specific for tracking data
-void TrackingServer::ProcessMessage (const osc::ReceivedMessage& m,
-                                     const IpEndpointName& remoteEndpoint)
+void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage,
+                                     const IpEndpointName&)
 {
-    (void) remoteEndpoint; // suppress unused parameter warning
-
-    //    DBG("Received message!");
-    //    DBG(m.AddressPattern());
     try
     {
-        // example of parsing single messages. osc::OsckPacketListener
-        // handles the bundle traversal.
-        for (TrackingNode* processor : processors)
+        for (TrackingNode* processor : m_processors)
         {
             String address = processor->address();
 
-            if ( std::strcmp ( m.AddressPattern(), address.toStdString().c_str() ) == 0 )
+            if ( std::strcmp ( receivedMessage.AddressPattern(), address.toStdString().c_str() ) == 0 )
             {
-                osc::ReceivedMessageArgumentStream args = m.ArgumentStream();
+                osc::ReceivedMessageArgumentStream args = receivedMessage.ArgumentStream();
                 std::vector<float> message;
 
-                for (int i = 0; i < m.ArgumentCount(); i++)
+                for (int i = 0; i < receivedMessage.ArgumentCount(); i++)
                 {
-                    if (m.TypeTags()[i] == 'f')
+                    if (receivedMessage.TypeTags()[i] == 'f')
                     {
                         float argument;
                         args >> argument;
                         message.push_back (argument);
                     }
-                    else if (m.TypeTags()[i] == 'i')
+                    else if (receivedMessage.TypeTags()[i] == 'i')
                     {
                         osc::int32 argument;
                         args >> argument;
@@ -52,7 +46,7 @@ void TrackingServer::ProcessMessage (const osc::ReceivedMessage& m,
                     }
                     else
                     {
-                        cout << "TrackingServer: We only support floats or ints right now, not" << m.TypeTags()[i] << endl;
+                        cout << "TrackingServer: We only support floats or ints right now, not" << receivedMessage.TypeTags()[i] << endl;
                         return;
                     }
                 }
@@ -61,17 +55,17 @@ void TrackingServer::ProcessMessage (const osc::ReceivedMessage& m,
 
 
                 processor->receiveMessage (message);
-                countin1sec++;
+                m_messagesPerSecond++;
 
                 m_currentTime = Time::currentTimeMillis();
-                m_timePassed = float (m_currentTime - m_prevTime) / 1000.0; // in seconds
+                m_timePassed = double (m_currentTime - m_prevTime) / 1000.0; // in seconds
 
                 if (m_timePassed > 1.0)
                 {
                     m_timePassed = 0.0;
                     m_prevTime = Time::currentTimeMillis();
-                    std::cout << "OSC msg in 1sec: " << countin1sec << std::endl;
-                    countin1sec = 0;
+                    std::cout << "OSC msg in 1sec: " << m_messagesPerSecond << std::endl;
+                    m_messagesPerSecond = 0;
                 }
 
             }
@@ -81,7 +75,7 @@ void TrackingServer::ProcessMessage (const osc::ReceivedMessage& m,
     {
         // any parsing errors such as unexpected argument types, or
         // missing arguments get thrown as exceptions.
-        DBG ("error while parsing message: " << m.AddressPattern() << ": " << e.what() << "\n");
+        DBG ("error while parsing message: " << receivedMessage.AddressPattern() << ": " << e.what() << "\n");
     }
 }
 
@@ -99,21 +93,21 @@ float TrackingServer::getFloatOSC()
 
 void TrackingServer::addProcessor (TrackingNode* processor)
 {
-    processors.push_back (processor);
+    m_processors.push_back (processor);
 }
 
 void TrackingServer::removeProcessor (TrackingNode* processor)
 {
-    processors.erase (std::remove (processors.begin(), processors.end(), processor), processors.end());
+    m_processors.erase (std::remove (m_processors.begin(), m_processors.end(), processor), m_processors.end());
 }
 
 TrackingServer::TrackingServer (int port)
     : Thread ("OscListener Thread")
-    , incomingPort (port)
-    , s (IpEndpointName ("localhost",
-                         incomingPort), this)
+    , m_incomingPort (port)
+    , m_listeningSocket (IpEndpointName ("localhost",
+                         m_incomingPort), this)
       //debug
-    , countin1sec (0)
+    , m_messagesPerSecond (0)
     , m_prevTime (0)
     , m_currentTime (0)
     , m_timePassed (0.0)
@@ -122,8 +116,64 @@ TrackingServer::TrackingServer (int port)
 TrackingServer::~TrackingServer()
 {
     // stop the OSC Listener thread running
-    s.AsynchronousBreak();
+    m_listeningSocket.AsynchronousBreak();
 
     // allow the thread 2 seconds to stop cleanly - should be plenty of time.
     stopThread (2000);
+}
+
+std::shared_ptr<TrackingServer> TrackingServer::getInstance(int port, bool justDelete)
+{
+    // TODO Handle case where port cannot be assigned
+    static std::unordered_map<int, std::shared_ptr<TrackingServer>> instances;
+
+    std::vector<int> toDelete;
+
+    for (auto r : instances)
+    {
+        if (r.first != port && r.second->m_processors.size() < 1)
+        {
+            toDelete.push_back (r.first);
+        }
+    }
+
+    for (auto port : toDelete)
+    {
+        instances.erase (port);
+    }
+
+    if (justDelete)
+    {
+        // the function was invoked only to delete stale instances
+        return nullptr;
+    }
+
+    if (instances.count (port) < 1)
+    {
+        try
+        {
+            instances[port] = std::make_shared<TrackingServer> (port);
+        }
+        catch (std::runtime_error& e)
+        {
+            DBG ("Error unable to bind port:");
+            DBG (port);
+        }
+    }
+
+    if (!instances[port]->isThreadRunning())
+    {
+        instances[port]->startThread();
+    }
+
+    return instances[port];
+}
+
+void TrackingServer::run()
+{
+    // Start the oscpack OSC Listener Thread
+    // NOTE: s.Run() won't return unless we force it to with
+    // s.AsynchronousBreak() as is done in the destructor
+    DBG ("TrackingServer: Running thread");
+    m_listeningSocket.Run();
 }

@@ -31,7 +31,6 @@
 #include <queue>
 #define BUFFER_SIZE 4096
 
-
 /**
     This helper class allows stores input tracking data in a circular queue.
 */
