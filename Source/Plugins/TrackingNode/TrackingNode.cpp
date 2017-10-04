@@ -137,17 +137,14 @@ void TrackingNode::process (AudioSampleBuffer&)
             break;
         }
 
-        // since the event saving messes timestamps up append it to the message
-        uint8_t msg_with_ts[BUFFER_MSG_SIZE];
         setTimestampAndSamples (uint64(message->timestamp), 0);
-
-        memcpy (msg_with_ts, &message->timestamp, sizeof (message->timestamp));
-        memcpy (&msg_with_ts[sizeof (message->timestamp)], &message->x, sizeof(TrackingData) - sizeof (message->timestamp));
 
         //setTimestamp(events, tsptr);
         const EventChannel* chan = getEventChannel (getEventChannelIndex (0, getNodeId()));
-        BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan, message->timestamp,
-                                                               msg_with_ts, 24);
+        BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan,
+                                                               message->timestamp,
+                                                               reinterpret_cast<uint8_t *>(message),
+                                                               sizeof(TrackingData));
         addEvent (chan, event, 0);
         countin1sec++;
     }

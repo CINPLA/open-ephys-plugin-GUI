@@ -430,6 +430,7 @@ void TrackingStimulator::process(AudioSampleBuffer&)
     }
 }
 
+// TODO make use of TrackingData
 void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
 {
     std::cout << "In tracker stim: handle event" << std::endl;

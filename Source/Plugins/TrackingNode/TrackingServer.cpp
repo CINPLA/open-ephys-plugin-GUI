@@ -64,7 +64,6 @@ void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage
             }
 
             processor->receiveMessage (trackingData);
-            cout << "Sending " << trackingData.x << " " << trackingData.y << endl;
         }
     }
     catch ( osc::Exception& e )

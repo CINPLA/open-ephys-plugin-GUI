@@ -10,6 +10,7 @@
 
 #include "TrackingVisualizer.h"
 #include "TrackingVisualizerEditor.h"
+#include "../TrackingNode/TrackingData.h"
 
 using std::cout;
 using std::endl;
@@ -51,100 +52,60 @@ void TrackingVisualizer::process(AudioSampleBuffer &)
 
 void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
 {
-    if ((eventInfo->getName()).compare("Tracking data") == 0)
+    if ((eventInfo->getName()).compare("Tracking data") != 0)
     {
-        BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
-        const uint8* rawData = (uint8*) evtptr->getBinaryDataPointer();
-        if(event.getRawDataSize() != sizeof(float)*4 + sizeof(int64)) {
-            cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-        }
-
-        uint8 nodeId = evtptr->getSourceID();
-        const int64 timestamp = *(rawData);
-        const float* message = (float*)(rawData+sizeof(int64));
-
-        std::vector<uint8>::iterator pos = find(m_ids.begin(), m_ids.end(), nodeId);
-
-        if (pos == m_ids.end())
-        {
-
-            if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
-            {
-                m_sources++;
-                m_ids.push_back(nodeId);
-                m_x.push_back(message[0]);
-                m_y.push_back(message[1]);
-            }
-            if(!(message[2] != message[2] || message[3] != message[3]))
-            {
-                m_width.push_back(message[2]);
-                m_height.push_back(message[3]);
-            }
-        }
-        else
-        {
-            auto idx = std::distance(m_ids.begin(),  pos) ;
-            if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
-            {
-                m_x[idx] = message[0];
-                m_y[idx] = message[1];
-            }
-            if(!(message[2] != message[2] || message[3] != message[3]))
-            {
-                m_width[idx] = message[2];
-                m_height[idx] = message[3];
-            }
-        }
-
-        m_positionIsUpdated = true;
+        return;
     }
 
+    BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
+
+    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
+        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
+        return;
+    }
+
+//    const auto* rawData = (uint8*) evtptr->getBinaryDataPointer();
+    auto nodeId = evtptr->getSourceID();
+//    const int64 timestamp = *(rawData);
+//    const float* message = (float*)(rawData+sizeof(int64));
+    const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
+
+    std::vector<uint8>::iterator pos = find(m_ids.begin(), m_ids.end(), nodeId);
+
+    if (pos == m_ids.end())
+    {
+
+        if(!(message->x != message->x || message->y != message->y) && message->x != 0 && message->y != 0)
+        {
+            m_sources++;
+            m_ids.push_back(nodeId);
+            m_x.push_back(message->x);
+            m_y.push_back(message->y);
+        }
+        if(!(message->width != message->width || message->height != message->height))
+        {
+            m_width.push_back(message->width);
+            m_height.push_back(message->height);
+        }
+    }
+    else
+    {
+        auto idx = std::distance(m_ids.begin(),  pos) ;
+        if(!(message->x != message->x || message->y != message->y) && message->x != 0 && message->y != 0)
+        {
+            m_x[idx] = message->x;
+            m_y[idx] = message->y;
+        }
+        if(!(message->width != message->width || message->height != message->height))
+        {
+            m_width[idx] = message->width;
+            m_height[idx] = message->height;
+        }
+    }
+
+    m_positionIsUpdated = true;
+
 }
-
-//    if(eventType == BINARY_MSG) {
-//        const uint8* rawData = event.getRawData();
-//        if(event.getRawDataSize() != 6 + sizeof(float)*4 + sizeof(int64)) {
-//            cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-//        }
-//        const uint8* nodeId = rawData + 1;
-//        const int64 timestamp = *(rawData + 6);
-//        const float* message = (float*)(rawData+6+sizeof(int64));
-
-//        std::vector<uint8>::iterator pos = find(m_ids.begin(), m_ids.end(), *nodeId);
-
-//        if (pos == m_ids.end())
-//        {
-
-//            if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
-//            {
-//                m_sources++;
-//                m_ids.push_back(*nodeId);
-//                m_x.push_back(message[0]);
-//                m_y.push_back(message[1]);
-//            }
-//            if(!(message[2] != message[2] || message[3] != message[3]))
-//            {
-//                m_width.push_back(message[2]);
-//                m_height.push_back(message[3]);
-//            }
-//        }
-//        else
-//        {
-//            auto idx = std::distance(m_ids.begin(),  pos) ;
-//            if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
-//            {
-//                m_x[idx] = message[0];
-//                m_y[idx] = message[1];
-//            }
-//            if(!(message[2] != message[2] || message[3] != message[3]))
-//            {
-//                m_width[idx] = message[2];
-//                m_height[idx] = message[3];
-//            }
-//        }
-
-//        m_positionIsUpdated = true;
-//    }
 
 
 float TrackingVisualizer::getX(int s) const
