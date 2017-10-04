@@ -23,10 +23,12 @@
 
 #include "TrackingNode.h"
 #include "TrackingNodeEditor.h"
+#include "TrackingData.h"
 
 //preallocate memory for msg
 #define BUFFER_MSG_SIZE 256
 
+using namespace std;
 
 TrackingNode::TrackingNode()
     : GenericProcessor ("Tracking Port")
@@ -122,42 +124,32 @@ int TrackingNode::port()
 
 void TrackingNode::process (AudioSampleBuffer&)
 {
-    int inBufferNow = msgQueue.getInBuffer();
-
-    if (!m_positionIsUpdated || inBufferNow <= 0)
+    if (!m_positionIsUpdated)
     {
         return;
     }
 
     lock.enter();
 
-    for (int i = 0; i < inBufferNow; i++)
-    {
-        int64 tsptr = 0;
-        char* msg = msgQueue.dequeueMsg (&tsptr);
-
-        if (msg == nullptr)
-        {
-            std::cout << "Queue is empty!" << std::endl;
-            continue;
+    while (true) {
+        auto *message = messageQueue.pop ();
+        if (!message) {
+            break;
         }
 
         // since the event saving messes timestamps up append it to the message
         uint8_t msg_with_ts[BUFFER_MSG_SIZE];
-        float position[4];
-        setTimestampAndSamples (tsptr, 0);
+        setTimestampAndSamples (uint64(message->timestamp), 0);
 
-        memcpy (msg_with_ts, &tsptr, sizeof (tsptr));
-        memcpy (&msg_with_ts[sizeof (tsptr)], msg, msgQueue.getMessageSize());
+        memcpy (msg_with_ts, &message->timestamp, sizeof (message->timestamp));
+        memcpy (&msg_with_ts[sizeof (message->timestamp)], &message->x, sizeof(TrackingData) - sizeof (message->timestamp));
 
         //setTimestamp(events, tsptr);
         const EventChannel* chan = getEventChannel (getEventChannelIndex (0, getNodeId()));
-        BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan, tsptr,
+        BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan, message->timestamp,
                                                                msg_with_ts, 24);
         addEvent (chan, event, 0);
         countin1sec++;
-
-
     }
 
     lock.exit();
@@ -165,7 +157,7 @@ void TrackingNode::process (AudioSampleBuffer&)
 
 }
 
-void TrackingNode::receiveMessage (std::vector<float> message)
+void TrackingNode::receiveMessage (const TrackingData &message)
 {
     lock.enter();
 
@@ -178,39 +170,12 @@ void TrackingNode::receiveMessage (std::vector<float> message)
             m_isRecordingTimeLogged = true;
             std::cout << "Starting Rec Ts: " << m_startingRecTimeMillis << std::endl;
             CoreServices::sendStatusMessage ("Clearing Queue in rectimelog " + String (m_startingRecTimeMillis));
-            msgQueue.clear();
+            messageQueue.clear();
         }
-
-        //m_positionIsUpdated = true;
-        //m_message = message;
-
-        //// fill buffer with new messages (assume all messages has the same size)
-        //if (!m_msgInfo)
-        //{
-        //    msgQueue.setMsgInfo(sizeof(float)* m_message.size());
-        //    m_msgInfo = true;
-        //}
-
-        //int64 ts;
-        //ts = Time::currentTimeMillis() - m_startingRecTimeMillis;
-        //msgQueue.enqueueMsg((char*)&(m_message[0]), ts);
-
-        //bool correct = msgQueue.checkQueuesConsistency();
-        //m_received_msg++;
-
-        //if (!correct)
-        //{
-        //    msgQueue.clear();
-        //    m_cleared_queues++;
-        //    String mess = "Cleared input queue " + String(m_cleared_queues) + " times. Received: " + String(m_received_msg);
-        //    CoreServices::sendStatusMessage(mess);
-        //}
     }
     else
     {
         m_isRecordingTimeLogged = false;
-        //msgQueue.clear();
-        //CoreServices::sendStatusMessage("Clearing Queue in stop recording");
     }
 
 
@@ -221,35 +186,19 @@ void TrackingNode::receiveMessage (std::vector<float> message)
             m_startingAcqTimeMillis = Time::currentTimeMillis();
             m_isAcquisitionTimeLogged = true;
             std::cout << "Starting Acq Ts: " << m_startingAcqTimeMillis << std::endl;
-            msgQueue.clear();
+            messageQueue.clear();
             CoreServices::sendStatusMessage ("Clearing Queue in acqtimelog " + String (m_startingAcqTimeMillis));
         }
 
         m_positionIsUpdated = true;
-        m_message = message;
-
-        // fill buffer with new messages (assume all messages has the same size)
-        if (!m_msgInfo)
-        {
-            msgQueue.setMsgInfo (sizeof (float) * m_message.size());
-            m_msgInfo = true;
-        }
 
         int64 ts = CoreServices::getGlobalTimestamp();
 
-        msgQueue.enqueueMsg ((char*) & (m_message[0]), ts);
+        TrackingData outputMessage = message;
+        outputMessage.timestamp = ts;
+        messageQueue.push (outputMessage);
 
-        bool correct = msgQueue.checkQueuesConsistency();
         m_received_msg++;
-
-        if (!correct)
-        {
-            msgQueue.clear();
-            m_cleared_queues++;
-            String mess = "Cleared input queue " + String (m_cleared_queues) + " times. Received: " + String (m_received_msg);
-            CoreServices::sendStatusMessage (mess);
-        }
-
     }
     else
     {
@@ -269,115 +218,37 @@ bool TrackingNode::isReady()
 
 // Class TrackingQueue methods
 TrackingQueue::TrackingQueue()
-    : m_msgHead (-1)
-    , m_msgTail (-1)
-    , m_byteCount (0)
-    , m_bufferLength (0)
-    , m_msgInBuffer (0)
+    : m_head (-1)
+    , m_tail (-1)
 {
     memset (m_buffer, 0, BUFFER_SIZE);
 }
 
 TrackingQueue::~TrackingQueue() {}
 
-void TrackingQueue::enqueueMsg (char* message, int64 ts)
+void TrackingQueue::push (const TrackingData &message)
 {
-    m_msgHead = (m_msgHead + 1) % m_bufferLength;
-    memcpy (&m_buffer[m_msgHead * m_byteCount], message, m_byteCount);
-    enqueueTimestamp (ts);
+    m_head = (m_head + 1) % BUFFER_SIZE;
+    m_buffer[m_head] = message;
 }
 
-char* TrackingQueue::dequeueMsg (int64* ts)
+TrackingData* TrackingQueue::pop ()
 {
-    if (!isEmpty())
-    {
-        m_msgTail = (m_msgTail + 1) % m_bufferLength;
-        int64 ts_ret = dequeueTimeStamp();
-        (*ts) = ts_ret;
-        checkQueuesConsistency();
-        return & (m_buffer[m_msgTail * m_byteCount]);
-    }
-    else
+    if (isEmpty())
         return nullptr;
 
-}
+    m_tail = (m_tail + 1) % BUFFER_SIZE;
+    return &(m_buffer[m_tail]);
 
-void TrackingQueue::enqueueTimestamp (int64 ts)
-{
-    m_timestamps.push (ts);
-}
-
-int64 TrackingQueue::dequeueTimeStamp()
-{
-    int64 ts = m_timestamps.front();
-    m_timestamps.pop();
-    return ts;
 }
 
 bool TrackingQueue::isEmpty()
 {
-    return m_msgHead == m_msgTail;
+    return m_head == m_tail;
 }
 
 void TrackingQueue::clear()
 {
-    m_msgHead = -1;
-    m_msgTail = -1;
-    memset (m_buffer, 0, BUFFER_SIZE);
-    // empty queue
-    std::queue<int64> empty;
-    std::swap (m_timestamps, empty);
-
+    m_tail = -1;
+    m_head = -1;
 }
-
-int TrackingQueue::getHead()
-{
-    return m_msgHead;
-}
-
-int TrackingQueue::getTail()
-{
-    return m_msgTail;
-}
-
-int TrackingQueue::getInBuffer()
-{
-    int inBufferNow = -1;
-
-    if (!isEmpty())
-        inBufferNow = (m_msgHead >= m_msgTail) ? m_msgHead - m_msgTail : m_bufferLength - m_msgTail + m_msgHead;
-    else
-        inBufferNow = 0;
-
-    return inBufferNow;
-}
-
-bool TrackingQueue::checkQueuesConsistency()
-{
-    if (getInBuffer() != m_timestamps.size())
-    {
-        std::cout << "Queuing error! buffer len: " << getInBuffer() << " tsqueue len: " << m_timestamps.size() << std::endl;
-        return false;
-    }
-    else
-        return true;
-
-}
-
-int TrackingQueue::getBufferSize()
-{
-    return m_bufferLength;
-}
-
-int TrackingQueue::getMessageSize()
-{
-    return m_byteCount;
-}
-
-void TrackingQueue::setMsgInfo (int msgSize)
-{
-    m_byteCount = msgSize;
-    m_bufferLength = int (std::floor ((float (BUFFER_SIZE) / float (m_byteCount))));
-
-}
-

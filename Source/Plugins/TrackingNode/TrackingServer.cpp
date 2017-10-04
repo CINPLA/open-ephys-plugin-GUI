@@ -11,64 +11,60 @@
 #include "TrackingServer.h"
 #include "TrackingNodeEditor.h"
 #include "TrackingNode.h"
+#include "TrackingData.h"
 
 using std::cout;
 using std::endl;
 
-// TODO: make specific for tracking data
 void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage,
                                      const IpEndpointName&)
 {
     try
     {
+        uint32 argumentCount = 4;
+
+        if ( receivedMessage.ArgumentCount() != argumentCount) {
+            cout << "ERROR: TrackingServer received message with wrong number of arguments. "
+                 << "Expected " << argumentCount << ", got " << receivedMessage.ArgumentCount() << endl;
+            return;
+        }
+
+        for (uint32 i = 0; i < receivedMessage.ArgumentCount(); i++)
+        {
+            if (receivedMessage.TypeTags()[i] != 'f')
+            {
+                cout << "TrackingServer only support 'f' (floats), not '"
+                     << receivedMessage.TypeTags()[i] << "'" << endl;
+                return;
+            }
+        }
+
+        osc::ReceivedMessageArgumentStream args = receivedMessage.ArgumentStream();
+
+        TrackingData trackingData;
+
+        // Arguments:
+        // 0 - x
+        // 1 - y
+        // 2 - box width
+        // 3 - box height
+        args >> trackingData.x;
+        args >> trackingData.y;
+        args >> trackingData.width;
+        args >> trackingData.height;
+        args >> osc::EndMessage;
+
         for (TrackingNode* processor : m_processors)
         {
             String address = processor->address();
 
-            if ( std::strcmp ( receivedMessage.AddressPattern(), address.toStdString().c_str() ) == 0 )
+            if ( std::strcmp ( receivedMessage.AddressPattern(), address.toStdString().c_str() ) != 0 )
             {
-                osc::ReceivedMessageArgumentStream args = receivedMessage.ArgumentStream();
-                std::vector<float> message;
-
-                for (int i = 0; i < receivedMessage.ArgumentCount(); i++)
-                {
-                    if (receivedMessage.TypeTags()[i] == 'f')
-                    {
-                        float argument;
-                        args >> argument;
-                        message.push_back (argument);
-                    }
-                    else if (receivedMessage.TypeTags()[i] == 'i')
-                    {
-                        osc::int32 argument;
-                        args >> argument;
-                        message.push_back (float (argument));
-                    }
-                    else
-                    {
-                        cout << "TrackingServer: We only support floats or ints right now, not" << receivedMessage.TypeTags()[i] << endl;
-                        return;
-                    }
-                }
-
-                args >> osc::EndMessage;
-
-
-                processor->receiveMessage (message);
-                m_messagesPerSecond++;
-
-                m_currentTime = Time::currentTimeMillis();
-                m_timePassed = double (m_currentTime - m_prevTime) / 1000.0; // in seconds
-
-                if (m_timePassed > 1.0)
-                {
-                    m_timePassed = 0.0;
-                    m_prevTime = Time::currentTimeMillis();
-                    std::cout << "OSC msg in 1sec: " << m_messagesPerSecond << std::endl;
-                    m_messagesPerSecond = 0;
-                }
-
+                continue;
             }
+
+            processor->receiveMessage (trackingData);
+            cout << "Sending " << trackingData.x << " " << trackingData.y << endl;
         }
     }
     catch ( osc::Exception& e )
@@ -104,13 +100,7 @@ void TrackingServer::removeProcessor (TrackingNode* processor)
 TrackingServer::TrackingServer (int port)
     : Thread ("OscListener Thread")
     , m_incomingPort (port)
-    , m_listeningSocket (IpEndpointName ("localhost",
-                         m_incomingPort), this)
-      //debug
-    , m_messagesPerSecond (0)
-    , m_prevTime (0)
-    , m_currentTime (0)
-    , m_timePassed (0.0)
+    , m_listeningSocket (IpEndpointName ("localhost", m_incomingPort), this)
 {}
 
 TrackingServer::~TrackingServer()

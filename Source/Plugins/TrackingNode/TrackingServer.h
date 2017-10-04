@@ -48,12 +48,6 @@ private:
     UdpListeningReceiveSocket m_listeningSocket;
     std::vector<TrackingNode*> m_processors;
     String m_address;
-
-    //debug
-    int m_messagesPerSecond;
-    int64 m_prevTime;
-    int64 m_currentTime;
-    double m_timePassed; // in seconds
 };
 
 

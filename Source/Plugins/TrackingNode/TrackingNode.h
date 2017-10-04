@@ -26,6 +26,7 @@
 
 #include <ProcessorHeaders.h>
 #include "TrackingServer.h"
+#include "TrackingData.h"
 
 #include <stdio.h>
 #include <queue>
@@ -41,35 +42,16 @@ public:
     TrackingQueue();
     ~TrackingQueue();
 
-    void enqueueMsg (char* message, int64 ts);
-    char* dequeueMsg (int64* ts);
+    void push (const TrackingData &message);
+    TrackingData *pop();
 
     bool isEmpty();
     void clear();
 
-    int getHead();
-    int getTail();
-    int getInBuffer();
-    int getBufferSize();
-    int getMessageSize();
-
-    void setMsgInfo (int msgSize);
-
-    bool checkQueuesConsistency();
-
 private:
-
-    char m_buffer[BUFFER_SIZE];
-    std::queue<int64> m_timestamps;
-    int m_msgHead;
-    int m_msgTail;
-    int m_bufferLength;
-    int m_msgInBuffer;
-    // this implementation assumes that the message size is constant
-    int m_byteCount;
-
-    void enqueueTimestamp (int64 ts);
-    int64 dequeueTimeStamp();
+    TrackingData m_buffer[BUFFER_SIZE];
+    int m_head;
+    int m_tail;
 };
 
 /**
@@ -88,7 +70,7 @@ public:
 
     AudioProcessorEditor* createEditor();
 
-    void receiveMessage (std::vector<float> message);
+    void receiveMessage (const TrackingData &message);
 
     /** Defines the functionality of the processor.
 
@@ -157,7 +139,7 @@ private:
     String m_address;
     int m_port;
 
-    TrackingQueue msgQueue;
+    TrackingQueue messageQueue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingNode);
 
