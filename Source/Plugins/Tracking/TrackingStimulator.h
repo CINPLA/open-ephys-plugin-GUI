@@ -3,6 +3,7 @@
 
 #include <ProcessorHeaders.h>
 #include "TrackingStimulatorEditor.h"
+#include "TrackingMessage.h"
 #include "serial/PulsePal.h"
 
 #include <vector>

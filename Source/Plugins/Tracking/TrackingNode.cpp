@@ -23,7 +23,7 @@
 
 #include "TrackingNode.h"
 #include "TrackingNodeEditor.h"
-#include "TrackingData.h"
+#include "TrackingMessage.h"
 
 //preallocate memory for msg
 #define BUFFER_MSG_SIZE 256

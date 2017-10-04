@@ -3,12 +3,16 @@
 
 #include <ProcessorHeaders.h>
 
-struct TrackingData {
-    int64 timestamp;
+struct TrackingPosition {
     float x;
     float y;
     float width;
     float height;
+};
+
+struct TrackingData {
+    uint64 timestamp;
+    TrackingPosition position;
 };
 
 #endif // TRACKINGDATA_H

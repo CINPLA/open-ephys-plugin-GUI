@@ -11,7 +11,7 @@
 #include "TrackingServer.h"
 #include "TrackingNodeEditor.h"
 #include "TrackingNode.h"
-#include "TrackingData.h"
+#include "TrackingMessage.h"
 
 using std::cout;
 using std::endl;
@@ -48,10 +48,10 @@ void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage
         // 1 - y
         // 2 - box width
         // 3 - box height
-        args >> trackingData.x;
-        args >> trackingData.y;
-        args >> trackingData.width;
-        args >> trackingData.height;
+        args >> trackingData.position.x;
+        args >> trackingData.position.y;
+        args >> trackingData.position.width;
+        args >> trackingData.position.height;
         args >> osc::EndMessage;
 
         for (TrackingNode* processor : m_processors)

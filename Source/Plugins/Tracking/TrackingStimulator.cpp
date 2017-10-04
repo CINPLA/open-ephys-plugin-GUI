@@ -433,30 +433,39 @@ void TrackingStimulator::process(AudioSampleBuffer&)
 // TODO make use of TrackingData
 void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
 {
-    std::cout << "In tracker stim: handle event" << std::endl;
-    if ((eventInfo->getName()).compare("Tracking data") == 0)
+    if ((eventInfo->getName()).compare("Tracking data") != 0)
     {
-        BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
-        const uint8* rawData = (uint8*) evtptr->getBinaryDataPointer();
-        if(event.getRawDataSize() != sizeof(float)*4 + sizeof(int64)) {
-            cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-        }
-
-        const float* message = (float*)(rawData+sizeof(int64));
-
-        if(!(message[0] != message[0] || message[1] != message[1]) && message[0] != 0 && message[1] != 0)
-        {
-            m_x = message[0];
-            m_y = message[1];
-        }
-        if(!(message[2] != message[2] || message[3] != message[3]))
-        {
-            m_width = message[2];
-            m_height = message[3];
-            m_aspect_ratio = m_width / m_height;
-        }
-        m_positionIsUpdated = true;
+        return;
     }
+
+    BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
+
+    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
+        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
+        return;
+    }
+
+//    const auto* rawData = (uint8*) evtptr->getBinaryDataPointer();
+    auto nodeId = evtptr->getSourceID();
+//    const int64 timestamp = *(rawData);
+//    const float* message = (float*)(rawData+sizeof(int64));
+    const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
+
+    TrackingPosition position = message->position;
+
+    if(!(position.x != position.x || position.y != position.y) && position.x != 0 && position.y != 0)
+    {
+        m_x = position.x;
+        m_y = position.y;
+    }
+    if(!(position.width != position.width || position.height != position.height))
+    {
+        m_width = position.width;
+        m_height = position.height;
+        m_aspect_ratio = m_width / m_height;
+    }
+    m_positionIsUpdated = true;
+
     // Sync
     if (eventInfo->getChannelType() == EventChannel::TTL) // && eventInfo == eventChannelArray[triggerEvent])
     {

@@ -10,7 +10,6 @@
 
 #include "TrackingVisualizer.h"
 #include "TrackingVisualizerEditor.h"
-#include "../TrackingNode/TrackingData.h"
 
 using std::cout;
 using std::endl;
@@ -75,31 +74,31 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
     if (pos == m_ids.end())
     {
 
-        if(!(message->x != message->x || message->y != message->y) && message->x != 0 && message->y != 0)
+        if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
         {
             m_sources++;
             m_ids.push_back(nodeId);
-            m_x.push_back(message->x);
-            m_y.push_back(message->y);
+            m_x.push_back(message->position.x);
+            m_y.push_back(message->position.y);
         }
-        if(!(message->width != message->width || message->height != message->height))
+        if(!(message->position.width != message->position.width || message->position.height != message->position.height))
         {
-            m_width.push_back(message->width);
-            m_height.push_back(message->height);
+            m_width.push_back(message->position.width);
+            m_height.push_back(message->position.height);
         }
     }
     else
     {
         auto idx = std::distance(m_ids.begin(),  pos) ;
-        if(!(message->x != message->x || message->y != message->y) && message->x != 0 && message->y != 0)
+        if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
         {
-            m_x[idx] = message->x;
-            m_y[idx] = message->y;
+            m_x[idx] = message->position.x;
+            m_y[idx] = message->position.y;
         }
-        if(!(message->width != message->width || message->height != message->height))
+        if(!(message->position.width != message->position.width || message->position.height != message->position.height))
         {
-            m_width[idx] = message->width;
-            m_height[idx] = message->height;
+            m_width[idx] = message->position.width;
+            m_height[idx] = message->position.height;
         }
     }
 

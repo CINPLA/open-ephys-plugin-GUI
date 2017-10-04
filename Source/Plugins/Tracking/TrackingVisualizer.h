@@ -13,6 +13,7 @@
 
 #include <ProcessorHeaders.h>
 #include "TrackingVisualizerEditor.h"
+#include "TrackingMessage.h"
 
 #include <vector>
 

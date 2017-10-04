@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <PluginInfo.h>
 #include "TrackingNode.h"
+#include "TrackingVisualizer.h"
+#include "TrackingStimulator.h"
 #include <string>
 #ifdef WIN32
 #include <Windows.h>
@@ -32,12 +34,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 using namespace Plugin;
-#define NUM_PLUGINS 1
+#define NUM_PLUGINS 3
 
 extern "C" EXPORT void getLibInfo (Plugin::LibraryInfo* info)
 {
     info->apiVersion = PLUGIN_API_VER;
-    info->name = "Tracking Port";
+    info->name = "Tracking";
     info->libVersion = 1;
     info->numPlugins = NUM_PLUGINS;
 }
@@ -52,7 +54,18 @@ extern "C" EXPORT int getPluginInfo (int index, Plugin::PluginInfo* info)
             info->processor.type = Plugin::SourceProcessor;
             info->processor.creator = & (Plugin::createProcessor<TrackingNode>);
             break;
-
+        case 1:
+            info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
+            info->processor.name = "Tracking Visual";
+            info->processor.type = Plugin::SinkProcessor;
+            info->processor.creator = & (Plugin::createProcessor<TrackingVisualizer>);
+            break;
+        case 2:
+            info->type = Plugin::PLUGIN_TYPE_PROCESSOR;
+            info->processor.name = "Tracking Stim";
+            info->processor.type = Plugin::SinkProcessor;
+            info->processor.creator = & (Plugin::createProcessor<TrackingStimulator>);
+            break;
         default:
             return -1;
             break;
