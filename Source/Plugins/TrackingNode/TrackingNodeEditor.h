@@ -27,10 +27,10 @@
 
 #include <EditorHeaders.h>
 
-class TrackingNodeEditor : public GenericEditor,public Label::Listener
+class TrackingNodeEditor : public GenericEditor, public Label::Listener
 {
 public:
-    TrackingNodeEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
+    TrackingNodeEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors);
     virtual ~TrackingNodeEditor();
 
 private:
@@ -39,17 +39,17 @@ private:
     ScopedPointer<Label> urlLabel;
     ScopedPointer<Label> labelAdr;
     ScopedPointer<Label> adrLabel;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingNodeEditor);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingNodeEditor);
 
 
     // Listener interface
 public:
-    virtual void labelTextChanged(Label *labelThatHasChanged) override;
+    virtual void labelTextChanged (Label* labelThatHasChanged) override;
 
     // GenericEditor interface
 public:
-    void saveCustomParameters(XmlElement *parentElement) override;
-    void loadCustomParameters(XmlElement *parametersAsXml) override;
+    void saveCustomParameters (XmlElement* parentElement) override;
+    void loadCustomParameters (XmlElement* parametersAsXml) override;
 };
 
 

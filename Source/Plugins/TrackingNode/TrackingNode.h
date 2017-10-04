@@ -37,40 +37,40 @@
 */
 class TrackingQueue
 {
-    public:
+public:
 
-        TrackingQueue();
-        ~TrackingQueue();
+    TrackingQueue();
+    ~TrackingQueue();
 
-        void enqueueMsg(char* message, int64 ts);
-        char* dequeueMsg(int64* ts);
+    void enqueueMsg (char* message, int64 ts);
+    char* dequeueMsg (int64* ts);
 
-        bool isEmpty();
-        void clear();
+    bool isEmpty();
+    void clear();
 
-        int getHead();
-        int getTail();
-        int getInBuffer();
-        int getBufferSize();
-        int getMessageSize();
+    int getHead();
+    int getTail();
+    int getInBuffer();
+    int getBufferSize();
+    int getMessageSize();
 
-        void setMsgInfo(int msgSize);
+    void setMsgInfo (int msgSize);
 
-        bool checkQueuesConsistency();
+    bool checkQueuesConsistency();
 
-    private:
+private:
 
-        char m_buffer[BUFFER_SIZE];
-        std::queue<int64> m_timestamps;
-        int m_msgHead;
-        int m_msgTail;
-        int m_bufferLength;
-        int m_msgInBuffer;
-        // this implementation assumes that the message size is constant
-        int m_byteCount;
+    char m_buffer[BUFFER_SIZE];
+    std::queue<int64> m_timestamps;
+    int m_msgHead;
+    int m_msgTail;
+    int m_bufferLength;
+    int m_msgInBuffer;
+    // this implementation assumes that the message size is constant
+    int m_byteCount;
 
-        void enqueueTimestamp(int64 ts);
-        int64 dequeueTimeStamp();
+    void enqueueTimestamp (int64 ts);
+    int64 dequeueTimeStamp();
 };
 
 /**
@@ -89,7 +89,7 @@ public:
 
     AudioProcessorEditor* createEditor();
 
-    void receiveMessage(std::vector<float> message);    
+    void receiveMessage (std::vector<float> message);
 
     /** Defines the functionality of the processor.
 
@@ -97,7 +97,7 @@ public:
 
         Adds all the new serial data that is available to the event data buffer.
      */
-    void process(AudioSampleBuffer&) override;
+    void process (AudioSampleBuffer&) override;
 
     /**
         This should only be run by the ProcessorGraph, before acquisition will be started.
@@ -113,7 +113,7 @@ public:
 
         It closes the open port serial port.
      */
-//    bool disable() override;
+    //    bool disable() override;
 
     //debug
     int countin1sec;
@@ -126,11 +126,11 @@ public:
     float m_timePassedBuf;
 
 
-//    int getNumEventChannels() const override;
-//    void updateSettings() override;
-    void setAddress(String address);
+    //    int getNumEventChannels() const override;
+    //    void updateSettings() override;
+    void setAddress (String address);
     String address();
-    void setPort(int port);
+    void setPort (int port);
     int port();
 
 protected:
@@ -160,7 +160,7 @@ private:
 
     TrackingQueue msgQueue;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingNode);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingNode);
 
 };
 

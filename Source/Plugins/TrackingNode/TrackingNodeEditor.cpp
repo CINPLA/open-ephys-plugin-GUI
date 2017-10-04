@@ -26,89 +26,90 @@
 #include "../../AccessClass.h"
 #include "../../UI/EditorViewport.h"
 
-TrackingNodeEditor::TrackingNodeEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors=true)
-    : GenericEditor(parentNode, useDefaultParameterEditors)
+TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors = true)
+    : GenericEditor (parentNode, useDefaultParameterEditors)
 
 {
     desiredWidth = 180;
 
-    TrackingNode *processor = (TrackingNode *)getProcessor();
+    TrackingNode* processor = (TrackingNode*)getProcessor();
 
-    adrLabel = new Label("Address", "Address:");
-    adrLabel->setBounds(10,80,140,25);
-    addAndMakeVisible(adrLabel);
-    DBG("in editor set default address");
+    adrLabel = new Label ("Address", "Address:");
+    adrLabel->setBounds (10, 80, 140, 25);
+    addAndMakeVisible (adrLabel);
+    DBG ("in editor set default address");
     String defaultAddress = "/red";
-    labelAdr = new Label("Address", defaultAddress);
-    labelAdr->setBounds(80,85,80,18);
-    labelAdr->setFont(Font("Default", 15, Font::plain));
-    labelAdr->setColour(Label::textColourId, Colours::white);
-    labelAdr->setColour(Label::backgroundColourId, Colours::grey);
-    labelAdr->setEditable(true);
-    labelAdr->addListener(this);
-    addAndMakeVisible(labelAdr);
-    processor->setAddress(defaultAddress);
+    labelAdr = new Label ("Address", defaultAddress);
+    labelAdr->setBounds (80, 85, 80, 18);
+    labelAdr->setFont (Font ("Default", 15, Font::plain));
+    labelAdr->setColour (Label::textColourId, Colours::white);
+    labelAdr->setColour (Label::backgroundColourId, Colours::grey);
+    labelAdr->setEditable (true);
+    labelAdr->addListener (this);
+    addAndMakeVisible (labelAdr);
+    processor->setAddress (defaultAddress);
 
-    urlLabel = new Label("Port", "Port:");
-    urlLabel->setBounds(10,40,140,25);
-    addAndMakeVisible(urlLabel);
+    urlLabel = new Label ("Port", "Port:");
+    urlLabel->setBounds (10, 40, 140, 25);
+    addAndMakeVisible (urlLabel);
 
     int defaultPort = 27020;
-    labelPort = new Label("Port", String(defaultPort));
-    labelPort->setBounds(80,45,80,18);
-    labelPort->setFont(Font("Default", 15, Font::plain));
-    labelPort->setColour(Label::textColourId, Colours::white);
-    labelPort->setColour(Label::backgroundColourId, Colours::grey);
-    labelPort->setEditable(true);
-    labelPort->addListener(this);
-    addAndMakeVisible(labelPort);
-    processor->setPort(defaultPort);
+    labelPort = new Label ("Port", String (defaultPort));
+    labelPort->setBounds (80, 45, 80, 18);
+    labelPort->setFont (Font ("Default", 15, Font::plain));
+    labelPort->setColour (Label::textColourId, Colours::white);
+    labelPort->setColour (Label::backgroundColourId, Colours::grey);
+    labelPort->setEditable (true);
+    labelPort->addListener (this);
+    addAndMakeVisible (labelPort);
+    processor->setPort (defaultPort);
 }
 
 TrackingNodeEditor::~TrackingNodeEditor()
 {
     // TODO should we delete all children, check JUCE docs
     // PS: Causes segfault if we do right now
-//    deleteAllChildren();
+    //    deleteAllChildren();
 }
 
-void TrackingNodeEditor::labelTextChanged(Label *label)
+void TrackingNodeEditor::labelTextChanged (Label* label)
 {
     if (label == labelAdr)
     {
-       Value val = label->getTextValue();
+        Value val = label->getTextValue();
 
-        TrackingNode *p= (TrackingNode *)getProcessor();
-        p->setAddress(val.getValue());
+        TrackingNode* p = (TrackingNode*)getProcessor();
+        p->setAddress (val.getValue());
     }
+
     if (label == labelPort)
     {
-       Value val = label->getTextValue();
+        Value val = label->getTextValue();
 
-        TrackingNode *p= (TrackingNode *)getProcessor();
-        p->setPort(val.getValue());
+        TrackingNode* p = (TrackingNode*)getProcessor();
+        p->setPort (val.getValue());
     }
 }
 
 
 
-void TrackingNodeEditor::saveCustomParameters(XmlElement *parentElement)
+void TrackingNodeEditor::saveCustomParameters (XmlElement* parentElement)
 {
-    XmlElement* mainNode = parentElement->createNewChildElement("TrackingNode");
-    mainNode->setAttribute("port", labelPort->getText());
-    mainNode->setAttribute("address", labelAdr->getText());
+    XmlElement* mainNode = parentElement->createNewChildElement ("TrackingNode");
+    mainNode->setAttribute ("port", labelPort->getText());
+    mainNode->setAttribute ("address", labelAdr->getText());
 }
 
-void TrackingNodeEditor::loadCustomParameters(XmlElement *parametersAsXml)
+void TrackingNodeEditor::loadCustomParameters (XmlElement* parametersAsXml)
 {
     if (parametersAsXml != nullptr)
     {
-        forEachXmlChildElement(*parametersAsXml, mainNode)
+        forEachXmlChildElement (*parametersAsXml, mainNode)
         {
-            if (mainNode->hasTagName("TrackingNode"))
+            if (mainNode->hasTagName ("TrackingNode"))
             {
-                labelPort->setText(mainNode->getStringAttribute("port"),sendNotification);
-                labelAdr->setText(mainNode->getStringAttribute("address"),sendNotification);
+                labelPort->setText (mainNode->getStringAttribute ("port"), sendNotification);
+                labelAdr->setText (mainNode->getStringAttribute ("address"), sendNotification);
             }
         }
     }
