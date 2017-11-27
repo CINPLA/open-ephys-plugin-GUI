@@ -138,7 +138,6 @@ public:
 
     bool isReady();
 
-
     void save();
     void saveAs();
     void load();

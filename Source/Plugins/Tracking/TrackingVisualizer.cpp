@@ -36,6 +36,23 @@ AudioProcessorEditor *TrackingVisualizer::createEditor()
     return editor;
 }
 
+void TrackingVisualizer::updateSettings()
+{
+    TrackingSources s;
+    int nEvents = getTotalEventChannels();
+    for (int i = 0; i < nEvents; i++)
+    {
+        const EventChannel* event = getEventChannel(i);
+        if (event->getName().compare("Tracking data") == 0)
+        {
+            s.eventIndex = i;
+            s.sourceId =  event->getSourceNodeID();
+            s.color = String("None");
+        }
+        sources.add (s);
+    }
+}
+
 void TrackingVisualizer::process(AudioSampleBuffer &)
 {
     checkForEvents();
@@ -59,17 +76,17 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
     BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
     if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
-        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
+        cout << "Position tracker got wrong event size x, y, width, height was expected: " << event.getRawDataSize() << endl;
         return;
     }
 
-//    const auto* rawData = (uint8*) evtptr->getBinaryDataPointer();
     auto nodeId = evtptr->getSourceID();
-//    const int64 timestamp = *(rawData);
-//    const float* message = (float*)(rawData+sizeof(int64));
     const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
 
+    cout << getTotalEventChannels() << endl;
+
     std::vector<uint8>::iterator pos = find(m_ids.begin(), m_ids.end(), nodeId);
+    // TODO use new channel info to deal with multiple sources
 
     if (pos == m_ids.end())
     {

@@ -62,6 +62,7 @@ public:
     virtual void setParameter(int, int, int, float);
 
 private:
+
     TrackingVisualizer* processor;
     float m_x;
     float m_y;
@@ -73,9 +74,10 @@ private:
     bool m_imgExists;
     Image rodentImg;
     int m_img_scale;
-//    float m_curr_rot;
 
+    ScopedPointer<ComboBox> selectedChans;
     ScopedPointer<UtilityButton> clearButton;
+
     ScopedPointer<UtilityButton> redButton;
     ScopedPointer<UtilityButton> greenButton;
     ScopedPointer<UtilityButton> yellowButton;

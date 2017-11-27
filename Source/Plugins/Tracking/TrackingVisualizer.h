@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#define MAX_SOURCES 4
+#define MAX_SOURCES 10
 
 //==============================================================================
 /*
@@ -32,6 +32,7 @@ public:
 
     void process(AudioSampleBuffer& buffer) override;
     void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int) override;
+    void updateSettings();
 
     float getX(int s) const;
     float getY(int s) const;
@@ -47,13 +48,26 @@ public:
     void clearPositionUpdated();
     bool positionIsUpdated() const;
 
-//    bool isSink(); //get the color correct
 
 private:
+    struct TrackingSources
+    {
+        unsigned int eventIndex;
+        unsigned int sourceId;
+        std::vector<float> m_x;
+        std::vector<float> m_y;
+        std::vector<float> m_width;
+        std::vector<float> m_height;
+        String color;
+    };
+    
+    Array<TrackingSources> sources;
+
     std::vector<float> m_x;
     std::vector<float> m_y;
     std::vector<float> m_width;
     std::vector<float> m_height;
+
     bool m_positionIsUpdated;
     bool m_clearTracking;
     bool m_isRecording;
@@ -64,11 +78,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingVisualizer);
 };
-
-//inline bool TrackingVisualizer::isSink()
-//{
-//    return true;
-//}
 
 
 #endif  // TRACKINGVISUALIZER_H_INCLUDED

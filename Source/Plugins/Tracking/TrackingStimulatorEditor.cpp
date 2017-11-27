@@ -40,49 +40,49 @@ TrackingStimulatorEditor::TrackingStimulatorEditor(GenericProcessor* parentNode,
     addAndMakeVisible(testPatternButton); // makes the button a child component of the editor and makes it visible
 
 
-    //sync
-    syncButton = new UtilityButton("Sync", Font("Small Text", 13, Font::plain));
-    syncButton->setRadius(3.0f); // sets the radius of the button's corners
-    syncButton->setBounds(70, 70, 60, 20); // sets the x position, y position, width, and height of the button
-    syncButton->addListener(this); // allows the editor to respond to clicks
-    syncButton->setClickingTogglesState(false); // makes the button toggle its state when clicked
-    addAndMakeVisible(syncButton); // makes the button a child component of the editor and makes it visible
+//    //sync
+//    syncButton = new UtilityButton("Sync", Font("Small Text", 13, Font::plain));
+//    syncButton->setRadius(3.0f); // sets the radius of the button's corners
+//    syncButton->setBounds(70, 70, 60, 20); // sets the x position, y position, width, and height of the button
+//    syncButton->addListener(this); // allows the editor to respond to clicks
+//    syncButton->setClickingTogglesState(false); // makes the button toggle its state when clicked
+//    addAndMakeVisible(syncButton); // makes the button a child component of the editor and makes it visible
 
-    syncTTLChanSelector = new ComboBox();
-    syncTTLChanSelector->setBounds(15, 70, 40, 20);
-    syncTTLChanSelector->addListener(this);
+//    syncTTLChanSelector = new ComboBox();
+//    syncTTLChanSelector->setBounds(15, 70, 40, 20);
+//    syncTTLChanSelector->addListener(this);
 
-    for (int i=1; i<10; i++)
-        syncTTLChanSelector->addItem(String(i), i);
+//    for (int i=1; i<10; i++)
+//        syncTTLChanSelector->addItem(String(i), i);
 
-    syncTTLChanSelector->setSelectedId(1, dontSendNotification);
-    addAndMakeVisible(syncTTLChanSelector);
+//    syncTTLChanSelector->setSelectedId(1, dontSendNotification);
+//    addAndMakeVisible(syncTTLChanSelector);
 
-    syncStimChanSelector = new ComboBox();
-    syncStimChanSelector->setBounds(140, 70, 40, 20);
-    syncStimChanSelector->addListener(this);
+//    syncStimChanSelector = new ComboBox();
+//    syncStimChanSelector->setBounds(140, 70, 40, 20);
+//    syncStimChanSelector->addListener(this);
 
-    for (int i=1; i<5; i++)
-        syncStimChanSelector->addItem(String(i), i);
+//    for (int i=1; i<5; i++)
+//        syncStimChanSelector->addItem(String(i), i);
 
-    syncStimChanSelector->setSelectedId(4, dontSendNotification);
-    addAndMakeVisible(syncStimChanSelector);
+//    syncStimChanSelector->setSelectedId(4, dontSendNotification);
+//    addAndMakeVisible(syncStimChanSelector);
 
-    //sync labels
-    ttlLabel = new Label("TTL", "TTL");
-    ttlLabel->setBounds(20, 55, 40, 15);
-    ttlLabel->setFont(Font("Default", 12, Font::plain));
-    addAndMakeVisible(ttlLabel);
+//    //sync labels
+//    ttlLabel = new Label("TTL", "TTL");
+//    ttlLabel->setBounds(20, 55, 40, 15);
+//    ttlLabel->setFont(Font("Default", 12, Font::plain));
+//    addAndMakeVisible(ttlLabel);
 
-    stimLabel = new Label("Stim", "Stim");
-    stimLabel->setBounds(135, 55, 40, 15);
-    stimLabel->setFont(Font("Default", 12, Font::plain));
-    addAndMakeVisible(stimLabel);
+//    stimLabel = new Label("Stim", "Stim");
+//    stimLabel->setBounds(135, 55, 40, 15);
+//    stimLabel->setFont(Font("Default", 12, Font::plain));
+//    addAndMakeVisible(stimLabel);
 
-    TrackingStimulator *p= (TrackingStimulator *)getProcessor();
-    p->setStimSyncChan(syncStimChanSelector->getSelectedId()-1);
-    p->setTTLSyncChan(syncTTLChanSelector->getSelectedId()-1);
-    syncStimChan = syncStimChanSelector->getSelectedId()-1;
+//    TrackingStimulator *p= (TrackingStimulator *)getProcessor();
+//    p->setStimSyncChan(syncStimChanSelector->getSelectedId()-1);
+//    p->setTTLSyncChan(syncTTLChanSelector->getSelectedId()-1);
+//    syncStimChan = syncStimChanSelector->getSelectedId()-1;
 
 }
 
@@ -119,13 +119,13 @@ void TrackingStimulatorEditor::buttonEvent(Button* button)
         if (!button->isDown())
             p->testStimulation();
     }
-    else if (button == syncButton)
-    {
-        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
+//    else if (button == syncButton)
+//    {
+//        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
 
-        if (!button->isDown())
-            p->syncStimulation(syncStimChan);
-    }
+//        if (!button->isDown())
+//            p->syncStimulation(syncStimChan);
+//    }
     else if (button == stimulateButton)
     {
         if (button->getToggleState()==true){
@@ -142,19 +142,19 @@ void TrackingStimulatorEditor::buttonEvent(Button* button)
 
 }
 
-void TrackingStimulatorEditor::comboBoxChanged(ComboBox* c)
-{
-    if (c==syncStimChanSelector)
-    {
-        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
-        p->setStimSyncChan(c->getSelectedId()-1);
-    }
-    else if (c==syncTTLChanSelector)
-    {
-        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
-        p->setTTLSyncChan(c->getSelectedId()-1);
-        syncStimChan = c->getSelectedId()-1;
-    }
+//void TrackingStimulatorEditor::comboBoxChanged(ComboBox* c)
+//{
+//    if (c==syncStimChanSelector)
+//    {
+//        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
+//        p->setStimSyncChan(c->getSelectedId()-1);
+//    }
+//    else if (c==syncTTLChanSelector)
+//    {
+//        TrackingStimulator *p= (TrackingStimulator *)getProcessor();
+//        p->setTTLSyncChan(c->getSelectedId()-1);
+//        syncStimChan = c->getSelectedId()-1;
+//    }
 
-}
+//}
 

@@ -149,35 +149,35 @@ void TrackingVisualizerCanvas::paint (Graphics& g)
         }
     }
 
-    if (sameButton->getToggleState())
-    {
-        float meanx = 0;
-        float meany = 0;
-        int nonEmptySources = 0;
-        for (int i = 0; i<processor->getNSources(); i++)
-        {
-            if (!m_positions[i].empty())
-            {
-                meanx += currentX[i];
-                meany += currentY[i];
-                nonEmptySources++;
-            }
-        }
-        if (nonEmptySources > 0)
-        {
-            meanx /= processor->getNSources();
-            meany /= processor->getNSources();
-            float x = camWidth*meanx + plot_bottom_left_x;
-            float y = camHeight*meany + plot_bottom_left_y;
+//    if (sameButton->getToggleState())
+//    {
+//        float meanx = 0;
+//        float meany = 0;
+//        int nonEmptySources = 0;
+//        for (int i = 0; i<processor->getNSources(); i++)
+//        {
+//            if (!m_positions[i].empty())
+//            {
+//                meanx += currentX[i];
+//                meany += currentY[i];
+//                nonEmptySources++;
+//            }
+//        }
+//        if (nonEmptySources > 0)
+//        {
+//            meanx /= processor->getNSources();
+//            meany /= processor->getNSources();
+//            float x = camWidth*meanx + plot_bottom_left_x;
+//            float y = camHeight*meany + plot_bottom_left_y;
 
-            g.setColour(defaultColour);
+//            g.setColour(defaultColour);
 
-            if (m_imgExists)
-                g.drawImageAt(rodentImg, x-(m_img_scale/2.), y-(m_img_scale/2.));
-            else
-                g.fillEllipse(x, y, 0.02*getHeight(), 0.02*getHeight());
-        }
-    }
+//            if (m_imgExists)
+//                g.drawImageAt(rodentImg, x-(m_img_scale/2.), y-(m_img_scale/2.));
+//            else
+//                g.fillEllipse(x, y, 0.02*getHeight(), 0.02*getHeight());
+//        }
+//    }
 
     g.setFont(Font("Default", 16, Font::plain));
 
@@ -186,23 +186,29 @@ void TrackingVisualizerCanvas::paint (Graphics& g)
 void TrackingVisualizerCanvas::resized()
 {
     clearButton->setBounds(0.01*getWidth(), getHeight()-0.05*getHeight(), 0.1*getWidth(), 0.03*getHeight());
-    redButton->setBounds(0.01*getWidth(), getHeight()-0.2*getHeight(), 0.1*getWidth(), 0.03*getHeight());
-    greenButton->setBounds(0.01*getWidth(), getHeight()-0.24*getHeight(), 0.1*getWidth(), 0.03*getHeight());
-    yellowButton->setBounds(0.01*getWidth(), getHeight()-0.28*getHeight(), 0.1*getWidth(), 0.03*getHeight());
+    selectedChans->setBounds(0.01*getWidth(), getHeight()-0.35*getHeight(), 0.1*getWidth(), 0.03*getHeight());
 
-    sourcesLabel->setBounds(0.01*getWidth(), getHeight()-0.54*getHeight(), 0.1*getWidth(), 0.03*getHeight());
 
-    for (int i = 0; i<MAX_SOURCES; i++)
-    {
-        sourcesButton[i]->setBounds(0.01*getWidth() + i*(0.1/MAX_SOURCES)*getWidth(), getHeight()-0.5*getHeight(),
-                                    (0.1/float(MAX_SOURCES))*getWidth(),0.03*getHeight());
-        if (i < processor->getNSources())
-            sourcesButton[i]->setVisible(true);
-        else
-            sourcesButton[i]->setVisible(false);
-    }
+//    redButton->setBounds(0.01*getWidth(), getHeight()-0.2*getHeight(), 0.1*getWidth(), 0.03*getHeight());
+//    greenButton->setBounds(0.01*getWidth(), getHeight()-0.24*getHeight(), 0.1*getWidth(), 0.03*getHeight());
+//    yellowButton->setBounds(0.01*getWidth(), getHeight()-0.28*getHeight(), 0.1*getWidth(), 0.03*getHeight());
 
-    sameButton->setBounds(0.01*getWidth() + 0.025*getWidth(), getHeight()-0.45*getHeight(), 0.05*getWidth(), 0.03*getHeight());
+    sourcesLabel->setBounds(0.01*getWidth(), getHeight()-0.25*getHeight(), 0.1*getWidth(), 0.03*getHeight());
+
+
+
+
+//    for (int i = 0; i<MAX_SOURCES; i++)
+//    {
+//        sourcesButton[i]->setBounds(0.01*getWidth() + i*(0.1/MAX_SOURCES)*getWidth(), getHeight()-0.5*getHeight(),
+//                                    (0.1/float(MAX_SOURCES))*getWidth(),0.03*getHeight());
+//        if (i < processor->getNSources())
+//            sourcesButton[i]->setVisible(true);
+//        else
+//            sourcesButton[i]->setVisible(false);
+//    }
+
+//    sameButton->setBounds(0.01*getWidth() + 0.025*getWidth(), getHeight()-0.45*getHeight(), 0.05*getWidth(), 0.03*getHeight());
 
     refresh();
 
@@ -290,6 +296,7 @@ void TrackingVisualizerCanvas::buttonClicked(Button* button)
 
 void TrackingVisualizerCanvas::comboBoxChanged(ComboBox *comboBoxThatHasChanged)
 {
+
 }
 
 void TrackingVisualizerCanvas::refreshState()
@@ -359,6 +366,18 @@ void TrackingVisualizerCanvas::initButtonsAndLabels()
     clearButton->setRadius(3.0f);
     clearButton->addListener(this);
     addAndMakeVisible(clearButton);
+
+    selectedChans = new ComboBox("Event Channels");
+
+    selectedChans->setEditableText(false);
+    selectedChans->setJustificationType(Justification::centredLeft);
+    selectedChans->addListener(this);
+    selectedChans->setSelectedId(0);
+
+    selectedChans->addItem("None",1);
+    selectedChans->setSelectedId(1, sendNotification);
+
+    addAndMakeVisible(selectedChans);
 
     redButton = new UtilityButton("red", Font("Small Text", 13, Font::plain));
     redButton->setRadius(3.0f);

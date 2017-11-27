@@ -40,7 +40,7 @@ TrackingStimulator::TrackingStimulator()
     , m_StimSyncChan(4)
 {
 
-    setProcessorType (PROCESSOR_TYPE_SINK);
+    setProcessorType (PROCESSOR_TYPE_FILTER);
 
     // Init PulsePal
     m_pulsePal.initialize();

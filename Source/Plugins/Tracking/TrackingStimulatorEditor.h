@@ -6,7 +6,7 @@
 #include <EditorHeaders.h>
 
 class TrackingStimulatorEditor : public VisualizerEditor
-        , public ComboBox::Listener
+//        , public ComboBox::Listener
 {
 public:
     TrackingStimulatorEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
@@ -14,7 +14,7 @@ public:
 
     // Listener Interface
     void buttonEvent(Button* button);
-    void comboBoxChanged(ComboBox* c);
+//    void comboBoxChanged(ComboBox* c);
 
     Visualizer* createNewCanvas();
 
@@ -25,15 +25,15 @@ private:
     // Test button
     ScopedPointer<UtilityButton> testPatternButton;
 
-    // Sync button
-    ScopedPointer<UtilityButton> syncButton;
-    ScopedPointer<ComboBox> syncTTLChanSelector;
-    ScopedPointer<ComboBox> syncStimChanSelector;
-    int syncStimChan;
+//    // Sync button
+//    ScopedPointer<UtilityButton> syncButton;
+//    ScopedPointer<ComboBox> syncTTLChanSelector;
+//    ScopedPointer<ComboBox> syncStimChanSelector;
+//    int syncStimChan;
 
-    //Sync labels
-    ScopedPointer<Label> ttlLabel;
-    ScopedPointer<Label> stimLabel;
+//    //Sync labels
+//    ScopedPointer<Label> ttlLabel;
+//    ScopedPointer<Label> stimLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingStimulatorEditor);
 };
