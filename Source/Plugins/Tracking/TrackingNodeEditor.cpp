@@ -90,7 +90,6 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
 
 TrackingNodeEditor::~TrackingNodeEditor()
 {
-    //deleteAllChildren();
 }
 
 void TrackingNodeEditor::labelTextChanged (Label* label)
@@ -119,8 +118,6 @@ void TrackingNodeEditor::labelTextChanged (Label* label)
         p->setColor (val.getValue());
     }
 }
-
-
 
 void TrackingNodeEditor::saveCustomParameters (XmlElement* parentElement)
 {

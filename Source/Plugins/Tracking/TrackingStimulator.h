@@ -99,6 +99,7 @@ public:
     void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int) override;
     void saveCustomParametersToXml(XmlElement* parentElement) override;
     void loadCustomParametersFromXml() override;
+    void updateSettings();
 
     // Pulse Pal
     bool updatePulsePal();
@@ -108,10 +109,13 @@ public:
     void stopStimulation();
 
     // Setter-Getters
-    float getX() const;
-    float getY() const;
-    float getWidth() const;
-    float getHeight() const;
+    float getX(int s) const;
+    float getY(int s) const;
+    float getWidth(int s) const;
+    float getHeight(int s) const;
+
+    int getNSources() const;
+    TrackingSources& getTrackingSource(int s) const;
 
     vector<Circle> getCircles();
     void addCircle(Circle c);
@@ -164,6 +168,8 @@ public:
 
     void clearPositionDisplayedUpdated();
     bool positionDisplayedIsUpdated() const;
+    bool getColorIsUpdated() const;
+    void setColorIsUpdated(bool up);
 
     int isPositionWithinCircles(float x, float y);
 
@@ -176,6 +182,8 @@ public:
 private:
 
     CriticalSection lock;
+
+    Array<TrackingSources> sources;
 
     // OnOff
     bool m_isOn;
@@ -202,6 +210,7 @@ private:
     bool m_positionIsUpdated;
     bool m_positionDisplayedIsUpdated;
     bool m_simulateTrajectory;
+    bool m_colorUpdated;
 
     vector<Circle> m_circles;
     int m_selectedCircle;

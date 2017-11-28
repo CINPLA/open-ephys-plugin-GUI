@@ -32,19 +32,17 @@
 #ifndef TRACKINGSTIMULATORCANVAS_H
 #define TRACKINGSTIMULATORCANVAS_H
 
-
 #include <VisualizerWindowHeaders.h>
 #include "TrackingStimulatorEditor.h"
 #include "TrackingStimulator.h"
-
 
 class DisplayAxes;
 
 class TrackingStimulatorCanvas : public Visualizer,
         public Button::Listener,
         public Label::Listener,
+        public ComboBox::Listener,
         public KeyListener
-//        public ComboBox::Listener,
 {
 public:
     TrackingStimulatorCanvas(TrackingStimulator* TrackingStimulator);
@@ -64,6 +62,7 @@ public:
     // Listener interface
     virtual void buttonClicked(Button* button);
     virtual void labelTextChanged(Label *label) override;
+    void comboBoxChanged(ComboBox* comboBox);
 
     // Visualizer interface
     virtual void refreshState();
@@ -81,6 +80,7 @@ public:
     void setOnButton();
     float my_round(float x);
     void uploadInfoOnLoad();
+    int getSelectedSource() const;
 
     // *** Maybe adjust with proper accessors instead of keep public *** //
     ScopedPointer<UtilityButton> clearButton;
@@ -95,6 +95,9 @@ public:
     ScopedPointer<UtilityButton> circlesButton[MAX_CIRCLES];
     ScopedPointer<UtilityButton> uniformButton;
     ScopedPointer<UtilityButton> gaussianButton;
+
+    ScopedPointer<ComboBox> availableChans;
+
     ScopedPointer<UtilityButton> negFirstButton;
     ScopedPointer<UtilityButton> posFirstButton;
     ScopedPointer<UtilityButton> biphasicButton;
@@ -112,7 +115,6 @@ public:
     ScopedPointer<Label> onLabel;
     ScopedPointer<Label> fmaxLabel;
     ScopedPointer<Label> sdevLabel;
-//    ScopedPointer<Label> elecLabel;
     ScopedPointer<Label> pulsePalLabel;
     ScopedPointer<Label> phaseLabel;
     ScopedPointer<Label> interphaseLabel;
@@ -121,14 +123,13 @@ public:
     ScopedPointer<Label> repetitionsLabel;
     ScopedPointer<Label> trainDurationLabel;
 
-
     // Labels with editable test
     ScopedPointer<Label> cxEditLabel;
     ScopedPointer<Label> cyEditLabel;
     ScopedPointer<Label> cradEditLabel;
     ScopedPointer<Label> fmaxEditLabel;
     ScopedPointer<Label> sdevEditLabel;
-//    ScopedPointer<Label> elecEditLabel;
+
     ScopedPointer<Label> phaseEditLabel;
     ScopedPointer<Label> interphaseEditLabel;
     ScopedPointer<Label> voltageEditLabel;
@@ -153,6 +154,8 @@ private:
     bool m_onoff;
     bool m_updateCircle;
     bool m_isDeleting;
+
+    int selectedSource;
 
     Colour buttonTextColour;
     Colour labelColour;

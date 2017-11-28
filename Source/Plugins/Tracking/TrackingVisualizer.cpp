@@ -40,7 +40,6 @@ using std::endl;
 TrackingVisualizer::TrackingVisualizer()
     : GenericProcessor("Tracking Visual")
     , m_positionIsUpdated(false)
-    , m_sources(0)
     , m_clearTracking(false)
     , m_isRecording(false)
     , m_colorUpdated(false)

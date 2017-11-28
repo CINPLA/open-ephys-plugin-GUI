@@ -75,7 +75,6 @@ public:
     bool getColorIsUpdated() const;
     void setColorIsUpdated(bool up);
 
-
 private:
     
     Array<TrackingSources> sources;
@@ -84,10 +83,6 @@ private:
     bool m_clearTracking;
     bool m_isRecording;
     bool m_colorUpdated;
-
-    // n sources
-    int m_sources;
-    std::vector<uint8> m_ids;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingVisualizer);
 };

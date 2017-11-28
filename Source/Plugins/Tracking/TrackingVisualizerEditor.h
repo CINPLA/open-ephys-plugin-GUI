@@ -40,16 +40,9 @@ public:
     TrackingVisualizerEditor(GenericProcessor* parentNode, bool useDefaultParameterEditors);
     ~TrackingVisualizerEditor();
 
-    void buttonCallback(Button* button);
-
     Visualizer* createNewCanvas();
 
-//    void saveCustomParameters(XmlElement *parentElement) override;
-//    void loadCustomParameters(XmlElement *parametersAsXml) override;
-
 private:
-    UtilityButton* clearBtn;
-    void initializeButtons();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingVisualizerEditor);
 
 };

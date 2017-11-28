@@ -101,21 +101,39 @@ AudioProcessorEditor* TrackingStimulator::createEditor()
 
 // Setters - Getters
 
-float TrackingStimulator::getX() const
+TrackingSources& TrackingStimulator::getTrackingSource(int s) const
 {
-    return m_x;
+    if (s < sources.size())
+        return sources.getReference (s);
 }
-float TrackingStimulator::getY() const
+
+float TrackingStimulator::getX(int s) const
 {
-    return m_y;
+    if (s < sources.size())
+        return sources[s].x_pos;
+    else
+        return -1;
 }
-float TrackingStimulator::getWidth() const
+float TrackingStimulator::getY(int s) const
 {
-    return m_width;
+    if (s < sources.size())
+        return sources[s].y_pos;
+    else
+        return -1;
 }
-float TrackingStimulator::getHeight() const
+float TrackingStimulator::getWidth(int s) const
 {
-    return m_height;
+    if (s < sources.size())
+        return sources[s].width;
+    else
+        return -1;
+}
+float TrackingStimulator::getHeight(int s) const
+{
+    if (s < sources.size())
+        return sources[s].height;
+    else
+        return -1;
 }
 
 bool TrackingStimulator::getSimulateTrajectory() const
@@ -132,18 +150,22 @@ vector<Circle> TrackingStimulator::getCircles()
 {
     return m_circles;
 }
+
 void TrackingStimulator::addCircle(Circle c)
 {
     m_circles.push_back(c);
 }
+
 void TrackingStimulator::editCircle(int ind, float x, float y, float rad, bool on)
 {
     m_circles[ind].set(x,y,rad,on);
 }
+
 void TrackingStimulator::deleteCircle(int ind)
 {
     m_circles.erase(m_circles.begin() + ind);
 }
+
 void TrackingStimulator::disableCircles()
 {
     for(int i=0; i<m_circles.size(); i++)
@@ -154,6 +176,7 @@ int TrackingStimulator::getSelectedCircle() const
 {
     return m_selectedCircle;
 }
+
 void TrackingStimulator::setSelectedCircle(int ind)
 {
     m_selectedCircle = ind;
@@ -163,7 +186,6 @@ int TrackingStimulator::getChan() const
 {
     return m_chan;
 }
-
 
 float TrackingStimulator::getStimFreq(int chan) const
 {
@@ -359,6 +381,30 @@ void TrackingStimulator::setRepetitionsTrainDuration(int chan, priority whatFirs
     }
 }
 
+void TrackingStimulator::updateSettings()
+{
+    sources.clear();
+    TrackingSources s;
+    int nEvents = getTotalEventChannels();
+
+    for (int i = 0; i < nEvents; i++)
+    {
+        const EventChannel* event = getEventChannel(i);
+        if (event->getName().compare("Tracking data") == 0)
+        {
+            s.eventIndex = i;
+            s.sourceId =  event->getSourceNodeID();
+            s.color = String("None");
+            s.x_pos = -1;
+            s.y_pos = -1;
+            s.width = -1;
+            s.height = -1;
+        }
+        sources.add (s);
+    }
+}
+
+
 void TrackingStimulator::process(AudioSampleBuffer&)
 {
     if (!m_simulateTrajectory)
@@ -388,13 +434,8 @@ void TrackingStimulator::process(AudioSampleBuffer&)
                 else
                     m_forward = true;
 
-
             m_x = m_rad*std::cos(theta) + 0.5;
             m_y = m_rad*std::sin(theta) + 0.5;
-
-            //            std::cout << m_x << ', ' << m_y << endl;
-
-
 
             m_previousTime_sim = Time::currentTimeMillis();
             m_timePassed_sim = 0;
@@ -451,7 +492,6 @@ void TrackingStimulator::process(AudioSampleBuffer&)
     }
 }
 
-// TODO make use of TrackingData
 void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int)
 {
     if ((eventInfo->getName()).compare("Tracking data") != 0)
@@ -461,47 +501,61 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
 
     BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
-    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
-        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-        return;
-    }
+//    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
+//        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
+//        return;
+//    }
 
-//    const auto* rawData = (uint8*) evtptr->getBinaryDataPointer();
     auto nodeId = evtptr->getSourceID();
-//    const int64 timestamp = *(rawData);
-//    const float* message = (float*)(rawData+sizeof(int64));
     const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
 
-    TrackingPosition position = message->position;
+    int nSources = sources.size ();
 
-    if(!(position.x != position.x || position.y != position.y) && position.x != 0 && position.y != 0)
+    for (int i = 0; i < nSources; i++)
     {
-        m_x = position.x;
-        m_y = position.y;
-    }
-    if(!(position.width != position.width || position.height != position.height))
-    {
-        m_width = position.width;
-        m_height = position.height;
-        m_aspect_ratio = m_width / m_height;
-    }
-    m_positionIsUpdated = true;
-
-    // Sync
-    if (eventInfo->getChannelType() == EventChannel::TTL) // && eventInfo == eventChannelArray[triggerEvent])
-    {
-        TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
-        int eventId = ttl->getState() ? 1 : 0;
-
-        std::cout << "In tracker stim" << std::endl;
-        if (ttl->getChannel() ==  m_TTLSyncChan && eventId == 1)
+        TrackingSources& currentSource = sources.getReference (i);
+        if (currentSource.sourceId == nodeId)
         {
+            if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
             {
-                syncStimulation(m_StimSyncChan);
-                CoreServices::sendStatusMessage("Sent trigger sync event!");
+                currentSource.x_pos = message->position.x;
+                currentSource.y_pos = message->position.y;
+            }
+            if(!(message->position.width != message->position.width || message->position.height != message->position.height))
+            {
+                currentSource.width = message->position.width;
+                currentSource.height = message->position.height;
+            }
+
+            String sourceColor;
+            evtptr->getMetaDataValue(0)->getValue(sourceColor);
+
+            if (currentSource.color.compare(sourceColor) != 0)
+            {
+                currentSource.color = sourceColor;
+
             }
         }
     }
+
+    m_positionIsUpdated = true;
+
+//    TrackingPosition position = message->position;
+
+//    if(!(position.x != position.x || position.y != position.y) && position.x != 0 && position.y != 0)
+//    {
+//        m_x = position.x;
+//        m_y = position.y;
+//    }
+//    if(!(position.width != position.width || position.height != position.height))
+//    {
+//        m_width = position.width;
+//        m_height = position.height;
+//        m_aspect_ratio = m_width / m_height;
+//    }
+//    m_positionIsUpdated = true;
+
+
 }
 
 int TrackingStimulator::isPositionWithinCircles(float x, float y)
@@ -533,6 +587,21 @@ void TrackingStimulator::clearPositionDisplayedUpdated()
 {
     //m_positionDisplayedIsUpdated = false;
     m_positionIsUpdated = false;
+}
+
+int TrackingStimulator::getNSources() const
+{
+    return sources.size ();
+}
+
+bool TrackingStimulator::getColorIsUpdated() const
+{
+    return m_colorUpdated;
+}
+
+void TrackingStimulator::setColorIsUpdated(bool up)
+{
+    m_colorUpdated = up;
 }
 
 
