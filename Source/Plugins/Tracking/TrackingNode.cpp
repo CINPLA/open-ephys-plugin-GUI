@@ -1,8 +1,17 @@
 /*
     ------------------------------------------------------------------
 
-    This file is part of the Open Ephys GUI
-    Copyright (C) 2014 Open Ephys
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
 
     ------------------------------------------------------------------
 
@@ -18,7 +27,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 #include "TrackingNode.h"
@@ -90,6 +98,7 @@ void TrackingNode::createEventChannels()
     chan->setName ("Tracking data");
     chan->setDescription ("Tracking data received from Bonsai. x, y, width, height");
     chan->setIdentifier ("external.tracking.rawData");
+    chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::CHAR, 15, "Color", "Tracking source color to be displayed", "eventInfo.data.size"));
     eventChannelArray.add (chan);
 }
 
@@ -101,6 +110,16 @@ void TrackingNode::setAddress (String address)
 String TrackingNode::address()
 {
     return m_address;
+}
+
+void TrackingNode::setColor (String color)
+{
+    m_color = color;
+}
+
+String TrackingNode::color()
+{
+    return m_color;
 }
 
 void TrackingNode::setPort (int port)
@@ -139,12 +158,16 @@ void TrackingNode::process (AudioSampleBuffer&)
 
         setTimestampAndSamples (uint64(message->timestamp), 0);
 
-        //setTimestamp(events, tsptr);
+        MetaDataValueArray metadata;
+        MetaDataValuePtr color = new MetaDataValue(MetaDataDescriptor::CHAR, 15);
+        color->setValue(m_color.toLowerCase());
+        metadata.add(color);
         const EventChannel* chan = getEventChannel (getEventChannelIndex (0, getNodeId()));
         BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan,
                                                                message->timestamp,
                                                                reinterpret_cast<uint8_t *>(message),
-                                                               sizeof(TrackingData));
+                                                               sizeof(TrackingData),
+                                                               metadata);
         addEvent (chan, event, 0);
         countin1sec++;
     }

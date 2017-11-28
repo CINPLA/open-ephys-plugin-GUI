@@ -1,11 +1,32 @@
 /*
-  ==============================================================================
+    ------------------------------------------------------------------
 
-    TrackingVisualizer.h
-    Created: 5 Oct 2015 11:34:58am
-    Author:  mikkel
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
 
-  ==============================================================================
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
+
+    ------------------------------------------------------------------
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef TRACKINGVISUALIZER_H_INCLUDED
@@ -19,8 +40,11 @@
 
 #define MAX_SOURCES 10
 
-//==============================================================================
-/*
+/**
+
+    Visualizes tracking from "Tracking data" events
+
+    @see GenericProcessor, TrackingVisualizerEditor, TrackingVisualizerCanvas
 */
 class TrackingVisualizer : public GenericProcessor
 {
@@ -42,35 +66,24 @@ public:
     bool getClearTracking() const;
 
     int getNSources() const;
+    TrackingSources& getTrackingSource(int i) const;
 
     void setClearTracking(bool clear);
 
     void clearPositionUpdated();
     bool positionIsUpdated() const;
+    bool getColorIsUpdated() const;
+    void setColorIsUpdated(bool up);
 
 
 private:
-    struct TrackingSources
-    {
-        unsigned int eventIndex;
-        unsigned int sourceId;
-        std::vector<float> m_x;
-        std::vector<float> m_y;
-        std::vector<float> m_width;
-        std::vector<float> m_height;
-        String color;
-    };
     
     Array<TrackingSources> sources;
-
-    std::vector<float> m_x;
-    std::vector<float> m_y;
-    std::vector<float> m_width;
-    std::vector<float> m_height;
 
     bool m_positionIsUpdated;
     bool m_clearTracking;
     bool m_isRecording;
+    bool m_colorUpdated;
 
     // n sources
     int m_sources;

@@ -1,8 +1,17 @@
 /*
     ------------------------------------------------------------------
 
-    This file is part of the Open Ephys GUI
-    Copyright (C) 2014 Open Ephys
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
 
     ------------------------------------------------------------------
 
@@ -18,7 +27,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 #ifndef TRACKINGNODE_H
@@ -113,6 +121,8 @@ public:
     String address();
     void setPort (int port);
     int port();
+    void setColor (String color);
+    String color();
 
 protected:
     void createEventChannels() override;
@@ -138,6 +148,7 @@ private:
 
     String m_address;
     int m_port;
+    String m_color;
 
     TrackingQueue messageQueue;
 

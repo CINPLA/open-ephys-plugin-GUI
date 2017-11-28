@@ -66,7 +66,6 @@ extern "C" EXPORT int getPluginInfo (int index, Plugin::PluginInfo* info)
         info->processor.type = Plugin::SinkProcessor;
         info->processor.creator = & (Plugin::createProcessor<TrackingVisualizer>);
         break;
-
     default:
         return -1;
         break;

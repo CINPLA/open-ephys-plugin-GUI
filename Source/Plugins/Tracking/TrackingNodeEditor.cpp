@@ -1,8 +1,17 @@
 /*
     ------------------------------------------------------------------
 
-    This file is part of the Open Ephys GUI
-    Copyright (C) 2014 Open Ephys
+    This file is part of the Tracking plugin for the Open Ephys GUI
+    Written by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
 
     ------------------------------------------------------------------
 
@@ -18,7 +27,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 #include "TrackingNodeEditor.h"
@@ -35,12 +43,12 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
     TrackingNode* processor = (TrackingNode*)getProcessor();
 
     adrLabel = new Label ("Address", "Address:");
-    adrLabel->setBounds (10, 80, 140, 25);
+    adrLabel->setBounds (10, 60, 140, 25);
     addAndMakeVisible (adrLabel);
     DBG ("in editor set default address");
     String defaultAddress = "/red";
     labelAdr = new Label ("Address", defaultAddress);
-    labelAdr->setBounds (80, 85, 80, 18);
+    labelAdr->setBounds (80, 65, 80, 18);
     labelAdr->setFont (Font ("Default", 15, Font::plain));
     labelAdr->setColour (Label::textColourId, Colours::white);
     labelAdr->setColour (Label::backgroundColourId, Colours::grey);
@@ -49,13 +57,13 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
     addAndMakeVisible (labelAdr);
     processor->setAddress (defaultAddress);
 
-    urlLabel = new Label ("Port", "Port:");
-    urlLabel->setBounds (10, 40, 140, 25);
-    addAndMakeVisible (urlLabel);
+    portLabel = new Label ("Port", "Port:");
+    portLabel->setBounds (10, 30, 140, 25);
+    addAndMakeVisible (portLabel);
 
     int defaultPort = 27020;
     labelPort = new Label ("Port", String (defaultPort));
-    labelPort->setBounds (80, 45, 80, 18);
+    labelPort->setBounds (80, 35, 80, 18);
     labelPort->setFont (Font ("Default", 15, Font::plain));
     labelPort->setColour (Label::textColourId, Colours::white);
     labelPort->setColour (Label::backgroundColourId, Colours::grey);
@@ -63,13 +71,26 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
     labelPort->addListener (this);
     addAndMakeVisible (labelPort);
     processor->setPort (defaultPort);
+
+    colorLabel = new Label ("Color", "Color:");
+    colorLabel->setBounds (10, 90, 140, 25);
+    addAndMakeVisible (colorLabel);
+
+    String defaultColor = "red";
+    labelColor = new Label ("Color", String (defaultColor));
+    labelColor->setBounds (80, 95, 80, 18);
+    labelColor->setFont (Font ("Default", 15, Font::plain));
+    labelColor->setColour (Label::textColourId, Colours::white);
+    labelColor->setColour (Label::backgroundColourId, Colours::grey);
+    labelColor->setEditable (true);
+    labelColor->addListener (this);
+    addAndMakeVisible (labelColor);
+    processor->setColor (defaultColor);
 }
 
 TrackingNodeEditor::~TrackingNodeEditor()
 {
-    // TODO should we delete all children, check JUCE docs
-    // PS: Causes segfault if we do right now
-    //    deleteAllChildren();
+    //deleteAllChildren();
 }
 
 void TrackingNodeEditor::labelTextChanged (Label* label)
@@ -78,7 +99,7 @@ void TrackingNodeEditor::labelTextChanged (Label* label)
     {
         Value val = label->getTextValue();
 
-        TrackingNode* p = (TrackingNode*)getProcessor();
+        TrackingNode* p = (TrackingNode*) getProcessor();
         p->setAddress (val.getValue());
     }
 
@@ -86,8 +107,16 @@ void TrackingNodeEditor::labelTextChanged (Label* label)
     {
         Value val = label->getTextValue();
 
-        TrackingNode* p = (TrackingNode*)getProcessor();
+        TrackingNode* p = (TrackingNode*) getProcessor();
         p->setPort (val.getValue());
+    }
+
+    if (label == labelColor)
+    {
+        Value val = label->getTextValue();
+
+        TrackingNode* p = (TrackingNode*) getProcessor();
+        p->setColor (val.getValue());
     }
 }
 
@@ -98,6 +127,7 @@ void TrackingNodeEditor::saveCustomParameters (XmlElement* parentElement)
     XmlElement* mainNode = parentElement->createNewChildElement ("TrackingNode");
     mainNode->setAttribute ("port", labelPort->getText());
     mainNode->setAttribute ("address", labelAdr->getText());
+    mainNode->setAttribute ("color", labelColor->getText());
 }
 
 void TrackingNodeEditor::loadCustomParameters (XmlElement* parametersAsXml)
@@ -110,6 +140,7 @@ void TrackingNodeEditor::loadCustomParameters (XmlElement* parametersAsXml)
             {
                 labelPort->setText (mainNode->getStringAttribute ("port"), sendNotification);
                 labelAdr->setText (mainNode->getStringAttribute ("address"), sendNotification);
+                labelColor->setText (mainNode->getStringAttribute ("color"), sendNotification);
             }
         }
     }
