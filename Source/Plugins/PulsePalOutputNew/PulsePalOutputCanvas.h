@@ -40,7 +40,6 @@
 class PulsePalOutputCanvas : public Visualizer,
         public Button::Listener,
         public Label::Listener,
-        public ComboBox::Listener,
         public KeyListener
 {
 public:
@@ -49,7 +48,6 @@ public:
 
     void paint (Graphics&);
     void resized();
-    void clear();
     void initButtons();
     void initLabels();
 
@@ -71,7 +69,7 @@ public:
     virtual void setParameter(int, float);
     virtual void setParameter(int, int, int, float);
 
-    int getSelectedSource() const;
+//    int getSelectedSource() const;
 
 
 private:
@@ -98,6 +96,12 @@ private:
     ScopedPointer<Label> interpulseEditLabel;
     ScopedPointer<Label> repetitionsEditLabel;
     ScopedPointer<Label> trainDurationEditLabel;
+
+    Colour labelColour;
+    Colour labelTextColour;
+    Colour labelBackgroundColour;
+
+    float my_round(float x);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PulsePalOutputCanvas);
 };

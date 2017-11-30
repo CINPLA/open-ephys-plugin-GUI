@@ -24,7 +24,7 @@
 #ifndef __PULSEPALOUTPUTEDITOR_H_BB5F0ECC__
 #define __PULSEPALOUTPUTEDITOR_H_BB5F0ECC__
 
-#include <EditorHeaders.h>
+#include <VisualizerEditorHeaders.h>
 
 /**
 
@@ -40,12 +40,14 @@ class PulsePalOutput;
 
 class UtilityButton;
 
-class PulsePalOutputEditor : public GenericEditor
+class PulsePalOutputEditor : public VisualizerEditor
 
 {
 public:
     PulsePalOutputEditor(GenericProcessor* parentNode, PulsePal* pp, bool useDefaultParameterEditors);
     virtual ~PulsePalOutputEditor();
+
+    Visualizer* createNewCanvas();
 
 private:
 

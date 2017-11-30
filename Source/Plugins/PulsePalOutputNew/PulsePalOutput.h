@@ -27,6 +27,12 @@
 #include "PulsePalOutputEditor.h"
 #include "serial/PulsePal.h"
 
+#define DEF_PHASE_DURATION 1
+#define DEF_INTER_PHASE 1
+#define DEF_INTER_PULSE 5
+#define DEF_REPETITIONS 1
+#define DEF_TRAINDURATION 10
+#define DEF_VOLTAGE 5
 
 /**
     Allows the signal chain to send outputs to the Pulse Pal
@@ -40,6 +46,8 @@ public:
     PulsePalOutput();
     ~PulsePalOutput();
 
+    enum priority {REPFIRST, TRAINFIRST};
+
     AudioProcessorEditor* createEditor() override;
 
     void process (AudioSampleBuffer& buffer) override;
@@ -48,15 +56,60 @@ public:
 
     void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int sampleNum) override;
 
+    // Pulse Pal
+    bool updatePulsePal();
+
+    bool getIsBiphasic(int chan) const;
+    bool getNegFirst(int chan) const;
+    float getPhaseDuration(int chan) const;
+    float getInterPhaseInt(int chan) const;
+    float getVoltage(int chan) const;
+    int getRepetitions(int chan) const;
+    float getInterPulseInt(int chan) const;
+    float getTrainDuration(int chan) const;
+    uint32_t getPulsePalVersion() const;
+
+    void setIsBiphasic(int chan, bool isBiphasic);
+    void setNegFirst(int chan, bool negFirst);
+    void setPhaseDuration(int chan, float phaseDuration);
+    void setInterPhaseInt(int chan, float interPhaseInt);
+    void setVoltage(int chan, float voltage);
+    void setRepetitions(int chan, int rep);
+    void setInterPulseInt(int chan, float interPulseInt);
+    void setTrainDuration(int chan, float trainDuration);
+    void setChan(int chan);
+    void setTTLSyncChan(int chan);
+    void setStimSyncChan(int chan);
+
+    bool checkParameterConsistency(int chan);
+    void setRepetitionsTrainDuration(int chan, priority whatFirst);
+
+    int getChan() const;
+
 
 private:
     Array<int> channelTtlTrigger;
     Array<int> channelTtlGate;
     Array<bool> channelState;
-
     int channelToChange;
 
+    // Pulse params
+    vector<int> m_isBiphasic;
+    vector<int> m_negativeFirst;
+    vector<float> m_phaseDuration; // ms
+    vector<float> m_interPhaseInt; // ms
+    vector<int> m_repetitions;
+    vector<float> m_trainDuration;
+    vector<float> m_voltage; // V
+    vector<float> m_interPulseInt; // ms
+
+    int m_chan;
+    int m_tot_chan;
+
+    // PULSE PAL
     PulsePal pulsePal;
+    uint32_t pulsePalVersion;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PulsePalOutput);
 };

@@ -52,6 +52,11 @@
 
 #define MAX_CIRCLES 9
 
+/**
+
+  Class for Circles
+
+*/
 class Circle
 {
 public:
@@ -83,6 +88,12 @@ private:
 
 };
 
+/**
+
+    Uses peaks to estimate the phase of a continuous signal.
+
+    @see GenericProcessor, TrackingStimulatorEditor, TrackingStimulatorCanvas
+*/
 class TrackingStimulator : public GenericProcessor
 {
 
@@ -101,16 +112,14 @@ public:
     void loadCustomParametersFromXml() override;
     void updateSettings();
 
-    // Pulse Pal
-    bool updatePulsePal();
-    bool testStimulation(); //test from Editor
-    bool syncStimulation(int chan); //sync from editor
     void startStimulation();
     void stopStimulation();
 
     // Setter-Getters
     float getX(int s) const;
     float getY(int s) const;
+    float getSimX() const;
+    float getSimY() const;
     float getWidth(int s) const;
     float getHeight(int s) const;
 
@@ -127,44 +136,20 @@ public:
     void setSelectedCircle(int ind);
 
     bool getSimulateTrajectory() const;
+    int getOutputChan() const;
+    int getSelectedSource() const;
 
-    int getChan() const;
-
-    float getStimFreq(int chan) const;
-    float getStimSD(int chan) const;
-    bool getIsUniform(int chan) const;
-
-    bool getIsBiphasic(int chan) const;
-    bool getNegFirst(int chan) const;
-    float getPhaseDuration(int chan) const;
-    float getInterPhaseInt(int chan) const;
-    float getVoltage(int chan) const;
-    int getRepetitions(int chan) const;
-    float getInterPulseInt(int chan) const;
-    float getTrainDuration(int chan) const;
-
-    uint32_t getPulsePalVersion() const;
+    float getStimFreq() const;
+    float getStimSD() const;
+    bool getIsUniform() const;
 
     void setSimulateTrajectory(bool sim);
+    void setOutputChan(int chan);
+    void setSelectedSource(int source);
 
-    void setStimFreq(int chan, float stimFreq);
-    void setStimSD(int chan, float stimSD);
-    void setIsUniform(int chan, bool isUniform);
-
-    void setIsBiphasic(int chan, bool isBiphasic);
-    void setNegFirst(int chan, bool negFirst);
-    void setPhaseDuration(int chan, float phaseDuration);
-    void setInterPhaseInt(int chan, float interPhaseInt);
-    void setVoltage(int chan, float voltage);
-    void setRepetitions(int chan, int rep);
-    void setInterPulseInt(int chan, float interPulseInt);
-    void setTrainDuration(int chan, float trainDuration);
-    void setChan(int chan);
-    void setTTLSyncChan(int chan);
-    void setStimSyncChan(int chan);
-
-    bool checkParameterConsistency(int chan);
-    void setRepetitionsTrainDuration(int chan, priority whatFirst);
+    void setStimFreq(float stimFreq);
+    void setStimSD(float stimSD);
+    void setIsUniform(bool isUniform);
 
     void clearPositionDisplayedUpdated();
     bool positionDisplayedIsUpdated() const;
@@ -173,16 +158,16 @@ public:
 
     int isPositionWithinCircles(float x, float y);
 
-    bool isReady();
-
     void save();
     void saveAs();
     void load();
 
+protected:
+    void createEventChannels() override;
+
 private:
 
     CriticalSection lock;
-
     Array<TrackingSources> sources;
 
     // OnOff
@@ -204,6 +189,8 @@ private:
     // Current Position
     float m_x;
     float m_y;
+    float m_simX;
+    float m_simY;
     float m_width;
     float m_height;
     float m_aspect_ratio;
@@ -216,32 +203,13 @@ private:
     int m_selectedCircle;
 
     // Stimulation params
-    vector<float> m_stimFreq;
-    vector<float> m_stimSD;
-    vector<int> m_isUniform;
-
-    // Pulse params
-    vector<int> m_isBiphasic;
-    vector<int> m_negativeFirst;
-    vector<float> m_phaseDuration; // ms
-    vector<float> m_interPhaseInt; // ms
-    vector<int> m_repetitions;
-    vector<float> m_trainDuration;
-    vector<float> m_voltage; // V
-    vector<float> m_interPulseInt; // ms
+    float m_stimFreq;
+    float m_stimSD;
+    int m_isUniform;
 
     // Selected stimulation chan
-    int m_chan;
-    int m_tot_chan;
-
-    // Save sync event
-    bool m_saveSync;
-    int m_TTLSyncChan;
-    int m_StimSyncChan;
-
-    // PULSE PAL
-    PulsePal m_pulsePal;
-    uint32_t m_pulsePalVersion;
+    int m_outputChan;
+    int m_selectedSource;
 
     File currentConfigFile;
 

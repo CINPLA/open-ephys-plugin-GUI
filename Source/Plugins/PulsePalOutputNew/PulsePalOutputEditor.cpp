@@ -23,15 +23,16 @@
 
 #include <stdio.h>
 #include "PulsePalOutputEditor.h"
+#include "PulsePalOutputCanvas.h"
 
 #include "PulsePalOutput.h"
 #include "serial/PulsePal.h"
 
 PulsePalOutputEditor::PulsePalOutputEditor(GenericProcessor* parentNode, PulsePal* pp, bool useDefaultParameterEditors=true)
-    : GenericEditor(parentNode, useDefaultParameterEditors), pulsePal(pp)
+    : VisualizerEditor(parentNode, useDefaultParameterEditors), pulsePal(pp)
 
 {
-
+    tabText = "PulsePal";
     desiredWidth = 315;
 
     for (int i = 1; i < 5; i++)
@@ -47,6 +48,12 @@ PulsePalOutputEditor::PulsePalOutputEditor(GenericProcessor* parentNode, PulsePa
     }
 
 
+}
+
+Visualizer* PulsePalOutputEditor::createNewCanvas()
+{
+    PulsePalOutput* processor = (PulsePalOutput*) getProcessor();
+    return new PulsePalOutputCanvas(processor);
 }
 
 PulsePalOutputEditor::~PulsePalOutputEditor()

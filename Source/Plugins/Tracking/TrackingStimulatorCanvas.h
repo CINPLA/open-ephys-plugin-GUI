@@ -38,6 +38,11 @@
 
 class DisplayAxes;
 
+/**
+
+  Visualizer class for TrackingStimulator
+
+*/
 class TrackingStimulatorCanvas : public Visualizer,
         public Button::Listener,
         public Label::Listener,
@@ -47,6 +52,8 @@ class TrackingStimulatorCanvas : public Visualizer,
 public:
     TrackingStimulatorCanvas(TrackingStimulator* TrackingStimulator);
     ~TrackingStimulatorCanvas();
+
+    friend class DisplayAxes;
 
     void paint (Graphics&);
     void resized();
@@ -79,64 +86,8 @@ public:
     bool areThereCicles();
     void setOnButton();
     float my_round(float x);
-    void uploadInfoOnLoad();
+    void uploadCircles();
     int getSelectedSource() const;
-
-    // *** Maybe adjust with proper accessors instead of keep public *** //
-    ScopedPointer<UtilityButton> clearButton;
-    ScopedPointer<UtilityButton> saveButton;
-    ScopedPointer<UtilityButton> saveAsButton;
-    ScopedPointer<UtilityButton> loadButton;
-    ScopedPointer<UtilityButton> newButton;
-    ScopedPointer<UtilityButton> editButton;
-    ScopedPointer<UtilityButton> delButton;
-    ScopedPointer<UtilityButton> onButton;
-    ScopedPointer<UtilityButton> newcircButton;
-    ScopedPointer<UtilityButton> circlesButton[MAX_CIRCLES];
-    ScopedPointer<UtilityButton> uniformButton;
-    ScopedPointer<UtilityButton> gaussianButton;
-
-    ScopedPointer<ComboBox> availableChans;
-
-    ScopedPointer<UtilityButton> negFirstButton;
-    ScopedPointer<UtilityButton> posFirstButton;
-    ScopedPointer<UtilityButton> biphasicButton;
-    ScopedPointer<UtilityButton> chan1Button;
-    ScopedPointer<UtilityButton> chan2Button;
-    ScopedPointer<UtilityButton> chan3Button;
-    ScopedPointer<UtilityButton> chan4Button;
-
-    ScopedPointer<UtilityButton> simTrajectoryButton;
-
-    // Label with non-editable text
-    ScopedPointer<Label> cxLabel;
-    ScopedPointer<Label> cyLabel;
-    ScopedPointer<Label> cradLabel;
-    ScopedPointer<Label> onLabel;
-    ScopedPointer<Label> fmaxLabel;
-    ScopedPointer<Label> sdevLabel;
-    ScopedPointer<Label> pulsePalLabel;
-    ScopedPointer<Label> phaseLabel;
-    ScopedPointer<Label> interphaseLabel;
-    ScopedPointer<Label> voltageLabel;
-    ScopedPointer<Label> interpulseLabel;
-    ScopedPointer<Label> repetitionsLabel;
-    ScopedPointer<Label> trainDurationLabel;
-
-    // Labels with editable test
-    ScopedPointer<Label> cxEditLabel;
-    ScopedPointer<Label> cyEditLabel;
-    ScopedPointer<Label> cradEditLabel;
-    ScopedPointer<Label> fmaxEditLabel;
-    ScopedPointer<Label> sdevEditLabel;
-
-    ScopedPointer<Label> phaseEditLabel;
-    ScopedPointer<Label> interphaseEditLabel;
-    ScopedPointer<Label> voltageEditLabel;
-    ScopedPointer<Label> interpulseEditLabel;
-    ScopedPointer<Label> repetitionsEditLabel;
-    ScopedPointer<Label> trainDurationEditLabel;
-
 
 private:
     TrackingStimulator* processor;
@@ -156,6 +107,7 @@ private:
     bool m_isDeleting;
 
     int selectedSource;
+    int outputChan;
 
     Colour buttonTextColour;
     Colour labelColour;
@@ -164,17 +116,53 @@ private:
     Colour backgroundColour;
 
     ScopedPointer<DisplayAxes> m_ax;
+    // *** Maybe adjust with proper accessors instead of keep public *** //
+    ScopedPointer<UtilityButton> clearButton;
+    ScopedPointer<UtilityButton> saveButton;
+    ScopedPointer<UtilityButton> saveAsButton;
+    ScopedPointer<UtilityButton> loadButton;
+    ScopedPointer<UtilityButton> newButton;
+    ScopedPointer<UtilityButton> editButton;
+    ScopedPointer<UtilityButton> delButton;
+    ScopedPointer<UtilityButton> onButton;
+    ScopedPointer<UtilityButton> newcircButton;
+    ScopedPointer<UtilityButton> circlesButton[MAX_CIRCLES];
+    ScopedPointer<UtilityButton> uniformButton;
+    ScopedPointer<UtilityButton> gaussianButton;
 
+    ScopedPointer<ComboBox> availableChans;
+    ScopedPointer<ComboBox> outputChans;
+
+    ScopedPointer<UtilityButton> simTrajectoryButton;
+
+    // Label with non-editable text
+    ScopedPointer<Label> sourcesLabel;
+    ScopedPointer<Label> outputLabel;
+    ScopedPointer<Label> circlesLabel;
+    ScopedPointer<Label> paramLabel;
+    ScopedPointer<Label> controlLabel;
+    ScopedPointer<Label> cxLabel;
+    ScopedPointer<Label> cyLabel;
+    ScopedPointer<Label> cradLabel;
+    ScopedPointer<Label> onLabel;
+    ScopedPointer<Label> fmaxLabel;
+    ScopedPointer<Label> sdevLabel;
+
+    // Labels with editable test
+    ScopedPointer<Label> cxEditLabel;
+    ScopedPointer<Label> cyEditLabel;
+    ScopedPointer<Label> cradEditLabel;
+    ScopedPointer<Label> fmaxEditLabel;
+    ScopedPointer<Label> sdevEditLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackingStimulatorCanvas);
 };
 
-///**
+/**
 
-//  Class for displaying and draw circles and current position
+  Class for displaying and draw circles and current position
 
-//*/
-
+*/
 class DisplayAxes : public Component
 {
 public:

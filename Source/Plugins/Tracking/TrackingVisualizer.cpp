@@ -74,8 +74,8 @@ void TrackingVisualizer::updateSettings()
             s.y_pos = -1;
             s.width = -1;
             s.height = -1;
+            sources.add (s);
         }
-        sources.add (s);
     }
 }
 
