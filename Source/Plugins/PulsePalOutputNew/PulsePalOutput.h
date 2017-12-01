@@ -34,6 +34,8 @@
 #define DEF_TRAINDURATION 10
 #define DEF_VOLTAGE 5
 
+#define PULSEPALCHANNELS 4
+
 /**
     Allows the signal chain to send outputs to the Pulse Pal
     from Lucid Biosystems (www.lucidbiosystems.com)

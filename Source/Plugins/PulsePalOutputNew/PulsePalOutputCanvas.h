@@ -69,33 +69,36 @@ public:
     virtual void setParameter(int, float);
     virtual void setParameter(int, int, int, float);
 
-//    int getSelectedSource() const;
+    //    int getSelectedSource() const;
 
 
 private:
     PulsePalOutput* processor;
-    ScopedPointer<UtilityButton> negFirstButton;
-    ScopedPointer<UtilityButton> posFirstButton;
-    ScopedPointer<UtilityButton> biphasicButton;
-    ScopedPointer<UtilityButton> chan1Button;
-    ScopedPointer<UtilityButton> chan2Button;
-    ScopedPointer<UtilityButton> chan3Button;
-    ScopedPointer<UtilityButton> chan4Button;
-
     ScopedPointer<Label> pulsePalLabel;
-    ScopedPointer<Label> phaseLabel;
-    ScopedPointer<Label> interphaseLabel;
-    ScopedPointer<Label> voltageLabel;
-    ScopedPointer<Label> interpulseLabel;
-    ScopedPointer<Label> repetitionsLabel;
-    ScopedPointer<Label> trainDurationLabel;
 
-    ScopedPointer<Label> phaseEditLabel;
-    ScopedPointer<Label> interphaseEditLabel;
-    ScopedPointer<Label> voltageEditLabel;
-    ScopedPointer<Label> interpulseEditLabel;
-    ScopedPointer<Label> repetitionsEditLabel;
-    ScopedPointer<Label> trainDurationEditLabel;
+    ScopedPointer<UtilityButton> negFirstButton[PULSEPALCHANNELS];
+    ScopedPointer<UtilityButton> posFirstButton[PULSEPALCHANNELS];
+    ScopedPointer<UtilityButton> biphasicButton[PULSEPALCHANNELS];
+    ScopedPointer<UtilityButton> ttlButton[PULSEPALCHANNELS];
+
+    ScopedPointer<Label> channelLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> phase1Label[PULSEPALCHANNELS];
+    ScopedPointer<Label> phase2Label[PULSEPALCHANNELS];
+    ScopedPointer<Label> interphaseLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> voltage1Label[PULSEPALCHANNELS];
+    ScopedPointer<Label> voltage2Label[PULSEPALCHANNELS];
+    ScopedPointer<Label> interpulseLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> repetitionsLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> trainDurationLabel[PULSEPALCHANNELS];
+
+    ScopedPointer<Label> phase1EditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> phase2EditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> interphaseEditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> voltage1EditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> voltage2EditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> interpulseEditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> repetitionsEditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> trainDurationEditLabel[PULSEPALCHANNELS];
 
     Colour labelColour;
     Colour labelTextColour;
