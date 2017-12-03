@@ -285,6 +285,8 @@ void TrackingStimulator::process(AudioSampleBuffer&)
 
             m_simX = m_rad*std::cos(theta) + 0.5;
             m_simY = m_rad*std::sin(theta) + 0.5;
+            m_x = m_simX;
+            m_y = m_simY;
             m_width = 1;
             m_height = 1;
 
@@ -293,7 +295,6 @@ void TrackingStimulator::process(AudioSampleBuffer&)
             m_count++;
             m_positionIsUpdated = true;
         }
-
     }
 
     if (m_isOn)
@@ -411,21 +412,6 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
         m_height = 1;
     }
     m_positionIsUpdated = true;
-
-    //    TrackingPosition position = message->position;
-
-    //    if(!(position.x != position.x || position.y != position.y) && position.x != 0 && position.y != 0)
-    //    {
-    //    }
-    //    if(!(position.width != position.width || position.height != position.height))
-    //    {
-    //        m_width = position.width;
-    //        m_height = position.height;
-    //        m_aspect_ratio = m_width / m_height;
-    //    }
-    //    m_positionIsUpdated = true;
-
-
 }
 
 int TrackingStimulator::isPositionWithinCircles(float x, float y)

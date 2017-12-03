@@ -39,6 +39,7 @@
 
 class PulsePalOutputCanvas : public Visualizer,
         public Button::Listener,
+        public ComboBox::Listener,
         public Label::Listener,
         public KeyListener
 {
@@ -50,6 +51,7 @@ public:
     void resized();
     void initButtons();
     void initLabels();
+    void updateLabels(int i);
 
     PulsePalOutput* getProcessor();
 
@@ -59,6 +61,7 @@ public:
     // Listener interface
     virtual void buttonClicked(Button* button);
     virtual void labelTextChanged(Label *label) override;
+    virtual void comboBoxChanged(ComboBox *combobox) override;
 
     // Visualizer interface
     virtual void refreshState();
@@ -76,10 +79,12 @@ private:
     PulsePalOutput* processor;
     ScopedPointer<Label> pulsePalLabel;
 
-    ScopedPointer<UtilityButton> negFirstButton[PULSEPALCHANNELS];
-    ScopedPointer<UtilityButton> posFirstButton[PULSEPALCHANNELS];
+    ScopedPointer<UtilityButton> burstButton[PULSEPALCHANNELS];
     ScopedPointer<UtilityButton> biphasicButton[PULSEPALCHANNELS];
     ScopedPointer<UtilityButton> ttlButton[PULSEPALCHANNELS];
+    ScopedPointer<UtilityButton> link2tr1Button[PULSEPALCHANNELS];
+    ScopedPointer<UtilityButton> link2tr2Button[PULSEPALCHANNELS];
+    ScopedPointer<ComboBox> triggerMode[PULSEPALCHANNELS];
 
     ScopedPointer<Label> channelLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> phase1Label[PULSEPALCHANNELS];
@@ -87,18 +92,27 @@ private:
     ScopedPointer<Label> interphaseLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> voltage1Label[PULSEPALCHANNELS];
     ScopedPointer<Label> voltage2Label[PULSEPALCHANNELS];
+    ScopedPointer<Label> restingVoltageLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> interpulseLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> burstDurationLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> interburstLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> repetitionsLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> trainDurationLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> trainDelayLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> triggerModeLabel[PULSEPALCHANNELS];
 
     ScopedPointer<Label> phase1EditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> phase2EditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> interphaseEditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> voltage1EditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> voltage2EditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> restingVoltageEditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> interpulseEditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> burstDurationEditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> interburstEditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> repetitionsEditLabel[PULSEPALCHANNELS];
     ScopedPointer<Label> trainDurationEditLabel[PULSEPALCHANNELS];
+    ScopedPointer<Label> trainDelayEditLabel[PULSEPALCHANNELS];
 
     Colour labelColour;
     Colour labelTextColour;

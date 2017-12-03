@@ -46,6 +46,7 @@ class PulsePalOutputEditor : public VisualizerEditor
 public:
     PulsePalOutputEditor(GenericProcessor* parentNode, PulsePal* pp, bool useDefaultParameterEditors);
     virtual ~PulsePalOutputEditor();
+    void updateSettings();
 
     Visualizer* createNewCanvas();
 
@@ -72,6 +73,7 @@ public:
     ~ChannelTriggerInterface();
 
     void paint(Graphics& g);
+    void updateSources();
 
     void setTriggerChannel(int chan);
     void setGateChannel(int chan);

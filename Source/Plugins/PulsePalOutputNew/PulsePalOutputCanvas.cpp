@@ -79,41 +79,50 @@ void PulsePalOutputCanvas::paint (Graphics& g)
     for (int i; i < PULSEPALCHANNELS; i++)
     {
         g.setColour(Colours::grey);
-        g.fillRoundedRectangle(0.005*getWidth() + 0.25*i*getWidth(), 0.15*getHeight(), 0.2*getWidth(), 0.7*getHeight(), 4.0f);
+        g.fillRoundedRectangle(0.005*getWidth() + 0.25*i*getWidth(), 0.1*getHeight(), 0.23*getWidth(), 0.89*getHeight(), 4.0f);
     }
 
 }
 
 void PulsePalOutputCanvas::resized()
 {
-    pulsePalLabel->setBounds(0.01*getWidth(), 0.05*getHeight(), 0.18*getWidth(),0.04*getHeight());
+    pulsePalLabel->setBounds(0.01*getWidth(), 0.02*getHeight(), 0.5*getWidth(),0.04*getHeight());
 
     for (int i; i < PULSEPALCHANNELS; i++)
     {
-        channelLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.15*getHeight(), 0.08*getWidth(),0.04*getHeight());
+        channelLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.1*getHeight(), 0.1*getWidth(),0.04*getHeight());
 
-        phase1Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.25*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        phase1EditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.25*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        phase2Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.3*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        phase2EditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.3*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        interphaseLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.35*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        interphaseEditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.35*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        voltage1Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.4*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        voltage1EditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.4*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        voltage2Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.45*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        voltage2EditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.45*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        interpulseLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.5*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        interpulseEditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.5*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        repetitionsLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.55*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        repetitionsEditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.55*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        trainDurationLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.6*getHeight(), 0.08*getWidth(),0.04*getHeight());
-        trainDurationEditLabel[i]->setBounds(0.11*getWidth() + 0.25*i*getWidth(), 0.6*getHeight(), 0.08*getWidth(),0.04*getHeight());
+        phase1Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.2*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        phase1EditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.2*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        voltage1Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.25*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        voltage1EditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.25*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        phase2Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.3*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        phase2EditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.3*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        voltage2Label[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.35*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        voltage2EditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.35*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        interphaseLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.4*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        interphaseEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.4*getHeight(), 0.1*getWidth(),0.04*getHeight());
 
-        ttlButton[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.68*getHeight(), 0.18*getWidth(), 0.06*getHeight());
-        biphasicButton[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.76*getHeight(), 0.18*getWidth(), 0.03*getHeight());
-        negFirstButton[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.8*getHeight(), 0.09*getWidth(),0.03*getHeight());
-        posFirstButton[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth() + 0.09*getWidth(), 0.8*getHeight(), 0.09*getWidth(),0.03*getHeight());
+        restingVoltageLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.45*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        restingVoltageEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.45*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        interpulseLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.5*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        interpulseEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.5*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        burstDurationLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.55*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        burstDurationEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.55*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        interburstLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.6*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        interburstEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.6*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        trainDurationLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.65*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        trainDurationEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.65*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        trainDelayLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.7*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        trainDelayEditLabel[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.7*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        triggerModeLabel[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.75*getHeight(), 0.1*getWidth(),0.04*getHeight());
+        triggerMode[i]->setBounds(0.13*getWidth() + 0.25*i*getWidth(), 0.75*getHeight(), 0.1*getWidth(),0.04*getHeight());
 
+        link2tr1Button[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.83*getHeight(), 0.11*getWidth(), 0.03*getHeight());
+        link2tr2Button[i]->setBounds(0.12*getWidth() + 0.25*i*getWidth(), 0.83*getHeight(), 0.11*getWidth(), 0.03*getHeight());
+        biphasicButton[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.87*getHeight(), 0.11*getWidth(), 0.03*getHeight());
+        burstButton[i]->setBounds(0.12*getWidth() + 0.25*i*getWidth(), 0.87*getHeight(), 0.11*getWidth(), 0.03*getHeight());
+        ttlButton[i]->setBounds(0.01*getWidth() + 0.25*i*getWidth(), 0.91*getHeight(), 0.22*getWidth(), 0.06*getHeight());
     }
 
     refresh();
@@ -121,229 +130,105 @@ void PulsePalOutputCanvas::resized()
 
 void PulsePalOutputCanvas::buttonClicked(Button* button)
 {
-    //    if (button == biphasicButton)
-    //    {
-    //        if (button->getToggleState()==true)
-    //            processor->setIsBiphasic(processor->getChan(), true);
-    //        else
-    //            processor->setIsBiphasic(processor->getChan(), false);
-
-    //        // update train duration/repetition
-    //        if (!processor->checkParameterConsistency(processor->getChan()))
-    //        {
-    //            trainDurationEditLabel->setText(String(processor->getTrainDuration(processor->getChan())), dontSendNotification);
-    //            interpulseEditLabel->setText(String(processor->getInterPulseInt(processor->getChan())), dontSendNotification);
-    //            processor->setRepetitions(processor->getChan(), 1);
-    //            repetitionsEditLabel->setText(String(1), dontSendNotification);
-    //        }
-    //        processor->setRepetitionsTrainDuration(processor->getChan(), processor->REPFIRST);
-    ////        uploadInfoOnLoad();
-    //    }
-    //    else if (button == negFirstButton)
-    //    {
-    //        if (button->getToggleState()==true){
-    //            if (posFirstButton->getToggleState()==true)
-    //                posFirstButton->triggerClick();
-
-    //            processor->setNegFirst(processor->getChan(), true);
-    //        }
-    //        else
-    //            if (posFirstButton->getToggleState()==false)
-    //                posFirstButton->triggerClick();
-    //    }
-    //    else if (button == posFirstButton)
-    //    {
-    //        if (button->getToggleState()==true){
-    //            if (negFirstButton->getToggleState()==true)
-    //                negFirstButton->triggerClick();
-
-    //            processor->setNegFirst(processor->getChan(), false);
-    //        }
-    //        else
-    //            if (negFirstButton->getToggleState()==false)
-    //                negFirstButton->triggerClick();
-    //    }
-    //    else if (button == chan1Button)
-    //    {
-    //        if (button->getToggleState()==true){
-    //            if (chan2Button->getToggleState()==true)
-    //                chan2Button->triggerClick();
-    //            if (chan3Button->getToggleState()==true)
-    //                chan3Button->triggerClick();
-    //            if (chan4Button->getToggleState()==true)
-    //                chan4Button->triggerClick();
-
-    //            processor->setChan(0);
-
-    //            // retrieve and set label values
-
-    //            phaseEditLabel->setText(String(processor->getPhaseDuration(0)), dontSendNotification);
-    //            interphaseEditLabel->setText(String(processor->getInterPhaseInt(0)), dontSendNotification);
-    //            voltageEditLabel->setText(String(processor->getVoltage(0)), dontSendNotification);
-    //            repetitionsEditLabel->setText(String(processor->getRepetitions(0)), dontSendNotification);
-    //            interpulseEditLabel->setText(String(processor->getInterPulseInt(0)), dontSendNotification);
-
-
-
-    //            if (processor->getIsBiphasic(0) == true) {
-    //                if (biphasicButton->getToggleState()==false)
-    //                    biphasicButton->triggerClick();
-    //            } else {
-    //                if (biphasicButton->getToggleState()==true)
-    //                    biphasicButton->triggerClick();
-    //            }
-
-    //            if (processor->getNegFirst(0) == true) {
-    //                if (negFirstButton->getToggleState()==false)
-    //                    negFirstButton->triggerClick();
-    //            } else {
-    //                if (negFirstButton->getToggleState()==true)
-    //                    negFirstButton->triggerClick();
-    //            }
-
-
-    //        }
-    //        else
-    //            if (chan1Button->getToggleState()==false && chan2Button->getToggleState() == false
-    //                    && chan3Button->getToggleState()==false && chan4Button->getToggleState() == false)
-    //                chan1Button->triggerClick();
-    //    }
-    //    else if (button == chan2Button)
-    //    {
-    //        if (button->getToggleState()==true){
-    //            if (chan1Button->getToggleState()==true)
-    //                chan1Button->triggerClick();
-    //            if (chan3Button->getToggleState()==true)
-    //                chan3Button->triggerClick();
-    //            if (chan4Button->getToggleState()==true)
-    //                chan4Button->triggerClick();
-
-    //            processor->setChan(1);
-
-    //            // retrieve and set label values
-
-    //            phaseEditLabel->setText(String(processor->getPhaseDuration(1)), dontSendNotification);
-    //            interphaseEditLabel->setText(String(processor->getInterPhaseInt(1)), dontSendNotification);
-    //            voltageEditLabel->setText(String(processor->getVoltage(1)), dontSendNotification);
-    //            repetitionsEditLabel->setText(String(processor->getRepetitions(1)), dontSendNotification);
-    //            interpulseEditLabel->setText(String(processor->getInterPulseInt(1)), dontSendNotification);
-
-
-
-    //            if (processor->getIsBiphasic(1) == true) {
-    //                if (biphasicButton->getToggleState()==false)
-    //                    biphasicButton->triggerClick();
-    //            } else {
-    //                if (biphasicButton->getToggleState()==true)
-    //                    biphasicButton->triggerClick();
-    //            }
-
-    //            if (processor->getNegFirst(1) == true) {
-    //                if (negFirstButton->getToggleState()==false)
-    //                    negFirstButton->triggerClick();
-    //            } else {
-    //                if (negFirstButton->getToggleState()==true)
-    //                    negFirstButton->triggerClick();
-    //            }
-
-
-    //        }
-    //        else
-    //            if (chan1Button->getToggleState()==false && chan2Button->getToggleState() == false
-    //                    && chan3Button->getToggleState()==false && chan4Button->getToggleState() == false)
-    //                chan2Button->triggerClick();
-
-    //    }
-    //    else if (button == chan3Button)
-    //    {
-    //        if (button->getToggleState()==true){
-    //            if (chan2Button->getToggleState()==true)
-    //                chan2Button->triggerClick();
-    //            if (chan1Button->getToggleState()==true)
-    //                chan1Button->triggerClick();
-    //            if (chan4Button->getToggleState()==true)
-    //                chan4Button->triggerClick();
-
-    //            processor->setChan(2);
-
-
-    //            phaseEditLabel->setText(String(processor->getPhaseDuration(2)), dontSendNotification);
-    //            interphaseEditLabel->setText(String(processor->getInterPhaseInt(2)), dontSendNotification);
-    //            voltageEditLabel->setText(String(processor->getVoltage(2)), dontSendNotification);
-    //            repetitionsEditLabel->setText(String(processor->getRepetitions(2)), dontSendNotification);
-    //            interpulseEditLabel->setText(String(processor->getInterPulseInt(2)), dontSendNotification);
-
-
-
-    //            if (processor->getIsBiphasic(2) == true) {
-    //                if (biphasicButton->getToggleState()==false)
-    //                    biphasicButton->triggerClick();
-    //            } else {
-    //                if (biphasicButton->getToggleState()==true)
-    //                    biphasicButton->triggerClick();
-    //            }
-
-    //            if (processor->getNegFirst(2) == true) {
-    //                if (negFirstButton->getToggleState()==false)
-    //                    negFirstButton->triggerClick();
-    //            } else {
-    //                if (negFirstButton->getToggleState()==true)
-    //                    negFirstButton->triggerClick();
-    //            }
-    //        }
-    //        else
-    //            if (chan1Button->getToggleState()==false && chan2Button->getToggleState() == false
-    //                    && chan3Button->getToggleState()==false && chan4Button->getToggleState() == false)
-    //                chan3Button->triggerClick();
-
-    //    }
-    //    else if (button == chan4Button)
-    //    {
-    //        if (button->getToggleState()==true){
-    //            if (chan2Button->getToggleState()==true)
-    //                chan2Button->triggerClick();
-    //            if (chan3Button->getToggleState()==true)
-    //                chan3Button->triggerClick();
-    //            if (chan1Button->getToggleState()==true)
-    //                chan1Button->triggerClick();
-
-    //            processor->setChan(3);
-
-
-    //            phaseEditLabel->setText(String(processor->getPhaseDuration(3)), dontSendNotification);
-    //            interphaseEditLabel->setText(String(processor->getInterPhaseInt(3)), dontSendNotification);
-    //            voltageEditLabel->setText(String(processor->getVoltage(3)), dontSendNotification);
-    //            repetitionsEditLabel->setText(String(processor->getRepetitions(3)), dontSendNotification);
-    //            interpulseEditLabel->setText(String(processor->getInterPulseInt(3)), dontSendNotification);
-
-
-
-    //            if (processor->getIsBiphasic(3) == true) {
-    //                if (biphasicButton->getToggleState()==false)
-    //                    biphasicButton->triggerClick();
-    //            } else {
-    //                if (biphasicButton->getToggleState()==true)
-    //                    biphasicButton->triggerClick();
-    //            }
-
-    //            if (processor->getNegFirst(3) == true) {
-    //                if (negFirstButton->getToggleState()==false)
-    //                    negFirstButton->triggerClick();
-    //            } else {
-    //                if (negFirstButton->getToggleState()==true)
-    //                    negFirstButton->triggerClick();
-    //            }
-    //        }
-    //        else
-    //            if (chan1Button->getToggleState()==false && chan2Button->getToggleState() == false
-    //                    && chan3Button->getToggleState()==false && chan4Button->getToggleState() == false)
-    //                chan4Button->triggerClick();
-
-    //    }
-
-    processor->updatePulsePal();
+    for (int i; i < PULSEPALCHANNELS; i++)
+    {
+        if (button == biphasicButton[i])
+        {
+            if (button->getToggleState()==true)
+            {
+                processor->setIsBiphasic(i, true);
+                phase2Label[i]->setVisible(true);
+                phase2EditLabel[i]->setVisible(true);
+                interphaseLabel[i]->setVisible(true);
+                interphaseEditLabel[i]->setVisible(true);
+                voltage2Label[i]->setVisible(true);
+                voltage2EditLabel[i]->setVisible(true);
+            }
+            else
+            {
+                processor->setIsBiphasic(i, false);
+                phase2Label[i]->setVisible(false);
+                phase2EditLabel[i]->setVisible(false);
+                interphaseLabel[i]->setVisible(false);
+                interphaseEditLabel[i]->setVisible(false);
+                voltage2Label[i]->setVisible(false);
+                voltage2EditLabel[i]->setVisible(false);
+            }
+        }
+        else if (button == burstButton[i])
+        {
+            if (button->getToggleState()==true)
+            {
+                if (processor->getBurstDuration(i) == 0)
+                {
+                    processor->setBurstDuration(i, DEF_BURSTDURATION);
+                    processor->setInterBurstInt(i, DEF_INTER_BURST);
+                }
+                burstDurationLabel[i]->setVisible(true);
+                burstDurationEditLabel[i]->setVisible(true);
+                interburstLabel[i]->setVisible(true);
+                interburstEditLabel[i]->setVisible(true);
+            }
+            else
+            {
+                if (processor->getBurstDuration(i) != 0)
+                {
+                    processor->setBurstDuration(i, 0);
+                    processor->setInterBurstInt(i, 0);
+                }
+                burstDurationLabel[i]->setVisible(false);
+                burstDurationEditLabel[i]->setVisible(false);
+                interburstLabel[i]->setVisible(false);
+                interburstEditLabel[i]->setVisible(false);
+            }
+        }
+        else if (button == link2tr1Button[i])
+        {
+            if (button->getToggleState()==true)
+                processor->setLinkTriggerChannel1(i, 1);
+            else if (button->getToggleState()==false)
+                processor->setLinkTriggerChannel1(i, 0);
+        }
+        else if (button == link2tr2Button[i])
+        {
+            if (button->getToggleState()==true)
+                processor->setLinkTriggerChannel2(i, 1);
+            else if (button->getToggleState()==false)
+                processor->setLinkTriggerChannel2(i, 0);
+        }
+        else if (button == ttlButton[i])
+        {
+            // set ttl channel i
+            processor->setTTLsettings(i);
+            processor->setIsBiphasic(i, false);
+            phase2Label[i]->setVisible(false);
+            phase2EditLabel[i]->setVisible(false);
+            interphaseLabel[i]->setVisible(false);
+            interphaseEditLabel[i]->setVisible(false);
+            voltage2Label[i]->setVisible(false);
+            voltage2EditLabel[i]->setVisible(false);
+            burstDurationLabel[i]->setVisible(false);
+            burstDurationEditLabel[i]->setVisible(false);
+            interburstLabel[i]->setVisible(false);
+            interburstEditLabel[i]->setVisible(false);
+            if (biphasicButton[i]->getToggleState()==true)
+            {
+                biphasicButton[i]->setToggleState(false, dontSendNotification);
+            }
+            if (burstButton[i]->getToggleState()==true)
+            {
+                burstButton[i]->setToggleState(false, dontSendNotification);
+            }
+        }
+        if (!processor->checkParameterConsistency(i))
+        {
+            CoreServices::sendStatusMessage("Inconsistent parameters: set train duration first");
+            processor->adjustParameters(i);
+        }
+        updateLabels(i);
+        processor->updatePulsePal(i);
+    }
     repaint();
-
 }
 
 bool PulsePalOutputCanvas::keyPressed(const KeyPress &key, Component *originatingComponent)
@@ -353,142 +238,173 @@ bool PulsePalOutputCanvas::keyPressed(const KeyPress &key, Component *originatin
 
 void PulsePalOutputCanvas::labelTextChanged(Label *label)
 {
-    //    if (label == phaseEditLabel)
-    //    {
-    //        // 100 - 3600*10e3 (3600 s)
-    //        Value val = label->getTextValue();
-    //        float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
-    //        if ((float(val.getValue())>=0 && int(val.getValue())<=3600*10e3))
-    //        {
-    //            processor->setPhaseDuration(processor->getChan(), value);
-    //            label->setText(String(value), dontSendNotification);
-    //            if (!processor->checkParameterConsistency(processor->getChan()))
-    //            {
-    //                CoreServices::sendStatusMessage("Inconsistent Values!");
-    //                //if values are inconsestent here phase is  > interpulse or trainduration
-    //                processor->setRepetitions(processor->getChan(), 1);
-    //                repetitionsEditLabel->setText(String(1), dontSendNotification);
-    //            }
-    //            trainDurationEditLabel->setText(String(processor->getTrainDuration(processor->getChan())), dontSendNotification);
-    //            interpulseEditLabel->setText(String(processor->getInterPulseInt(processor->getChan())), dontSendNotification);
-    //        }
-    //        else
-    //        {
-    //            CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
-    //            label->setText("", dontSendNotification);
-
-    //        }
-    //    }
-    //    if (label == interphaseEditLabel)
-    //    {
-    //        Value val = label->getTextValue();
-    //        float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
-    //        if ((float(val.getValue())>=0 && int(val.getValue())<=3600*10e3))
-    //        {
-    //            processor->setInterPhaseInt(processor->getChan(), value);
-    //            label->setText(String(value), dontSendNotification);
-    //            if (!processor->checkParameterConsistency(processor->getChan()))
-    //            {
-    //                CoreServices::sendStatusMessage("Inconsistent Values!");
-    //                processor->setInterPhaseInt(processor->getChan(), DEF_INTER_PHASE);
-    //                label->setText("", dontSendNotification);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
-    //            label->setText("", dontSendNotification);
-    //        }
-    //    }
-    //    if (label == voltageEditLabel)
-    //    {
-    //        Value val = label->getTextValue();
-    //        if (float(val.getValue())>=0 && float(val.getValue())<=10)
-    //        {
-    //            //            float value = float(int(float(val.getValue())*100) / 5 * 5)/100; //only multiple of 100us
-    //            processor->setVoltage(processor->getChan(), float(val.getValue()));
-    //        }
-    //        else
-    //        {
-    //            CoreServices::sendStatusMessage("Selected values must be within 0 and 10 with 0.05 step!");
-    //            label->setText("", dontSendNotification);
-    //        }
-    //    }
-    //    if (label == repetitionsEditLabel)
-    //    {
-    //        Value val = label->getTextValue();
-    //        if (int(val.getValue())>=1)
-    //        {
-    //            processor->setRepetitions(processor->getChan(), int(val.getValue()));
-    //            processor->setRepetitionsTrainDuration(processor->getChan(), processor->REPFIRST);
-    //            trainDurationEditLabel->setText(String(processor->getTrainDuration(processor->getChan())), dontSendNotification);
-    //            if (!processor->checkParameterConsistency(processor->getChan()))
-    //            {
-    //                CoreServices::sendStatusMessage("Inconsistent Values!");
-    //                processor->setRepetitions(processor->getChan(), DEF_REPETITIONS);
-    //                label->setText("", dontSendNotification);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            CoreServices::sendStatusMessage("Selected values cannot be less than 1!");
-    //            label->setText("", dontSendNotification);
-    //        }
-    //    }
-    //    if (label == interpulseEditLabel)
-    //    {
-    //        Value val = label->getTextValue();
-    //        float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
-    //        if ((float(val.getValue())>=0 && int(val.getValue())<=3600*10e3))
-    //        {
-    //            processor->setInterPulseInt(processor->getChan(), value);
-    //            label->setText(String(value), dontSendNotification);
-    //            processor->setRepetitionsTrainDuration(processor->getChan(), processor->REPFIRST);
-    //            trainDurationEditLabel->setText(String(processor->getTrainDuration(processor->getChan())), dontSendNotification);
-    //            if (!processor->checkParameterConsistency(processor->getChan()))
-    //            {
-    //                CoreServices::sendStatusMessage("Inconsistent Values!");
-    //                processor->setInterPulseInt(processor->getChan(), DEF_INTER_PULSE);
-    //                label->setText("", dontSendNotification);
-    //            }
-    //        }
-    //        else
-    //        {
-    //            CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
-    //            label->setText("", dontSendNotification);
-    //        }
-    //    }
-    //    if (label == trainDurationEditLabel)
-    //    {
-    //        Value val = label->getTextValue();
-    //        float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
-    //        if (int(val.getValue())>=1)
-    //        {
-    //            processor->setTrainDuration(processor->getChan(), value);
-
-    //            processor->setRepetitionsTrainDuration(processor->getChan(), processor->TRAINFIRST);
-    //            repetitionsEditLabel->setText(String(processor->getRepetitions(processor->getChan())), dontSendNotification);
-    //            if (!processor->checkParameterConsistency(processor->getChan()))
-    //            {
-    //                CoreServices::sendStatusMessage("Inconsistent Values!");
-    //                //processor->setTrainDuration(processor->getChan(), DEF_TRAINDURATION);
-    //                label->setText("", dontSendNotification);
-    //            }
-    //            label->setText(String(processor->getTrainDuration(processor->getChan())), dontSendNotification);
-    //        }
-    //        else
-    //        {
-    //            CoreServices::sendStatusMessage("Selected values cannot be less than 1!");
-    //            label->setText("", dontSendNotification);
-    //        }
-    //    }
-    for (int i; i < 4; i++)
+    for (int i; i < PULSEPALCHANNELS; i++)
     {
         if (label == phase1EditLabel[i])
-            std::cout << i << " label changed" << std::endl;
-    }
+        {
+            // 100 - 3600*10e3 (3600 s)
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue()) >= 0 && int(val.getValue())<=MAX_INTERVAL))
+            {
+                processor->setPhase1Duration(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600000 with 0.1 step!");
+                label->setText("", dontSendNotification);
 
-    processor->updatePulsePal();
+            }
+        }
+        else if (label == phase2EditLabel[i])
+        {
+            // 100 - 3600000 (3600 s)
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue())>=0 && int(val.getValue())<=MAX_INTERVAL))
+            {
+                processor->setPhase2Duration(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+
+            }
+        }
+        else if (label == interphaseEditLabel[i])
+        {
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue())>=0 && int(val.getValue())<=MAX_INTERVAL))
+            {
+                processor->setInterPhaseInt(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == voltage1EditLabel[i])
+        {
+            Value val = label->getTextValue();
+            if (float(val.getValue()) >= 0 && float(val.getValue()) <= MAX_VOLTAGE)
+            {
+                processor->setVoltage1(i, float(val.getValue()));
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 10 with 0.05 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == voltage2EditLabel[i])
+        {
+            Value val = label->getTextValue();
+            if (float(val.getValue()) >= 0 && float(val.getValue()) <= MAX_VOLTAGE)
+            {
+                processor->setVoltage2(i, float(val.getValue()));
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 10 with 0.05 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == burstDurationEditLabel[i])
+        {
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue()) >= 0 && int(val.getValue()) <= MAX_INTERVAL))
+            {
+                processor->setBurstDuration(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == interburstEditLabel[i])
+        {
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue()) >= 0 && int(val.getValue()) <= MAX_INTERVAL))
+            {
+                processor->setInterBurstInt(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == interpulseEditLabel[i])
+        {
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue()) >= 0 && int(val.getValue()) <= MAX_INTERVAL))
+            {
+                processor->setInterPulseInt(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == trainDurationEditLabel[i])
+        {
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue()) >= 0 && int(val.getValue()) <= MAX_INTERVAL))
+            {
+                processor->setTrainDuration(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        else if (label == trainDelayEditLabel[i])
+        {
+            Value val = label->getTextValue();
+            float value = float(my_round(float(val.getValue())*10) / 10); //only multiple of 100us
+            if ((float(val.getValue()) >= 0 && int(val.getValue()) <= MAX_INTERVAL))
+            {
+                processor->setTrainDelay(i, value);
+                label->setText(String(value), dontSendNotification);
+            }
+            else
+            {
+                CoreServices::sendStatusMessage("Selected values must be within 0 and 3600*10e3 with 0.1 step!");
+                label->setText("", dontSendNotification);
+            }
+        }
+        if (!processor->checkParameterConsistency(i))
+        {
+            CoreServices::sendStatusMessage("Inconsistent parameters: set train duration first");
+            processor->adjustParameters(i);
+        }
+        updateLabels(i);
+        processor->updatePulsePal(i);
+    }
+}
+
+void PulsePalOutputCanvas::comboBoxChanged(ComboBox *combobox)
+{
+    for (int i; i < PULSEPALCHANNELS; i++)
+        if (combobox == triggerMode[i])
+            processor->setTriggerMode(i, combobox->getSelectedId() - 1);
 }
 
 void PulsePalOutputCanvas::initButtons()
@@ -500,67 +416,71 @@ void PulsePalOutputCanvas::initButtons()
         biph->setRadius(3.0f);
         biph->addListener(this);
         biph->setClickingTogglesState(true);
-        //    biphasicButton->triggerClick();
         biphasicButton[i] = biph;
         addAndMakeVisible(biphasicButton[i]);
 
-        ScopedPointer<UtilityButton> neg = new UtilityButton("neg", Font("Small Text", 20, Font::plain));
-        neg->setRadius(3.0f);
-        neg->addListener(this);
-        neg->setClickingTogglesState(true);
-        //    negFirstButton->triggerClick();
-        negFirstButton[i] = neg;
-        addAndMakeVisible(negFirstButton[i]);
+        ScopedPointer<UtilityButton> burst = new UtilityButton("burst", Font("Small Text", 20, Font::plain));
+        burst->setRadius(3.0f);
+        burst->addListener(this);
+        burst->setClickingTogglesState(true);
+        burstButton[i] = burst;
+        addAndMakeVisible(burstButton[i]);
 
-        ScopedPointer<UtilityButton> pos = new UtilityButton("pos", Font("Small Text", 20, Font::plain));
-        pos->setRadius(3.0f);
-        pos->addListener(this);
-        pos->setClickingTogglesState(true);
-        posFirstButton[i] = pos;
-        addAndMakeVisible(posFirstButton[i]);
+        ScopedPointer<UtilityButton> link21 = new UtilityButton("link trig 1", Font("Small Text", 20, Font::plain));
+        link21->setRadius(3.0f);
+        link21->addListener(this);
+        link21->setClickingTogglesState(true);
+        link2tr1Button[i] = link21;
+        addAndMakeVisible(link2tr1Button[i]);
 
-        ScopedPointer<UtilityButton> ttl = new UtilityButton("ttl", Font("Small Text", 25, Font::plain));
+        ScopedPointer<UtilityButton> link22 = new UtilityButton("link trig 2", Font("Small Text", 20, Font::plain));
+        link22->setRadius(3.0f);
+        link22->addListener(this);
+        link22->setClickingTogglesState(true);
+        link2tr2Button[i] = link22;
+        addAndMakeVisible(link2tr2Button[i]);
+
+        ScopedPointer<UtilityButton> ttl = new UtilityButton("ttl", Font("Small Text", 20, Font::plain));
         ttl->setRadius(3.0f);
         ttl->addListener(this);
-        ttl->setClickingTogglesState(true);
         ttlButton[i] = ttl;
         addAndMakeVisible(ttlButton[i]);
 
-        //    chan1Button = new UtilityButton("1", Font("Small Text", 13, Font::plain));
-        //    chan1Button->setRadius(3.0f);
-        //    chan1Button->addListener(this);
-        //    chan1Button->setClickingTogglesState(true);
-        //    chan1Button->triggerClick();
-        //    addAndMakeVisible(chan1Button);
+        ScopedPointer<ComboBox> mode = new ComboBox();
+        mode->addListener(this);
+        for (int i = 0; i < 3; i++)
+            mode->addItem(String(i), i+1); // start numbering at one for
+        // user-visible channels
 
-        //    chan2Button = new UtilityButton("2", Font("Small Text", 13, Font::plain));
-        //    chan2Button->setRadius(3.0f);
-        //    chan2Button->addListener(this);
-        //    chan2Button->setClickingTogglesState(true);
-        //    addAndMakeVisible(chan2Button);
-
-        //    chan3Button = new UtilityButton("3", Font("Small Text", 13, Font::plain));
-        //    chan3Button->setRadius(3.0f);
-        //    chan3Button->addListener(this);
-        //    chan3Button->setClickingTogglesState(true);
-        //    addAndMakeVisible(chan3Button);
-
-        //    chan4Button = new UtilityButton("4", Font("Small Text", 13, Font::plain));
-        //    chan4Button->setRadius(3.0f);
-        //    chan4Button->addListener(this);
-        //    chan4Button->setClickingTogglesState(true);
-        //    addAndMakeVisible(chan4Button);
-
-        //    if (processor->getIsBiphasic(0))
-        //        biphasicButton->triggerClick();
-        //    if (processor->getNegFirst(0))
-        //        negFirstButton->triggerClick();
-        //    else
-        //        posFirstButton->triggerClick();
-        //    }
+        mode->setSelectedId(1, dontSendNotification);
+        triggerMode[i] = mode;
+        addAndMakeVisible(triggerMode[i]);
 
 
+        if (processor->getIsBiphasic(i))
+            biphasicButton[i]->triggerClick();
+//        if (processor->getBurstDuration(i))
+//            biphasicButton[i]->triggerClick();
+//        if (processor->getIsBiphasic(i))
+//            biphasicButton[i]->triggerClick();
+//        if (processor->getIsBiphasic(i))
+//            biphasicButton[i]->triggerClick();
     }
+}
+
+void PulsePalOutputCanvas::updateLabels(int i)
+{
+    phase1EditLabel[i]->setText(String(processor->getPhase1Duration(i)), dontSendNotification);
+    phase2EditLabel[i]->setText(String(processor->getPhase2Duration(i)), dontSendNotification);
+    voltage1EditLabel[i]->setText(String(processor->getVoltage1(i)), dontSendNotification);
+    voltage2EditLabel[i]->setText(String(processor->getVoltage2(i)), dontSendNotification);
+    interphaseEditLabel[i]->setText(String(processor->getInterPhaseInt(i)), dontSendNotification);
+    restingVoltageEditLabel[i]->setText(String(processor->getRestingVoltage(i)), dontSendNotification);
+    interpulseEditLabel[i]->setText(String(processor->getInterPulseInt(i)), dontSendNotification);
+    burstDurationEditLabel[i]->setText(String(processor->getBurstDuration(i)), dontSendNotification);
+    interburstEditLabel[i]->setText(String(processor->getInterBurstInt(i)), dontSendNotification);
+    trainDurationEditLabel[i]->setText(String(processor->getTrainDuration(i)), dontSendNotification);
+    trainDelayEditLabel[i]->setText(String(processor->getTrainDelay(i)), dontSendNotification);
 }
 
 void PulsePalOutputCanvas::initLabels()
@@ -574,7 +494,6 @@ void PulsePalOutputCanvas::initLabels()
     pulsePalLabel->setFont(Font(40));
     pulsePalLabel->setColour(Label::textColourId, labelColour);
     addAndMakeVisible(pulsePalLabel);
-
 
     for (int i; i < PULSEPALCHANNELS; i++)
     {
@@ -595,12 +514,14 @@ void PulsePalOutputCanvas::initLabels()
         ph2->setColour(Label::textColourId, labelColour);
         phase2Label[i] = ph2;
         addAndMakeVisible(phase2Label[i]);
+        phase2Label[i]->setVisible(false);
 
         ScopedPointer<Label> intph = new Label("s_interphase", "interphase [ms]:");
         intph->setFont(Font(20));
         intph->setColour(Label::textColourId, labelColour);
         interphaseLabel[i] = intph;
         addAndMakeVisible(interphaseLabel[i]);
+        interphaseLabel[i]->setVisible(false);
 
         ScopedPointer<Label> v1 = new Label("s_v1", "voltage1 [V]:");
         v1->setFont(Font(20));
@@ -613,6 +534,13 @@ void PulsePalOutputCanvas::initLabels()
         v2->setColour(Label::textColourId, labelColour);
         voltage2Label[i] = v2;
         addAndMakeVisible(voltage2Label[i]);
+        voltage2Label[i]->setVisible(false);
+
+        ScopedPointer<Label> rv = new Label("s_v2", "rest voltage [V]:");
+        rv->setFont(Font(20));
+        rv->setColour(Label::textColourId, labelColour);
+        restingVoltageLabel[i] = rv;
+        addAndMakeVisible(restingVoltageLabel[i]);
 
         ScopedPointer<Label> intpul = new Label("s_intpul", "interpulse [ms]:");
         intpul->setFont(Font(20));
@@ -620,17 +548,37 @@ void PulsePalOutputCanvas::initLabels()
         interpulseLabel[i] = intpul;
         addAndMakeVisible(interpulseLabel[i]);
 
-        ScopedPointer<Label> rep = new Label("s_rep", "repetitions:");
-        rep->setFont(Font(20));
-        rep->setColour(Label::textColourId, labelColour);
-        repetitionsLabel[i] = rep;
-        addAndMakeVisible(repetitionsLabel[i]);
+        ScopedPointer<Label> burst = new Label("s_train", "burst duration [ms]:");
+        burst->setFont(Font(20));
+        burst->setColour(Label::textColourId, labelColour);
+        burstDurationLabel[i] = burst;
+        addAndMakeVisible(burstDurationLabel[i]);
+        burstDurationLabel[i]->setVisible(false);
+
+        ScopedPointer<Label> burstint = new Label("s_train", "inter burst [ms]:");
+        burstint->setFont(Font(20));
+        burstint->setColour(Label::textColourId, labelColour);
+        interburstLabel[i] = burstint;
+        addAndMakeVisible(interburstLabel[i]);
+        interburstLabel[i]->setVisible(false);
 
         ScopedPointer<Label> train = new Label("s_train", "train duration [ms]:");
         train->setFont(Font(20));
         train->setColour(Label::textColourId, labelColour);
         trainDurationLabel[i] = train;
         addAndMakeVisible(trainDurationLabel[i]);
+
+        ScopedPointer<Label> traindel = new Label("s_traindel", "train delay [ms]:");
+        traindel->setFont(Font(20));
+        traindel->setColour(Label::textColourId, labelColour);
+        trainDelayLabel[i] = traindel;
+        addAndMakeVisible(trainDelayLabel[i]);
+
+        ScopedPointer<Label> trigmode = new Label("s_traindel", "trigger mode:");
+        trigmode->setFont(Font(20));
+        trigmode->setColour(Label::textColourId, labelColour);
+        triggerModeLabel[i] = trigmode;
+        addAndMakeVisible(triggerModeLabel[i]);
 
         ScopedPointer<Label> phEd1 = new Label("phase1", String(DEF_PHASE_DURATION));
         phEd1->setFont(Font(20));
@@ -649,6 +597,7 @@ void PulsePalOutputCanvas::initLabels()
         phase2EditLabel[i] = phEd2;
         phase2EditLabel[i]->addListener(this);
         addAndMakeVisible(phase2EditLabel[i]);
+        phase2EditLabel[i]->setVisible(false);
 
         ScopedPointer<Label> intphEd = new Label("interphase", String(DEF_INTER_PHASE));
         intphEd->setFont(Font(20));
@@ -658,6 +607,7 @@ void PulsePalOutputCanvas::initLabels()
         interphaseEditLabel[i] = intphEd;
         interphaseEditLabel[i]->addListener(this);
         addAndMakeVisible(interphaseEditLabel[i]);
+        interphaseEditLabel[i]->setVisible(false);
 
         ScopedPointer<Label> vEd1 = new Label("v1", String(DEF_VOLTAGE));
         vEd1->setFont(Font(20));
@@ -676,6 +626,16 @@ void PulsePalOutputCanvas::initLabels()
         voltage2EditLabel[i] = vEd2;
         voltage2EditLabel[i]->addListener(this);
         addAndMakeVisible(voltage2EditLabel[i]);
+        voltage2EditLabel[i]->setVisible(false);
+
+        ScopedPointer<Label> rvEd = new Label("v2", String(0));
+        rvEd->setFont(Font(20));
+        rvEd->setColour(Label::textColourId, labelTextColour);
+        rvEd->setColour(Label::backgroundColourId, labelBackgroundColour);
+        rvEd->setEditable(true);
+        restingVoltageEditLabel[i] = rvEd;
+        restingVoltageEditLabel[i]->addListener(this);
+        addAndMakeVisible(restingVoltageEditLabel[i]);
 
         ScopedPointer<Label> intpulEd = new Label("pul", String(DEF_INTER_PULSE));
         intpulEd->setFont(Font(20));
@@ -686,16 +646,37 @@ void PulsePalOutputCanvas::initLabels()
         interpulseEditLabel[i]->addListener(this);
         addAndMakeVisible(interpulseEditLabel[i]);
 
-        ScopedPointer<Label> repEd = new Label("rep", String(DEF_REPETITIONS));
-        repEd->setFont(Font(20));
-        repEd->setColour(Label::textColourId, labelTextColour);
-        repEd->setColour(Label::backgroundColourId, labelBackgroundColour);
-        repEd->setEditable(true);
-        repetitionsEditLabel[i] = repEd;
-        repetitionsEditLabel[i]->addListener(this);
-        addAndMakeVisible(repetitionsEditLabel[i]);
 
-        ScopedPointer<Label> trainEd = new Label("train", String(DEF_TRAINDURATION));
+        ScopedPointer<Label> burstEd = new Label("burst", String(0));
+        burstEd->setFont(Font(20));
+        burstEd->setColour(Label::textColourId, labelTextColour);
+        burstEd->setColour(Label::backgroundColourId, labelBackgroundColour);
+        burstEd->setEditable(true);
+        burstDurationEditLabel[i] = burstEd;
+        burstDurationEditLabel[i]->addListener(this);
+        addAndMakeVisible(burstDurationEditLabel[i]);
+        burstDurationEditLabel[i]->setVisible(false);
+
+        ScopedPointer<Label> burstintEd = new Label("train", String(0));
+        burstintEd->setFont(Font(20));
+        burstintEd->setColour(Label::textColourId, labelTextColour);
+        burstintEd->setColour(Label::backgroundColourId, labelBackgroundColour);
+        burstintEd->setEditable(true);
+        interburstEditLabel[i] = burstintEd;
+        interburstEditLabel[i]->addListener(this);
+        addAndMakeVisible(interburstEditLabel[i]);
+        interburstEditLabel[i]->setVisible(false);
+
+        ScopedPointer<Label> traindelEd = new Label("train", String(0));
+        traindelEd->setFont(Font(20));
+        traindelEd->setColour(Label::textColourId, labelTextColour);
+        traindelEd->setColour(Label::backgroundColourId, labelBackgroundColour);
+        traindelEd->setEditable(true);
+        trainDelayEditLabel[i] = traindelEd;
+        trainDelayEditLabel[i]->addListener(this);
+        addAndMakeVisible(trainDelayEditLabel[i]);
+
+        ScopedPointer<Label> trainEd = new Label("train", String(DEF_TRAINDURATION))    ;
         trainEd->setFont(Font(20));
         trainEd->setColour(Label::textColourId, labelTextColour);
         trainEd->setColour(Label::backgroundColourId, labelBackgroundColour);
@@ -737,7 +718,6 @@ void PulsePalOutputCanvas::update()
     //        String name = String(source.sourceId) + " " + source.color;
     //        availableChans->addItem(name, nextItem++);
     //    }
-
 }
 
 void PulsePalOutputCanvas::setParameter(int, float)

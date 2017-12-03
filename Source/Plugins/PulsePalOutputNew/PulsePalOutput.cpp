@@ -4,6 +4,17 @@
     This file is part of the Open Ephys GUI
     Copyright (C) 2016 Open Ephys
 
+    Modified by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
+
     ------------------------------------------------------------------
 
     This program is free software: you can redistribute it and/or modify
@@ -29,7 +40,6 @@
 PulsePalOutput::PulsePalOutput()
     : GenericProcessor ("Pulse Pal New")
     , channelToChange (0)
-    , m_tot_chan (4)
 {
     setProcessorType (PROCESSOR_TYPE_SINK);
 
@@ -37,21 +47,28 @@ PulsePalOutput::PulsePalOutput()
     // Init PulsePal
     pulsePal.initialize();
     pulsePal.setDefaultParameters();
-    pulsePal.updateDisplay("GUI Connected","Click for menu");
+    pulsePal.updateDisplay("PulsePal Output GUI Connected","Click for menu");
     pulsePalVersion = pulsePal.getFirmwareVersion();
 
+    m_phase1Duration = vector<float>(PULSEPALCHANNELS, DEF_PHASE_DURATION);
+    m_phase2Duration = vector<float>(PULSEPALCHANNELS, DEF_PHASE_DURATION);
+    m_interPhaseInterval = vector<float>(PULSEPALCHANNELS, DEF_INTER_PHASE);
+    m_repetitions = vector<int>(PULSEPALCHANNELS, DEF_REPETITIONS);
+    m_phase1Voltage = vector<float>(PULSEPALCHANNELS, DEF_VOLTAGE);
+    m_phase2Voltage = vector<float>(PULSEPALCHANNELS, DEF_VOLTAGE);
+    m_restingVoltage = vector<float>(PULSEPALCHANNELS, 0);
+    m_interPulseInterval = vector<float>(PULSEPALCHANNELS, DEF_INTER_PULSE);
+    m_burstDuration = vector<float>(PULSEPALCHANNELS, 0);
+    m_interBurstInterval = vector<float>(PULSEPALCHANNELS, 0);
+    m_trainDuration = vector<float>(PULSEPALCHANNELS, DEF_TRAINDURATION);
+    m_trainDelay = vector<float>(PULSEPALCHANNELS, 0);
+    m_linkTriggerChannel1 = vector<int>(PULSEPALCHANNELS, 0);
+    m_linkTriggerChannel2 = vector<int>(PULSEPALCHANNELS, 0);
+    m_triggerMode = vector<int>(PULSEPALCHANNELS, 0);
 
-    m_phaseDuration = vector<float>(m_tot_chan, DEF_PHASE_DURATION);
-    m_interPhaseInt = vector<float>(m_tot_chan, DEF_INTER_PHASE);
-    m_repetitions = vector<int>(m_tot_chan, DEF_REPETITIONS);
-    m_voltage = vector<float>(m_tot_chan, DEF_VOLTAGE);
-    m_interPulseInt = vector<float>(m_tot_chan, DEF_INTER_PULSE);
-    m_trainDuration = vector<float>(m_tot_chan, DEF_TRAINDURATION);
+    m_isBiphasic = vector<int>(PULSEPALCHANNELS, 0);
 
-    m_isBiphasic = vector<int>(m_tot_chan, 1);
-    m_negativeFirst = vector<int>(m_tot_chan, 1);
-
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < PULSEPALCHANNELS; ++i)
     {
         channelTtlTrigger.add   (-1);
         channelTtlGate.add      (-1);
@@ -79,27 +96,35 @@ void PulsePalOutput::handleEvent (const EventChannel* eventInfo, const MidiMessa
     {
         //  std::cout << "Received an event!" << std::endl;
 
-		TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
+        TTLEventPtr ttl = TTLEvent::deserializeFromMessage(event, eventInfo);
 
         // int eventNodeId = *(dataptr+1);
-        const int eventId       = ttl->getState() ? 1 : 0;
+        const int state         = ttl->getState() ? 1 : 0;
+        const int eventId       = ttl->getSourceIndex();
+        const int sourceId      = ttl->getSourceID();
         const int eventChannel  = ttl->getChannel();
 
-        for (int i = 0; i < channelTtlTrigger.size(); ++i)
+        for (int i = 0; i < PULSEPALCHANNELS; ++i)
         {
-            if (eventId == 1
-                && eventChannel == channelTtlTrigger[i]
-                && channelState[i])
+            if (channelTtlTrigger[i] != -1)
             {
-                pulsePal.triggerChannel (i + 1);
-            }
+                EventSources s = sources.getReference (channelTtlTrigger[i]);
+                std::cout << "PP Channel " << i+1  << " " << channelTtlTrigger[i] << std::endl;
+                std::cout << "Event Channel " << eventId  << " " << sourceId << " " << eventChannel << std::endl;
+                std::cout << "Source " << s.sourceId  << " " << s.channel << " " << s.eventIndex << std::endl;
+                if (eventId == s.eventIndex && sourceId == s.sourceId && eventChannel == s.channel) // && channelState[i])
+                {
+                    std::cout << "Stimulate" << std::endl;
+                    pulsePal.triggerChannel (i + 1);
+                }
 
-            if (eventChannel == channelTtlGate[i])
-            {
-                if (eventId == 1)
-                    channelState.set (i, true);
-                else
-                    channelState.set (i, false);
+                if (eventChannel == channelTtlGate[i])
+                {
+                    if (eventId == 1)
+                        channelState.set (i, true);
+                    else
+                        channelState.set (i, false);
+                }
             }
         }
     }
@@ -109,33 +134,32 @@ void PulsePalOutput::handleEvent (const EventChannel* eventInfo, const MidiMessa
 void PulsePalOutput::setParameter (int parameterIndex, float newValue)
 {
     editor->updateParameterButtons (parameterIndex);
-    //std::cout << "Changing channel " << parameterIndex << " to " << newValue << std::endl;
 
     switch (parameterIndex)
     {
-        case 0:
-            channelToChange = (int) newValue - 1;
-            break;
+    case 0:
+        channelToChange = (int) newValue;
+        break;
 
-        case 1:
-            channelTtlTrigger.set (channelToChange, (int) newValue);
-            break;
+    case 1:
+        channelTtlTrigger.set (channelToChange, (int) newValue);
+        break;
 
-        case 2:
-            channelTtlGate.set (channelToChange, (int) newValue);
+    case 2:
+        channelTtlGate.set (channelToChange, (int) newValue);
 
-            if (newValue < 0)
-            {
-                channelState.set (channelToChange, true);
-            }
-            else
-            {
-                channelState.set (channelToChange, false);
-            }
-            break;
+        if (newValue < 0)
+        {
+            channelState.set (channelToChange, true);
+        }
+        else
+        {
+            channelState.set (channelToChange, false);
+        }
+        break;
 
-        default:
-            std::cout << "Unrecognized parameter index." << std::endl;
+    default:
+        std::cout << "Unrecognized parameter index." << std::endl;
     }
 }
 
@@ -145,53 +169,38 @@ void PulsePalOutput::process (AudioSampleBuffer& buffer)
     checkForEvents ();
 }
 
-bool PulsePalOutput::updatePulsePal()
+void PulsePalOutput::addEventSource(EventSources s)
+{
+    sources.add (s);
+}
+
+void PulsePalOutput::clearEventSources()
+{
+    sources.clear();
+}
+
+bool PulsePalOutput::updatePulsePal(int chan)
 {
     // check that Pulspal is connected and update param
     if (pulsePalVersion != 0)
     {
-        int actual_chan = m_chan+1;
-        float pulse_duration = 0;
-        pulsePal.setBiphasic(actual_chan, m_isBiphasic[m_chan]);
-        if (m_isBiphasic[m_chan])
-        {
-            //pulse_duration = float(m_phaseDuration[m_chan])/1000*2 + float(m_interPhaseInt[m_chan])/1000;
-            pulsePal.setPhase1Duration(actual_chan, float(m_phaseDuration[m_chan])/1000);
-            pulsePal.setPhase2Duration(actual_chan, float(m_phaseDuration[m_chan])/1000);
-            pulsePal.setInterPhaseInterval(actual_chan, float(m_interPhaseInt[m_chan])/1000);
-            if (m_negativeFirst[m_chan])
-            {
-                pulsePal.setPhase1Voltage(actual_chan, - m_voltage[m_chan]);
-                pulsePal.setPhase2Voltage(actual_chan, m_voltage[m_chan]);
-            }
-            else
-            {
-                pulsePal.setPhase1Voltage(actual_chan, m_voltage[m_chan]);
-                pulsePal.setPhase2Voltage(actual_chan, - m_voltage[m_chan]);
-            }
-        }
-        else
-        {
-            pulse_duration = float(m_phaseDuration[m_chan])/1000;
-            pulsePal.setPhase1Duration(actual_chan, float(m_phaseDuration[m_chan])/1000);
-            pulsePal.setPhase2Duration(actual_chan, 0);
-            pulsePal.setInterPhaseInterval(actual_chan, 0);
-            if (m_negativeFirst[m_chan])
-            {
-                pulsePal.setPhase1Voltage(actual_chan, - m_voltage[m_chan]);
-            }
-            else
-            {
-                pulsePal.setPhase1Voltage(actual_chan, m_voltage[m_chan]);
-            }
+        int actual_chan = chan + 1;
+        pulsePal.setBiphasic(actual_chan, m_isBiphasic[chan]);
+        pulsePal.setPhase1Duration(actual_chan, float(m_phase1Duration[chan])/1000);
+        pulsePal.setPhase2Duration(actual_chan, float(m_phase2Duration[chan])/1000);
+        pulsePal.setInterPhaseInterval(actual_chan, float(m_interPhaseInterval[chan])/1000);
+        pulsePal.setPhase1Voltage(actual_chan, float(m_phase1Voltage[chan]));
+        pulsePal.setPhase2Voltage(actual_chan, float(m_phase2Voltage[chan]));
+        pulsePal.setRestingVoltage(actual_chan, float(m_restingVoltage[chan]));
+        pulsePal.setInterPulseInterval(actual_chan, float(m_interPulseInterval[chan])/1000);
+        pulsePal.setBurstDuration(actual_chan, float(m_burstDuration[chan])/1000);
+        pulsePal.setBurstInterval(actual_chan, float(m_interBurstInterval[chan])/1000);
+        pulsePal.setPulseTrainDuration(actual_chan, float(m_trainDuration[chan])/1000);
+        pulsePal.setPulseTrainDelay(actual_chan, float(m_trainDelay[chan])/1000);
 
-        }
-
-        //float train_duration = float(m_interPulseInt[m_chan])/1000 * m_repetitions[m_chan] + float(m_phaseDuration[m_chan])/1000;
-        pulsePal.setPulseTrainDuration(actual_chan, float(m_trainDuration[m_chan])/1000);
-
-        pulsePal.setInterPulseInterval(actual_chan, float(m_interPulseInt[m_chan])/1000);
-
+        pulsePal.setTrigger1Link(actual_chan, m_linkTriggerChannel1[chan]);
+        pulsePal.setTrigger2Link(actual_chan, m_linkTriggerChannel2[chan]);
+        pulsePal.setTriggerMode(actual_chan, m_triggerMode[chan]);
         return true;
     }
     else
@@ -205,38 +214,62 @@ bool PulsePalOutput::getIsBiphasic(int chan) const
     else
         return false;
 }
-bool PulsePalOutput::getNegFirst(int chan) const
+float PulsePalOutput::getPhase1Duration(int chan) const
 {
-    if (m_negativeFirst[chan])
-        return true;
-    else
-        return false;
+    return m_phase1Duration[chan];
 }
-float PulsePalOutput::getPhaseDuration(int chan) const
+float PulsePalOutput::getPhase2Duration(int chan) const
 {
-    return m_phaseDuration[chan];
+    return m_phase2Duration[chan];
 }
 float PulsePalOutput::getInterPhaseInt(int chan) const
 {
-    return m_interPhaseInt[chan];
+    return m_interPhaseInterval[chan];
 }
-float PulsePalOutput::getVoltage(int chan) const
+float PulsePalOutput::getVoltage1(int chan) const
 {
-    return m_voltage[chan];
+    return m_phase1Voltage[chan];
 }
-int PulsePalOutput::getRepetitions(int chan) const
+float PulsePalOutput::getVoltage2(int chan) const
 {
-    return m_repetitions[chan];
+    return m_phase2Voltage[chan];
+}
+float PulsePalOutput::getRestingVoltage(int chan) const
+{
+    return m_restingVoltage[chan];
 }
 float PulsePalOutput::getInterPulseInt(int chan) const
 {
-    return m_interPulseInt[chan];
+    return m_interPulseInterval[chan];
+}
+float PulsePalOutput::getBurstDuration(int chan) const
+{
+    return m_burstDuration[chan];
+}
+float PulsePalOutput::getInterBurstInt(int chan) const
+{
+    return m_interBurstInterval[chan];
 }
 float PulsePalOutput::getTrainDuration(int chan) const
 {
     return m_trainDuration[chan];
 }
-
+float PulsePalOutput::getTrainDelay(int chan) const
+{
+    return m_trainDelay[chan];
+}
+int PulsePalOutput::getLinkTriggerChannel1(int chan) const
+{
+    return m_linkTriggerChannel1[chan];
+}
+int PulsePalOutput::getLinkTriggerChannel2(int chan) const
+{
+    return m_linkTriggerChannel2[chan];
+}
+int PulsePalOutput::getTriggerMode(int chan) const
+{
+    return m_triggerMode[chan];
+}
 uint32_t PulsePalOutput::getPulsePalVersion() const
 {
     return pulsePalVersion;
@@ -250,111 +283,120 @@ void PulsePalOutput::setIsBiphasic(int chan, bool isBiphasic)
     else
         m_isBiphasic[chan] = 0;
 }
-void PulsePalOutput::setNegFirst(int chan, bool negFirst)
+void PulsePalOutput::setPhase1Duration(int chan, float phaseDuration)
 {
-    if (negFirst)
-        m_negativeFirst[chan] = 1;
-    else
-        m_negativeFirst[chan] = 0;
-
+    m_phase1Duration[chan] = phaseDuration;
 }
-void PulsePalOutput::setPhaseDuration(int chan, float phaseDuration)
+void PulsePalOutput::setPhase2Duration(int chan, float phaseDuration)
 {
-    m_phaseDuration[chan] = phaseDuration;
-    //    updatePulsePal();
+    m_phase2Duration[chan] = phaseDuration;
 }
 void PulsePalOutput::setInterPhaseInt(int chan, float interPhaseInt)
 {
-    m_interPhaseInt[chan] = interPhaseInt;
-    //    updatePulsePal();
+    m_interPhaseInterval[chan] = interPhaseInt;
 }
-void PulsePalOutput::setVoltage(int chan, float voltage)
+void PulsePalOutput::setVoltage1(int chan, float voltage)
 {
-    m_voltage[chan] = voltage;
-    //    updatePulsePal();
+    m_phase1Voltage[chan] = voltage;
 }
-void PulsePalOutput::setRepetitions(int chan, int rep)
+void PulsePalOutput::setVoltage2(int chan, float voltage)
 {
-    m_repetitions[chan] = rep;
-    //    updatePulsePal();
+    m_phase2Voltage[chan] = voltage;
+}
+void PulsePalOutput::setRestingVoltage(int chan, float voltage)
+{
+    m_restingVoltage[chan] = voltage;
 }
 void PulsePalOutput::setInterPulseInt(int chan, float interPulseInt)
 {
-    m_interPulseInt[chan] = interPulseInt;
-    //    updatePulsePal();
+    m_interPulseInterval[chan] = interPulseInt;
+}
+void PulsePalOutput::setBurstDuration(int chan, float burstDuration)
+{
+    m_burstDuration[chan] = burstDuration;
+}
+void PulsePalOutput::setInterBurstInt(int chan, float interBurstInt)
+{
+    m_interBurstInterval[chan] = interBurstInt;
 }
 void PulsePalOutput::setTrainDuration(int chan, float trainDuration)
 {
     m_trainDuration[chan] = trainDuration;
-    //    updatePulsePal();
 }
-
-void PulsePalOutput::setChan(int chan)
+void PulsePalOutput::setTrainDelay(int chan, float trainDelay)
 {
-    m_chan = chan;
+    m_trainDelay[chan] = trainDelay;
 }
-
-
-int PulsePalOutput::getChan() const
+void PulsePalOutput::setLinkTriggerChannel1(int chan, int link)
 {
-    return m_chan;
+    m_linkTriggerChannel1[chan] = link;
 }
+void PulsePalOutput::setLinkTriggerChannel2(int chan, int link)
+{
+    m_linkTriggerChannel2[chan] = link;
+}
+void PulsePalOutput::setTriggerMode(int chan, int mode)
+{
+    m_triggerMode[chan] = mode;
+}
+
+void PulsePalOutput::setTTLsettings(int chan)
+{
+    m_isBiphasic[chan] = 0;
+    m_phase1Duration[chan] = 1;
+    m_phase2Duration[chan] = 0;
+    m_phase1Voltage[chan] = 5;
+    m_phase2Voltage[chan] = 0;
+    m_restingVoltage[chan] = 0;
+    m_interPhaseInterval[chan] = 0;
+    m_interPulseInterval[chan] = 1;
+    m_burstDuration[chan] = 0;
+    m_interBurstInterval[chan] = 0;
+    m_trainDuration[chan] = 2;
+    m_trainDelay[chan] = 0;
+
+}
+
 
 bool PulsePalOutput::checkParameterConsistency(int chan)
 {
-    if (m_repetitions[chan] > 1)
-        if (!m_isBiphasic[chan])
-            return !(m_phaseDuration[chan] + m_interPulseInt[chan] > m_trainDuration[chan]);
+    bool consistent;
+
+    if (!m_isBiphasic[chan])
+        if (m_burstDuration[chan] != 0)
+            consistent = (m_phase1Duration[chan] + m_interPulseInterval[chan] < m_burstDuration[chan]) &&
+                    (m_burstDuration[chan] + m_interBurstInterval[chan] < m_trainDuration[chan]);
         else
-            return !(2*m_phaseDuration[chan] + m_interPhaseInt[chan] + m_interPulseInt[chan] > m_trainDuration[chan]);
+            consistent = (m_phase1Duration[chan] <= m_trainDuration[chan]);
     else
-    {
-        if (!m_isBiphasic[chan])
-        {
-            //            m_interPulseInt[chan] = m_phaseDuration[chan];
-            m_trainDuration[chan] = m_phaseDuration[chan];
-        }
+        if (m_burstDuration[chan] != 0)
+            consistent =  (m_phase1Duration[chan] + m_phase2Duration[chan] + m_interPhaseInterval[chan] + m_interPulseInterval[chan] < m_burstDuration[chan]) &&
+                    (m_burstDuration[chan] + m_interBurstInterval[chan] < m_trainDuration[chan]);
         else
-        {
-            //            m_interPulseInt[chan] = 2*m_phaseDuration[chan] + m_interPhaseInt[chan];
-            m_trainDuration[chan] = 2*m_phaseDuration[chan] + m_interPhaseInt[chan];
-        }
-        return true;
-    }
+            consistent =  (m_phase1Duration[chan] + m_phase2Duration[chan] + m_interPhaseInterval[chan] <= m_trainDuration[chan]);
+
+    return consistent;
 }
 
-void PulsePalOutput::setRepetitionsTrainDuration(int chan, priority whatFirst)
+void PulsePalOutput::adjustParameters(int chan)
 {
-    if (whatFirst == REPFIRST)
-    {
-        if (m_repetitions[chan] > 1)
-            if (!m_isBiphasic[chan])
-                m_trainDuration[chan] = (m_phaseDuration[chan] + m_interPulseInt[chan])*m_repetitions[chan]; // + m_phaseDuration[chan];
-            else
-                m_trainDuration[chan] = (2*m_phaseDuration[chan] + m_interPhaseInt[chan] + m_interPulseInt[chan])*m_repetitions[chan]; // + (2*m_phaseDuration[chan]+ m_interPhaseInt[chan]);
+    if (!m_isBiphasic[chan])
+        if (m_burstDuration[chan] != 0)
+        {
+            m_burstDuration[chan] = m_phase1Duration[chan] + m_interPulseInterval[chan] + 1;
+            m_trainDuration[chan] = m_burstDuration[chan] + m_interBurstInterval[chan] + 1;
+        }
         else
-            if (!m_isBiphasic[chan])
-                m_trainDuration[chan] = m_phaseDuration[chan];
-            else
-                m_trainDuration[chan] = 2*m_phaseDuration[chan] + m_interPhaseInt[chan];
-    }
+            m_trainDuration[chan] = m_phase1Duration[chan] + m_interPulseInterval[chan] + 1;
     else
-    {
-        if (!m_isBiphasic[chan])
-            if (int(m_trainDuration[chan]/(m_phaseDuration[chan] + m_interPulseInt[chan])) > 1)
-                m_repetitions[chan] = int(m_trainDuration[chan]/(m_phaseDuration[chan] + m_interPulseInt[chan]));
-            else
-            {
-                m_repetitions[chan] = 1;
-                m_trainDuration[chan] = m_phaseDuration[chan];
-            }
+        if (m_burstDuration[chan] != 0)
+        {
+            m_burstDuration[chan] = m_phase1Duration[chan] + m_phase2Duration[chan] + m_interPhaseInterval[chan]
+                    + m_interPulseInterval[chan] + 1;
+            m_trainDuration[chan] = m_burstDuration[chan] + m_interBurstInterval[chan] + 1;
+        }
         else
-            if (int(m_trainDuration[chan]/(2*m_phaseDuration[chan] + m_interPulseInt[chan] + m_interPulseInt[chan]) > 1))
-                m_repetitions[chan] = int(m_trainDuration[chan]/(2*m_phaseDuration[chan] + m_interPulseInt[chan] + m_interPulseInt[chan]));
-            else
-            {
-                m_repetitions[chan] = 1;
-                m_trainDuration[chan] = 2*m_phaseDuration[chan] + m_interPhaseInt[chan];
-            }
-    }
+            m_trainDuration[chan] =  m_phase1Duration[chan] + m_phase2Duration[chan] + m_interPhaseInterval[chan]
+                    + m_interPulseInterval[chan] + 1;
 }
+

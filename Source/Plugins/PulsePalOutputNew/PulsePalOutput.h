@@ -4,6 +4,18 @@
     This file is part of the Open Ephys GUI
     Copyright (C) 2016 Open Ephys
 
+    Modified by:
+
+    Alessio Buccino     alessiob@ifi.uio.no
+    Mikkel Lepperod
+    Svenn-Arne Dragly
+
+    Center for Integrated Neuroplasticity CINPLA
+    Department of Biosciences
+    University of Oslo
+    Norway
+
+
     ------------------------------------------------------------------
 
     This program is free software: you can redistribute it and/or modify
@@ -31,10 +43,21 @@
 #define DEF_INTER_PHASE 1
 #define DEF_INTER_PULSE 5
 #define DEF_REPETITIONS 1
-#define DEF_TRAINDURATION 10
+#define DEF_TRAINDURATION 100
 #define DEF_VOLTAGE 5
+#define DEF_BURSTDURATION 30
+#define DEF_INTER_BURST 20
 
+#define MAX_VOLTAGE 10
+#define MAX_INTERVAL 3600000
 #define PULSEPALCHANNELS 4
+
+struct EventSources
+{
+    unsigned int eventIndex;
+    unsigned int sourceId;
+    unsigned int channel;
+};
 
 /**
     Allows the signal chain to send outputs to the Pulse Pal
@@ -48,65 +71,81 @@ public:
     PulsePalOutput();
     ~PulsePalOutput();
 
-    enum priority {REPFIRST, TRAINFIRST};
-
     AudioProcessorEditor* createEditor() override;
-
     void process (AudioSampleBuffer& buffer) override;
-
     void setParameter (int parameterIndex, float newValue) override;
-
     void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int sampleNum) override;
 
     // Pulse Pal
-    bool updatePulsePal();
+    bool updatePulsePal(int chan);
 
     bool getIsBiphasic(int chan) const;
-    bool getNegFirst(int chan) const;
-    float getPhaseDuration(int chan) const;
+    float getPhase1Duration(int chan) const;
+    float getPhase2Duration(int chan) const;
     float getInterPhaseInt(int chan) const;
-    float getVoltage(int chan) const;
-    int getRepetitions(int chan) const;
+    float getVoltage1(int chan) const;
+    float getVoltage2(int chan) const;
+    float getRestingVoltage(int chan) const;
     float getInterPulseInt(int chan) const;
+    float getBurstDuration(int chan) const;
+    float getInterBurstInt(int chan) const;
     float getTrainDuration(int chan) const;
+    float getTrainDelay(int chan) const;
+    int getLinkTriggerChannel1(int chan) const;
+    int getLinkTriggerChannel2(int chan) const;
+    int getTriggerMode(int chan) const;
     uint32_t getPulsePalVersion() const;
 
     void setIsBiphasic(int chan, bool isBiphasic);
     void setNegFirst(int chan, bool negFirst);
-    void setPhaseDuration(int chan, float phaseDuration);
+    void setPhase1Duration(int chan, float phaseDuration);
+    void setPhase2Duration(int chan, float phaseDuration);
     void setInterPhaseInt(int chan, float interPhaseInt);
-    void setVoltage(int chan, float voltage);
-    void setRepetitions(int chan, int rep);
+    void setVoltage1(int chan, float voltage);
+    void setVoltage2(int chan, float voltage);
+    void setRestingVoltage(int chan, float voltage);
     void setInterPulseInt(int chan, float interPulseInt);
+    void setBurstDuration(int chan, float burstDuration);
+    void setInterBurstInt(int chan, float interBurstInt);
     void setTrainDuration(int chan, float trainDuration);
-    void setChan(int chan);
-    void setTTLSyncChan(int chan);
-    void setStimSyncChan(int chan);
+    void setTrainDelay(int chan, float trainDelay);
+    void setLinkTriggerChannel1(int chan, int link);
+    void setLinkTriggerChannel2(int chan, int link);
+    void setTriggerMode(int chan, int mode);
+    void setTTLsettings(int chan);
 
     bool checkParameterConsistency(int chan);
-    void setRepetitionsTrainDuration(int chan, priority whatFirst);
+    void adjustParameters(int chan);
 
-    int getChan() const;
-
+    void addEventSource(EventSources s);
+    void clearEventSources();
 
 private:
     Array<int> channelTtlTrigger;
     Array<int> channelTtlGate;
     Array<bool> channelState;
+    Array<EventSources> sources;
+
     int channelToChange;
 
-    // Pulse params
+    // PulsePal params
     vector<int> m_isBiphasic;
-    vector<int> m_negativeFirst;
-    vector<float> m_phaseDuration; // ms
-    vector<float> m_interPhaseInt; // ms
-    vector<int> m_repetitions;
+    vector<float> m_phase1Duration; // ms
+    vector<float> m_phase2Duration; // ms
+    vector<float> m_interPhaseInterval; // ms
     vector<float> m_trainDuration;
-    vector<float> m_voltage; // V
-    vector<float> m_interPulseInt; // ms
+    vector<float> m_trainDelay;
+    vector<float> m_burstDuration;
+    vector<float> m_phase1Voltage; // V
+    vector<float> m_phase2Voltage; // V
+    vector<float> m_restingVoltage; // V
+    vector<float> m_interPulseInterval; // ms
+    vector<float> m_interBurstInterval; // ms
+    vector<int> m_linkTriggerChannel1;
+    vector<int> m_linkTriggerChannel2;
+    vector<int> m_triggerMode;
 
-    int m_chan;
-    int m_tot_chan;
+    vector<int> m_repetitions;
 
     // PULSE PAL
     PulsePal pulsePal;

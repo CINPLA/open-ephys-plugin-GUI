@@ -33,21 +33,15 @@ PulsePalOutputEditor::PulsePalOutputEditor(GenericProcessor* parentNode, PulsePa
 
 {
     tabText = "PulsePal";
-    desiredWidth = 315;
+    desiredWidth = 460;
 
-    for (int i = 1; i < 5; i++)
+    for (int i = 0; i < PULSEPALCHANNELS; i++)
     {
         ChannelTriggerInterface* cti = new ChannelTriggerInterface(pp, (PulsePalOutput*) getProcessor(), i);
-
         channelTriggerInterfaces.add(cti);
-
-        cti->setBounds(10+75*(i-1),30,65,90);
-
+        cti->setBounds(5+115*(i), 30, 100, 90);
         addAndMakeVisible(cti);
-
     }
-
-
 }
 
 Visualizer* PulsePalOutputEditor::createNewCanvas()
@@ -58,8 +52,14 @@ Visualizer* PulsePalOutputEditor::createNewCanvas()
 
 PulsePalOutputEditor::~PulsePalOutputEditor()
 {
+}
 
-
+void PulsePalOutputEditor::updateSettings()
+{
+    for (int i = 0; i < PULSEPALCHANNELS; i++)
+    {
+        channelTriggerInterfaces[i]->updateSources();
+    }
 }
 
 void PulsePalOutputEditor::saveCustomParameters(XmlElement* xml)
@@ -67,7 +67,7 @@ void PulsePalOutputEditor::saveCustomParameters(XmlElement* xml)
 
     xml->setAttribute("Type", "PulsePalOutputEditor");
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < PULSEPALCHANNELS; i++)
     {
         XmlElement* outputXml = xml->createNewChildElement("OUTPUTCHANNEL");
         outputXml->setAttribute("Number",i);
@@ -105,30 +105,30 @@ ChannelTriggerInterface::ChannelTriggerInterface(PulsePal* pp, PulsePalOutput* p
     triggerButton = new UtilityButton("trigger", Font("Small Text", 10, Font::plain));
     triggerButton->addListener(this);
     triggerButton->setRadius(3.0f);
-    triggerButton->setBounds(5,5,55,20);
+    triggerButton->setBounds(5, 5, 90, 20);
     addAndMakeVisible(triggerButton);
 
     triggerSelector = new ComboBox();
-    triggerSelector->setBounds(5,30,55,20);
+    triggerSelector->setBounds(5, 30, 90, 20);
     triggerSelector->addListener(this);
     triggerSelector->addItem("Trig",1);
 
-    for (int i = 0; i < 10; i++)
-        triggerSelector->addItem(String(i+1),i+2); // start numbering at one for
-    // user-visible channels
-
-    triggerSelector->setSelectedId(1, dontSendNotification);
-    addAndMakeVisible(triggerSelector);
+//    for (int i = 0; i < 10; i++)
+//        triggerSelector->addItem(String(i+1),i+2); // start numbering at one for
+//    // user-visible channels
 
     gateSelector = new ComboBox();
-    gateSelector->setBounds(5,55,55,20);
+    gateSelector->setBounds(5, 55, 90,20);
     gateSelector->addListener(this);
     gateSelector->addItem("Gate",1);
 
-    for (int i = 0; i < 10; i++)
-        gateSelector->addItem(String(i+1),i+2); // start numbering at one for
-    // user-visible channels
+//    for (int i = 0; i < 10; i++)
+//        gateSelector->addItem(String(i+1),i+2); // start numbering at one for
+//    // user-visible channels
+    updateSources();
 
+    triggerSelector->setSelectedId(1, dontSendNotification);
+    addAndMakeVisible(triggerSelector);
     gateSelector->setSelectedId(1, dontSendNotification);
     addAndMakeVisible(gateSelector);
 
@@ -160,10 +160,48 @@ void ChannelTriggerInterface::buttonClicked(Button* button)
     pulsePal->triggerChannel(channelNumber);
 }
 
+void ChannelTriggerInterface::updateSources()
+{
+    EventSources s;
+    String name;
+    int oldId = triggerSelector->getSelectedId();
+    processor->clearEventSources();
+    triggerSelector->clear();
+    gateSelector->clear();
+    triggerSelector->addItem("Trigger", 1);
+    gateSelector->addItem("Gate", 1);
+    int nextItemTrig = 2;
+    int nextItemGate = 2;
+    int nEvents = processor->getTotalEventChannels();
+    for (int i = 0; i < nEvents; i++)
+    {
+        const EventChannel* event = processor->getEventChannel(i);
+        if (event->getChannelType() == EventChannel::TTL)
+        {
+            s.eventIndex = event->getSourceIndex();
+            s.sourceId = event->getSourceNodeID();
+            int nChans = event->getNumChannels();
+            for (int c = 0; c < nChans; c++)
+            {
+                s.channel = c;
+                name = event->getSourceName() + " " + String(event->getSourceIndex()) + " (TTL" + String(c+1) + ")";
+                processor->addEventSource(s);
+                triggerSelector->addItem(name, nextItemTrig++);
+                gateSelector->addItem(name, nextItemGate++);
+            }
+        }
+    }
+    if (oldId > triggerSelector->getNumItems())
+    {
+        oldId = 1;
+    }
+    triggerSelector->setSelectedId(oldId, sendNotification);
+    gateSelector->setSelectedId(oldId, sendNotification);
+}
+
+
 void ChannelTriggerInterface::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 {
-    //std::cout << "Combo box changed to " << comboBoxThatHasChanged->getSelectedId() << std::endl;
-
     if (comboBoxThatHasChanged == triggerSelector)
     {
         processor->setParameter(0, channelNumber);
@@ -174,8 +212,6 @@ void ChannelTriggerInterface::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
         processor->setParameter(0, channelNumber);
         processor->setParameter(2, (float) comboBoxThatHasChanged->getSelectedId() - 2);
     }
-
-
 }
 
 int ChannelTriggerInterface::getTriggerChannel()
