@@ -200,7 +200,6 @@ void ChannelTriggerInterface::updateSources()
     }
     else
         gateSelector->setSelectedId(m_gateSelected);
-
 }
 
 void ChannelTriggerInterface::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
@@ -209,14 +208,19 @@ void ChannelTriggerInterface::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
     {
         processor->setParameter(0, channelNumber);
         processor->setParameter(1, (float) comboBoxThatHasChanged->getSelectedId() - 2);
-        m_triggerSelected = comboBoxThatHasChanged->getSelectedId() - 2;
+        if (comboBoxThatHasChanged->getSelectedId() - 1 > 0)
+            m_triggerSelected = comboBoxThatHasChanged->getSelectedId() - 1;
+        else
+            m_triggerSelected = 1;
     }
     else if (comboBoxThatHasChanged == gateSelector)
     {
         processor->setParameter(0, channelNumber);
         processor->setParameter(2, (float) comboBoxThatHasChanged->getSelectedId() - 2);
-        m_gateSelected = comboBoxThatHasChanged->getSelectedId() - 2;
-    }
+        if (comboBoxThatHasChanged->getSelectedId() - 1 > 0)
+            m_gateSelected = comboBoxThatHasChanged->getSelectedId() - 1;
+        else
+            m_gateSelected = 1;    }
 }
 
 int ChannelTriggerInterface::getTriggerChannel()
