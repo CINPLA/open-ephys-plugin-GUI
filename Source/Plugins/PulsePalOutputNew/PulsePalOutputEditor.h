@@ -89,6 +89,9 @@ private:
     PulsePal* pulsePal;
     PulsePalOutput* processor;
 
+    int m_triggerSelected;
+    int m_gateSelected;
+
     bool isEnabled;
 
     int channelNumber;
