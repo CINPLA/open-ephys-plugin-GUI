@@ -449,22 +449,20 @@ void PulsePalOutputCanvas::initButtons()
         ScopedPointer<ComboBox> mode = new ComboBox();
         mode->addListener(this);
         for (int i = 0; i < 3; i++)
-            mode->addItem(String(i), i+1); // start numbering at one for
-        // user-visible channels
+            mode->addItem(String(i), i+1);
 
-        mode->setSelectedId(1, dontSendNotification);
+        // user-visible channels
+        mode->setSelectedId(processor->getTriggerMode(i)+1, dontSendNotification);
         triggerMode[i] = mode;
         addAndMakeVisible(triggerMode[i]);
 
 
         if (processor->getIsBiphasic(i))
             biphasicButton[i]->triggerClick();
-//        if (processor->getBurstDuration(i))
-//            biphasicButton[i]->triggerClick();
-//        if (processor->getIsBiphasic(i))
-//            biphasicButton[i]->triggerClick();
-//        if (processor->getIsBiphasic(i))
-//            biphasicButton[i]->triggerClick();
+        if (processor->getLinkTriggerChannel1(i))
+            link2tr1Button[i]->triggerClick();
+        if (processor->getLinkTriggerChannel2(i))
+            link2tr2Button[i]->triggerClick();
     }
 }
 
@@ -708,16 +706,7 @@ void PulsePalOutputCanvas::endAnimation()
 
 void PulsePalOutputCanvas::update()
 {
-    //    availableChans->clear();
-    //    int nSources = processor->getNSources();
-    //    int nextItem = 2;
-    //    availableChans->addItem("None", 1);
-    //    for (int i = 0; i < nSources; i++)
-    //    {
-    //        TrackingSources& source = processor->getTrackingSource(i);
-    //        String name = String(source.sourceId) + " " + source.color;
-    //        availableChans->addItem(name, nextItem++);
-    //    }
+
 }
 
 void PulsePalOutputCanvas::setParameter(int, float)

@@ -115,12 +115,6 @@ void TrackingStimulatorCanvas::paint (Graphics& g)
         g.setColour(labelBackgroundColour);
     g.fillEllipse(getWidth() - 0.065*getWidth(), 0.46*getHeight(), 0.03*getWidth(), 0.03*getHeight());
 
-    // Check pulse Pal connection
-    //    if (processor->getPulsePalVersion() > 0)
-    //        pulsePalLabel->setText(String("Pulse Pal: ") +=  String("CONNECTED"), dontSendNotification);
-    //    else
-    //        pulsePalLabel->setText(String("Pulse Pal: ") +=  String("NOT CONNECTED"), dontSendNotification);
-
     if (camWidth > left_limit)
     {
         camWidth = left_limit;
@@ -418,9 +412,7 @@ void TrackingStimulatorCanvas::buttonClicked(Button* button)
 
         }
     }
-
     repaint();
-
 }
 
 void TrackingStimulatorCanvas::uploadCircles()
@@ -507,7 +499,7 @@ void TrackingStimulatorCanvas::update()
     for (int i = 0; i < nSources; i++)
     {
         TrackingSources& source = processor->getTrackingSource(i);
-        String name = String(source.sourceId) + " " + source.color;
+        String name = source.name;
         availableChans->addItem(name, nextItem++);
     }
 

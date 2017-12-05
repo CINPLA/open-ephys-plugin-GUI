@@ -173,7 +173,7 @@ void TrackingVisualizerCanvas::update()
     for (int i = 0; i < nSources; i++)
     {
         TrackingSources& source = processor->getTrackingSource(i);
-        String name = String(source.sourceId) + " " + source.color;
+        String name = source.name;
         listboxData.add (name);
     }
 

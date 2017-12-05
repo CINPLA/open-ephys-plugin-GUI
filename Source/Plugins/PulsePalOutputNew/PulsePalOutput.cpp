@@ -109,9 +109,9 @@ void PulsePalOutput::handleEvent (const EventChannel* eventInfo, const MidiMessa
             if (channelTtlTrigger[i] != -1)
             {
                 EventSources s = sources.getReference (channelTtlTrigger[i]);
-                std::cout << "PP Channel " << i+1  << " " << channelTtlTrigger[i] << std::endl;
-                std::cout << "Event Channel " << eventId  << " " << sourceId << " " << eventChannel << std::endl;
-                std::cout << "Source " << s.sourceId  << " " << s.channel << " " << s.eventIndex << std::endl;
+//                std::cout << "PP Channel " << i+1  << " " << channelTtlTrigger[i] << std::endl;
+//                std::cout << "Event Channel " << eventId  << " " << sourceId << " " << eventChannel << std::endl;
+//                std::cout << "Source " << s.sourceId  << " " << s.channel << " " << s.eventIndex << std::endl;
                 if (eventId == s.eventIndex && sourceId == s.sourceId && eventChannel == s.channel) // && channelState[i])
                 {
                     std::cout << "Stimulate" << std::endl;
@@ -399,4 +399,80 @@ void PulsePalOutput::adjustParameters(int chan)
             m_trainDuration[chan] =  m_phase1Duration[chan] + m_phase2Duration[chan] + m_interPhaseInterval[chan]
                     + m_interPulseInterval[chan] + 1;
 }
+
+void PulsePalOutput::saveCustomParametersToXml(XmlElement *parentElement)
+{
+    XmlElement* mainNode = parentElement->createNewChildElement("PulsePalOutput");
+    for (int i=0; i<PULSEPALCHANNELS; i++)
+    {
+        XmlElement* chan = new XmlElement(String("Channel_")+=String(i+1));
+        chan->setAttribute("id", i);
+        chan->setAttribute("biphasic", m_isBiphasic[i]);
+        chan->setAttribute("phase1", m_phase1Duration[i]);
+        chan->setAttribute("phase2", m_phase1Duration[i]);
+        chan->setAttribute("interphase", m_interPhaseInterval[i]);
+        chan->setAttribute("voltage1", m_phase1Voltage[i]);
+        chan->setAttribute("voltage2", m_phase2Voltage[i]);
+        chan->setAttribute("restingvoltage", m_restingVoltage[i]);
+        chan->setAttribute("interpulse", m_interPulseInterval[i]);
+        chan->setAttribute("burstduration", m_burstDuration[i]);
+        chan->setAttribute("interburst", m_interBurstInterval[i]);
+        chan->setAttribute("trainduration", m_trainDuration[i]);
+        chan->setAttribute("traindelay", m_trainDelay[i]);
+        chan->setAttribute("link2trigger1", m_linkTriggerChannel1[i]);
+        chan->setAttribute("link2trigger2", m_linkTriggerChannel2[i]);
+        chan->setAttribute("triggermode", m_triggerMode[i]);
+
+        mainNode->addChildElement(chan);
+    }
+}
+
+void PulsePalOutput::loadCustomParametersFromXml ()
+{
+    if (parametersAsXml != nullptr)
+    {
+        forEachXmlChildElement (*parametersAsXml, mainNode)
+        {
+            if (mainNode->hasTagName ("PulsePalOutput"))
+            {
+                forEachXmlChildElement(*mainNode, chan)
+                {
+                    int id = chan->getIntAttribute("id");
+                    int biphasic = chan->getIntAttribute("biphasic");
+                    double phase1 = chan->getDoubleAttribute("phase1");
+                    double phase2 = chan->getDoubleAttribute("phase2");
+                    double interphase = chan->getDoubleAttribute("interphase");
+                    double voltage1 = chan->getDoubleAttribute("voltage1");
+                    double voltage2 = chan->getDoubleAttribute("voltage2");
+                    double resting = chan->getDoubleAttribute("restingvoltage");
+                    double interpulse = chan->getDoubleAttribute("interpulse");
+                    double burst = chan->getDoubleAttribute("burstduration");
+                    double interburst = chan->getDoubleAttribute("interburst");
+                    double trainduration = chan->getDoubleAttribute("trainduration");
+                    double traindelay = chan->getDoubleAttribute("traindelay");
+                    int link21 = chan->getIntAttribute("link2trigger1");
+                    int link22 = chan->getIntAttribute("link2trigger2");
+                    int trigger = chan->getIntAttribute("triggermode");
+
+                    m_isBiphasic[id] = biphasic;
+                    m_phase1Duration[id] = phase1;
+                    m_phase2Duration[id] = phase2;
+                    m_interPhaseInterval[id] = interphase;
+                    m_phase1Voltage[id] = voltage1;
+                    m_phase2Voltage[id] = voltage2;
+                    m_restingVoltage[id] = resting;
+                    m_interPulseInterval[id] = interpulse;
+                    m_burstDuration[id] = burst;
+                    m_interBurstInterval[id] = interburst;
+                    m_trainDuration[id] = trainduration;
+                    m_trainDelay[id] = traindelay;
+                    m_linkTriggerChannel1[id] = link21;
+                    m_linkTriggerChannel2[id] = link22;
+                    m_triggerMode[id] = trigger;
+                }
+            }
+        }
+    }
+}
+
 

@@ -35,13 +35,31 @@
 
 #include <EditorHeaders.h>
 
-class TrackingNodeEditor : public GenericEditor, public Label::Listener
+class TrackingNodeEditor :
+        public GenericEditor,
+        public Label::Listener,
+        public ComboBox::Listener
 {
 public:
     TrackingNodeEditor (GenericProcessor* parentNode, bool useDefaultParameterEditors);
     virtual ~TrackingNodeEditor();
 
+    virtual void labelTextChanged (Label* labelThatHasChanged) override;
+    void buttonEvent(Button* button);
+    virtual void comboBoxChanged (ComboBox* c) override;
+
+    virtual void updateSettings();
+    void updateLabels();
+
 private:
+    ScopedPointer<ComboBox> sourceSelector;
+    ScopedPointer<UtilityButton> plusButton;
+    ScopedPointer<UtilityButton> minusButton;
+    int selectedSource;
+
+    void addTrackingSource();
+    void removeTrackingSource();
+
     ScopedPointer<Label> positionLabel;
     ScopedPointer<Label> labelPort;
     ScopedPointer<Label> portLabel;
@@ -49,16 +67,9 @@ private:
     ScopedPointer<Label> adrLabel;
     ScopedPointer<Label> labelColor;
     ScopedPointer<Label> colorLabel;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackingNodeEditor);
 
-
-    // Listener interface
-public:
-    virtual void labelTextChanged (Label* labelThatHasChanged) override;
-
-    // GenericEditor interface
-    void saveCustomParameters (XmlElement* parentElement) override;
-    void loadCustomParameters (XmlElement* parametersAsXml) override;
 };
 
 

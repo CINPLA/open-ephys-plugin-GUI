@@ -241,8 +241,9 @@ void TrackingStimulator::updateSettings()
         const EventChannel* event = getEventChannel(i);
         if (event->getName().compare("Tracking data") == 0)
         {
-            s.eventIndex = i;
+            s.eventIndex = event->getSourceIndex();
             s.sourceId =  event->getSourceNodeID();
+            s.name = event->getName() + " " + String(event->getSourceIndex()+1);
             s.color = String("None");
             s.x_pos = -1;
             s.y_pos = -1;
@@ -365,7 +366,8 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
     //        return;
     //    }
 
-    auto nodeId = evtptr->getSourceID();
+    int nodeId = evtptr->getSourceID();
+    int evtId = evtptr->getSourceIndex();
     const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
 
     int nSources = sources.size ();
@@ -373,7 +375,7 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
     for (int i = 0; i < nSources; i++)
     {
         TrackingSources& currentSource = sources.getReference (i);
-        if (currentSource.sourceId == nodeId)
+        if (currentSource.sourceId == nodeId && evtId == currentSource.eventIndex)
         {
             if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
             {

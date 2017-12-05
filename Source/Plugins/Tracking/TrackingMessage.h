@@ -54,6 +54,7 @@ struct TrackingSources
     float y_pos;
     float width;
     float height;
+    String name;
     String color;
 };
 

@@ -67,14 +67,16 @@ void TrackingVisualizer::updateSettings()
         const EventChannel* event = getEventChannel(i);
         if (event->getName().compare("Tracking data") == 0)
         {
-            s.eventIndex = i;
+            s.eventIndex = event->getSourceIndex();
             s.sourceId =  event->getSourceNodeID();
-            s.color = String("None");
+            s.name = event->getName() + " " + String(event->getSourceIndex()+1);
+            s.color = "None";
             s.x_pos = -1;
             s.y_pos = -1;
             s.width = -1;
             s.height = -1;
             sources.add (s);
+            m_colorUpdated = true;
         }
     }
 }
@@ -101,7 +103,8 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
 
     BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
-    auto nodeId = evtptr->getSourceID();
+    int nodeId = evtptr->getSourceID();
+    int evtId = evtptr->getSourceIndex();
     const auto *message = reinterpret_cast<const TrackingData *>(evtptr->getBinaryDataPointer());
 
     int nSources = sources.size ();
@@ -109,7 +112,7 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
     for (int i = 0; i < nSources; i++)
     {
         TrackingSources& currentSource = sources.getReference (i);
-        if (currentSource.sourceId == nodeId)
+        if (currentSource.sourceId == nodeId && evtId == currentSource.eventIndex)
         {
             if(!(message->position.x != message->position.x || message->position.y != message->position.y) && message->position.x != 0 && message->position.y != 0)
             {
@@ -124,6 +127,8 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
 
             String sourceColor;
             evtptr->getMetaDataValue(0)->getValue(sourceColor);
+
+            std::cout << "In tracking visual process: " << sourceColor << " " << currentSource.color << std::endl;
 
             if (currentSource.color.compare(sourceColor) != 0)
             {

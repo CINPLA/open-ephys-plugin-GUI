@@ -75,6 +75,8 @@ public:
     void process (AudioSampleBuffer& buffer) override;
     void setParameter (int parameterIndex, float newValue) override;
     void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int sampleNum) override;
+    void saveCustomParametersToXml(XmlElement *parentElement);
+    void loadCustomParametersFromXml();
 
     // Pulse Pal
     bool updatePulsePal(int chan);
