@@ -119,13 +119,15 @@ class TrackingNode : public GenericProcessor
 public:
     /** The class constructor, used to initialize any members. */
     TrackingNode();
-
     /** The class destructor, used to deallocate memory */
     ~TrackingNode();
 
     AudioProcessorEditor* createEditor();
-
     void updateSettings() override;
+    void process (AudioSampleBuffer&) override;
+    bool isReady() override;
+    void saveCustomParametersToXml(XmlElement* parentElement) override;
+    void loadCustomParametersFromXml() override;
 
     void receiveMessage (int port, String address, const TrackingData &message);
     int getTrackingModuleIndex(int port, String address);
@@ -134,25 +136,8 @@ public:
     int getNSources();
     bool isPortUsed(int port);
 
-    /** Defines the functionality of the processor.
 
-        The process method is called every time a new data buffer is available.
 
-        Adds all the new serial data that is available to the event data buffer.
-     */
-    void process (AudioSampleBuffer&) override;
-
-    /**
-        This should only be run by the ProcessorGraph, before acquisition will be started.
-
-        It tries to open the serial port previsouly specified by the setDevice and setBaudrate setters.
-
-        Returns true on success, false if port could not be opened.
-    */
-    bool isReady() override;
-
-    void saveCustomParametersToXml(XmlElement* parentElement) override;
-    void loadCustomParametersFromXml() override;
 
     void setAddress (int i, String address);
     String getAddress(int i);

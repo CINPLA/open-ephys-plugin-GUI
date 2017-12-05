@@ -32,11 +32,8 @@
 #include "TrackingVisualizer.h"
 #include "TrackingVisualizerEditor.h"
 
-using std::cout;
-using std::endl;
 #include <algorithm>
 
-//==============================================================================
 TrackingVisualizer::TrackingVisualizer()
     : GenericProcessor("Tracking Visual")
     , m_positionIsUpdated(false)
@@ -127,8 +124,6 @@ void TrackingVisualizer::handleEvent (const EventChannel* eventInfo, const MidiM
 
             String sourceColor;
             evtptr->getMetaDataValue(0)->getValue(sourceColor);
-
-            std::cout << "In tracking visual process: " << sourceColor << " " << currentSource.color << std::endl;
 
             if (currentSource.color.compare(sourceColor) != 0)
             {

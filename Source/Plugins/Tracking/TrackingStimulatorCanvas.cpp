@@ -202,7 +202,7 @@ void TrackingStimulatorCanvas::comboBoxChanged(ComboBox* comboBox)
     }
     else if (comboBox == outputChans)
     {
-        if (comboBox->getSelectedId() > 1)
+        if (comboBox->getSelectedId() > 0)
         {
             int index = comboBox->getSelectedId() - 1;
             outputChan = index;
