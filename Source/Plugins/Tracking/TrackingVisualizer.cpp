@@ -66,7 +66,7 @@ void TrackingVisualizer::updateSettings()
         {
             s.eventIndex = event->getSourceIndex();
             s.sourceId =  event->getSourceNodeID();
-            s.name = event->getName() + " " + String(event->getSourceIndex()+1);
+            s.name = "Tracking source " + String(event->getSourceIndex()+1);
             s.color = "None";
             s.x_pos = -1;
             s.y_pos = -1;

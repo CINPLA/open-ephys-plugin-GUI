@@ -109,6 +109,21 @@ void TrackingNode::addSource (int port, String address, String color)
 
 }
 
+void TrackingNode::addSource ()
+{
+    cout << "Adding empty source" << endl;
+    try
+    {
+        auto *module = new TrackingModule(this);
+        trackingModules.add (module);
+    }
+    catch (const std::runtime_error& e)
+    {
+        std::cout << "Add source: " << e.what() << std::endl;
+    }
+
+}
+
 void TrackingNode::removeSource (int i)
 {
     auto *current = trackingModules.getReference(i);
@@ -136,16 +151,20 @@ void TrackingNode::setPort (int i, int port)
     }
 
     auto *module = trackingModules.getReference (i);
+    module->m_port = port;
     String address = module->m_address;
     String color = module->m_color;
-    delete module;
-    try
+    if (address.compare("") != 0)
     {
-        module = new TrackingModule(port, address, color, this);
-    }
-    catch (const std::runtime_error& e)
-    {
-        std::cout << "Set port: " << e.what() << std::endl;
+        delete module;
+        try
+        {
+            module = new TrackingModule(port, address, color, this);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::cout << "Set port: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -168,16 +187,20 @@ void TrackingNode::setAddress (int i, String address)
     }
 
     auto *module = trackingModules.getReference (i);
+    module->m_address = address;
     int port = module->m_port;
     String color = module->m_color;
-    delete module;
-    try
+    if (port != -1)
     {
-        module = new TrackingModule(port, address, color, this);
-    }
-    catch (const std::runtime_error& e)
-    {
-        std::cout << "Set address: " << e.what() << std::endl;
+        delete module;
+        try
+        {
+            module = new TrackingModule(port, address, color, this);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::cout << "Set address: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -401,8 +424,14 @@ void TrackingQueue::clear()
     m_head = -1;
 }
 
-
 // Class TrackingServer methods
+TrackingServer::TrackingServer ()
+    : Thread ("OscListener Thread")
+    , m_incomingPort (0)
+    , m_address ("")
+{
+}
+
 TrackingServer::TrackingServer (int port, String address)
     : Thread ("OscListener Thread")
     , m_incomingPort (port)
