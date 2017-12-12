@@ -84,7 +84,7 @@ void TrackingNode::updateSettings()
     for (int i = 0; i < trackingModules.size(); i++)
     {
         //It's going to be raw binary data, so let's make it uint8
-        EventChannel* chan = new EventChannel (EventChannel::UINT8_ARRAY, 1, 24, CoreServices::getGlobalSampleRate(), this);
+        EventChannel* chan = new EventChannel (EventChannel::UINT8_ARRAY, 1, 16, CoreServices::getGlobalSampleRate(), this);
         chan->setName ("Tracking data");
         chan->setDescription ("Tracking data received from Bonsai. x, y, width, height");
         chan->setIdentifier ("external.tracking.rawData");
@@ -268,8 +268,8 @@ void TrackingNode::process (AudioSampleBuffer&)
             const EventChannel* chan = getEventChannel (getEventChannelIndex (i, getNodeId()));
             BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan,
                                                                    message->timestamp,
-                                                                   reinterpret_cast<uint8_t *>(message),
-                                                                   sizeof(TrackingData),
+                                                                   reinterpret_cast<uint8_t *>(&(message->position)),
+                                                                   sizeof(TrackingPosition),
                                                                    metadata);
             addEvent (chan, event, 0);
         }
