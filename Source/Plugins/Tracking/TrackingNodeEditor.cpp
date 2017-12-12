@@ -157,7 +157,12 @@ void TrackingNodeEditor::updateLabels()
     TrackingNode* p = (TrackingNode*) getProcessor();
     labelAdr->setText(p->getAddress(selectedSource), dontSendNotification);
     labelPort->setText(String(p->getPort(selectedSource)), dontSendNotification);
-//    labelColor->setText(p->getColor(selectedSource), dontSendNotification);
+
+    for (int i=0; i < MAX_SOURCES; i++)
+    {
+        if (color_palette[i].compare(p->getColor(selectedSource))==0)
+            colorSelector->setSelectedId(i+1);
+    }
 }
 
 void TrackingNodeEditor::buttonEvent(Button* button)

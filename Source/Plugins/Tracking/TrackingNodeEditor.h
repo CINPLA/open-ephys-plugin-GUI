@@ -54,7 +54,7 @@ public:
 
 private:
     String color_palette[MAX_SOURCES] = {"red", "green", "blue", "magenta", "cyan",
-                                         "orange", "pink", "grey", "violet", "white"};
+                                         "orange", "pink", "grey", "violet", "yellow"};
 
     ScopedPointer<ComboBox> sourceSelector;
     ScopedPointer<UtilityButton> plusButton;

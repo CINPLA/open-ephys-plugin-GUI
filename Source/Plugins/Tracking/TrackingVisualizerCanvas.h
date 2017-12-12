@@ -104,6 +104,7 @@ private:
         { "pink", Colours::pink },
         { "grey", Colours::grey },
         { "violet", Colours::violet },
+        { "yellow", Colours::yellow },
         { "white", Colours::white },
         { "background", Colour(0, 18, 43) }
     };

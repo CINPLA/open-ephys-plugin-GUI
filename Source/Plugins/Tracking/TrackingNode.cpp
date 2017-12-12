@@ -51,9 +51,9 @@ TrackingNode::TrackingNode()
     sendSampleCount = false;
 
     cout << "Adding module" << endl;
-//    auto module = new TrackingModule(27020, "/red", "red", this);
+    //    auto module = new TrackingModule(27020, "/red", "red", this);
 
-//    trackingModules.add (module);
+    //    trackingModules.add (module);
 
     lastNumInputs = 0;
 
@@ -89,6 +89,8 @@ void TrackingNode::updateSettings()
         chan->setDescription ("Tracking data received from Bonsai. x, y, width, height");
         chan->setIdentifier ("external.tracking.rawData");
         chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::CHAR, 15, "Color", "Tracking source color to be displayed", "channelInfo.extra"));
+        chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::INT32, 1, "Port", "Tracking source OSC port", "channelInfo.extra"));
+        chan->addEventMetaData(new MetaDataDescriptor(MetaDataDescriptor::CHAR, 15, "Address", "Tracking source OSC address", "channelInfo.extra"));
         eventChannelArray.add (chan);
     }
     lastNumInputs = getNumInputs();
@@ -257,6 +259,12 @@ void TrackingNode::process (AudioSampleBuffer&)
             MetaDataValuePtr color = new MetaDataValue(MetaDataDescriptor::CHAR, 15);
             color->setValue(module->m_color.toLowerCase());
             metadata.add(color);
+            MetaDataValuePtr port = new MetaDataValue(MetaDataDescriptor::INT32, 1);
+            port->setValue(module->m_port);
+            metadata.add(port);
+            MetaDataValuePtr address = new MetaDataValue(MetaDataDescriptor::CHAR, 15);
+            address->setValue(module->m_address.toLowerCase());
+            metadata.add(address);
             const EventChannel* chan = getEventChannel (getEventChannelIndex (i, getNodeId()));
             BinaryEventPtr event = BinaryEvent::createBinaryEvent (chan,
                                                                    message->timestamp,
@@ -443,7 +451,7 @@ TrackingServer::~TrackingServer()
 {
     cout << "Destructing tracking server" << endl;
     // stop the OSC Listener thread running
-//    m_listeningSocket->Break();
+    //    m_listeningSocket->Break();
     // allow the thread 2 seconds to stop cleanly - should be plenty of time.
     cout << "Destructed tracking server" << endl;
     delete m_listeningSocket;
