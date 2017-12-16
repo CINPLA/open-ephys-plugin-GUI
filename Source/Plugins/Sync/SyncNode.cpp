@@ -68,7 +68,7 @@ void SyncNode::process(AudioSampleBuffer& )
     {
         uint8 ttlData = 1 << m_chan;
         const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
-        std::cout << chan->getDataSize() << std::endl;
+        std::cout << "Sync TTL " << m_chan+1 << std::endl;
 
         TTLEventPtr event = TTLEvent::createTTLEvent(chan, timestamp, &ttlData, sizeof(uint8), m_chan);
         addEvent(chan, event, 0);

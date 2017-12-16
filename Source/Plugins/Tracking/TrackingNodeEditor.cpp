@@ -98,15 +98,6 @@ TrackingNodeEditor::TrackingNodeEditor (GenericProcessor* parentNode, bool useDe
         colorSelector->addItem(color_palette[i], i+1);
     colorSelector->setSelectedId(1, dontSendNotification);
     addAndMakeVisible(colorSelector);
-
-//    labelColor = new Label ("Color", String (defaultColor));
-//    labelColor->setBounds (80, 110, 80, 18);
-//    labelColor->setFont (Font ("Default", 15, Font::plain));
-//    labelColor->setColour (Label::textColourId, Colours::white);
-//    labelColor->setColour (Label::backgroundColourId, Colours::grey);
-//    labelColor->setEditable (true);
-//    labelColor->addListener (this);
-//    addAndMakeVisible (labelColor);
 }
 
 TrackingNodeEditor::~TrackingNodeEditor()
