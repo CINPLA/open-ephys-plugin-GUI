@@ -461,6 +461,8 @@ TrackingServer::~TrackingServer()
 void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage,
                                      const IpEndpointName&)
 {
+    int64 ts = CoreServices::getGlobalTimestamp();
+    std::cout << "Server got message " << ts << std::endl;
     try
     {
         uint32 argumentCount = 4;
