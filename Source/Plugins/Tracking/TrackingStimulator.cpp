@@ -331,7 +331,15 @@ void TrackingStimulator::process(AudioSampleBuffer&)
                 std::cout << "Stim_interval:" << endl;
                 std::cout << stim_interval << endl;
             }
-
+            // draw a random number for the initial value
+            if (m_isEntering == true)
+            {
+                std::uniform_real_distribution<float> distribution(0.0,stim_interval);
+                m_timePassed = distribution(generator);
+                std::cout << "Entering time passed" << endl;
+                std::cout << m_timePassed << endl;
+                m_isEntering = false;
+            }
 
             if (m_timePassed >= stim_interval)
             {
@@ -347,6 +355,8 @@ void TrackingStimulator::process(AudioSampleBuffer&)
             }
 
         }
+        else
+            m_isEntering = true;
 
         lock.exit();
     }
