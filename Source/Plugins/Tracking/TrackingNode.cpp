@@ -338,6 +338,7 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
             m_positionIsUpdated = true;
 
             int64 ts = CoreServices::getGlobalTimestamp();
+            std::cout << "Timestamp" << ts << std::endl;
 
             TrackingData outputMessage = message;
             outputMessage.timestamp = ts;
