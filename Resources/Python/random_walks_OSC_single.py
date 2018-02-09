@@ -103,7 +103,7 @@ class OSCthread(threading.Thread):
             pass
         
 
-duration = 60 * 30  # sec
+duration = 60 * 120  # sec
 nsamples = []
 osc_ports = []
 periods = []
@@ -115,7 +115,7 @@ height = 1.
 
 osc = []
 
-thread = OSCthread(name = 'Tread', port=27020, addr='/red', freq=30, duration=300)
+thread = OSCthread(name = 'Tread', port=27020, addr='/red', freq=30, duration=duration)
 thread.setup(width, height)
 
 thread.run()
