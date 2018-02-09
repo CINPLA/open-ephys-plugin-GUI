@@ -302,7 +302,7 @@ void TrackingStimulator::process(AudioSampleBuffer&)
     {
 
         m_currentTime = Time::currentTimeMillis();
-        m_timePassed = float(m_currentTime - m_previousTime)/1000.0; // in seconds
+        m_timePassed = float(m_currentTime - m_previousTime) / 1000.f; // in seconds
 
         lock.enter();
 
@@ -314,49 +314,33 @@ void TrackingStimulator::process(AudioSampleBuffer&)
             // Check if timePassed >= latency
 
             float stim_interval;
-            if (m_isUniform) //uniform
-                stim_interval = float(1/m_stimFreq);
+            if (m_isUniform)  {
+                stim_interval = float(1.f / m_stimFreq);
+            }
             else                     //gaussian
             {
                 int circleIn = isPositionWithinCircles(m_x, m_y);
                 float dist_norm = m_circles[circleIn].distanceFromCenter(m_x, m_y) / m_circles[circleIn].getRad();
-                std::cout << "Norm dist: "  << dist_norm << endl;
-
                 float k = -1.0 / std::log(m_stimSD);
-
                 float freq_gauss = m_stimFreq*std::exp(-pow(dist_norm,2)/k);
                 stim_interval = float(1/freq_gauss);
-                std::cout << "Gauss_freq:" << endl;
-                std::cout << freq_gauss << endl;
-                std::cout << "Stim_interval:" << endl;
-                std::cout << stim_interval << endl;
-            }
-            // draw a random number for the initial value
-            if (m_isEntering == true)
-            {
-                std::uniform_real_distribution<float> distribution(0.0,stim_interval);
-                m_timePassed = distribution(generator);
-                std::cout << "Entering time passed" << endl;
-                std::cout << m_timePassed << endl;
-                m_isEntering = false;
             }
 
-            if (m_timePassed >= stim_interval)
-            {
+            float stimulationProbability = m_timePassed / stim_interval;
+            std::uniform_real_distribution<float> distribution(0.0, 1.0);
+            float randomNumber = distribution(generator);
+
+            if (randomNumber > stimulationProbability) {
                 int64 timestamp = CoreServices::getGlobalTimestamp();
                 setTimestampAndSamples(timestamp, 0);
                 uint8 ttlData = 1 << m_outputChan;
                 const EventChannel* chan = getEventChannel(getEventChannelIndex(0, getNodeId()));
                 TTLEventPtr event = TTLEvent::createTTLEvent(chan, timestamp, &ttlData, sizeof(uint8), m_outputChan);
                 addEvent(chan, event, 0);
-
-                m_previousTime = Time::currentTimeMillis();
-                m_timePassed = 0;
             }
-
         }
-        else
-            m_isEntering = true;
+
+        m_previousTime = m_currentTime;
 
         lock.exit();
     }
