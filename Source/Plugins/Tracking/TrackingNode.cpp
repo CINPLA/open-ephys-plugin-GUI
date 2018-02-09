@@ -337,7 +337,9 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
 
             m_positionIsUpdated = true;
 
-            int64 ts = CoreServices::getGlobalTimestamp();
+            // NOTE: We cannot trust the getGlobalTimestamp function because it can return
+            // negative time deltas. The reason is unknown.
+            int64 ts = CoreServices::getSoftwareTimestamp();
             std::cout << "Timestamp" << ts << std::endl;
 
             TrackingData outputMessage = message;
@@ -462,7 +464,6 @@ void TrackingServer::ProcessMessage (const osc::ReceivedMessage& receivedMessage
                                      const IpEndpointName&)
 {
     int64 ts = CoreServices::getGlobalTimestamp();
-    std::cout << "Server got message " << ts << std::endl;
     try
     {
         uint32 argumentCount = 4;

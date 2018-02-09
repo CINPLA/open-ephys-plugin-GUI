@@ -754,7 +754,6 @@ void ProcessorGraph::getTimestampSources(int& selectedSource, int& selectedSubId
 
 int64 ProcessorGraph::getGlobalTimestamp(bool softwareOnly) const
 {
-    std::cout << "Got source " << m_timestampSource << std::endl;
 	if (softwareOnly || !m_timestampSource)
 	{
 		return (Time::getHighResolutionTicks() - m_startSoftTimestamp);
