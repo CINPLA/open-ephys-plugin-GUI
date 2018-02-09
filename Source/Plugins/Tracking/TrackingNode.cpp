@@ -340,7 +340,6 @@ void TrackingNode::receiveMessage (int port, String address, const TrackingData 
             // NOTE: We cannot trust the getGlobalTimestamp function because it can return
             // negative time deltas. The reason is unknown.
             int64 ts = CoreServices::getSoftwareTimestamp();
-            std::cout << "Timestamp" << ts << std::endl;
 
             TrackingData outputMessage = message;
             outputMessage.timestamp = ts;
