@@ -330,7 +330,7 @@ void TrackingStimulator::process(AudioSampleBuffer&)
             std::uniform_real_distribution<float> distribution(0.0, 1.0);
             float randomNumber = distribution(generator);
 
-            if (randomNumber > stimulationProbability) {
+            if (randomNumber < stimulationProbability) {
                 int64 timestamp = CoreServices::getGlobalTimestamp();
                 setTimestampAndSamples(timestamp, 0);
                 uint8 ttlData = 1 << m_outputChan;
