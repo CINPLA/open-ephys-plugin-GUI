@@ -330,6 +330,9 @@ void TrackingStimulator::process(AudioSampleBuffer&)
             std::uniform_real_distribution<float> distribution(0.0, 1.0);
             float randomNumber = distribution(generator);
 
+            if (stimulationProbability > 1)
+                std::cout << "WARNING: The tracking stimulation frequency is higher than the sampling frequency." << std::endl;
+
             if (randomNumber < stimulationProbability) {
                 int64 timestamp = CoreServices::getGlobalTimestamp();
                 setTimestampAndSamples(timestamp, 0);
