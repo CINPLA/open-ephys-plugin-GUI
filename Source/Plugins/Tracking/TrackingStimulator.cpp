@@ -358,11 +358,6 @@ void TrackingStimulator::handleEvent (const EventChannel* eventInfo, const MidiM
 
     BinaryEventPtr evtptr = BinaryEvent::deserializeFromMessage(event, eventInfo);
 
-    //    if(event.getRawDataSize() != sizeof(TrackingData) + 18) { // TODO figure out why it is + 18
-    //        cout << "Position tracker got wrong event size x,y,width,height was expected: " << event.getRawDataSize() << endl;
-    //        return;
-    //    }
-
     int nodeId = evtptr->getSourceID();
     int evtId = evtptr->getSourceIndex();
     const auto *position = reinterpret_cast<const TrackingPosition *>(evtptr->getBinaryDataPointer());
@@ -492,25 +487,10 @@ bool TrackingStimulator::saveParametersXml()
     }
     // save stimulator conf
     XmlElement* stim = new XmlElement("STIMULATION");
-//    for (int i=0; i<4; i++)
-//    {
-//        XmlElement* stim = new XmlElement(String("stim_")+=String(i+1));
-//        stim->setAttribute("id", i);
-        stim->setAttribute("freq", m_stimFreq);
-        stim->setAttribute("sd", m_stimSD);
-        stim->setAttribute("uniform-gaussian", m_isUniform);
-        //        chan->setAttribute("biphasic", m_isBiphasic[i]);
-        //        chan->setAttribute("negative-positive", m_negativeFirst[i]);
-        //        chan->setAttribute("phase", m_phaseDuration[i]);
-        //        chan->setAttribute("interphase", m_interPhaseInt[i]);
-        //        chan->setAttribute("voltage", m_voltage[i]);
-        //        chan->setAttribute("repetitions", m_repetitions[i]);
-        //        chan->setAttribute("trainduration", m_trainDuration[i]);
-        //        chan->setAttribute("interpulse", m_interPulseInt[i]);
 
-//        channels->addChildElement(chan);
-//    }
-
+    stim->setAttribute("freq", m_stimFreq);
+    stim->setAttribute("sd", m_stimSD);
+    stim->setAttribute("uniform-gaussian", m_isUniform);
 
     state->addChildElement(circles);
     state->addChildElement(stim);
@@ -559,39 +539,14 @@ bool TrackingStimulator::loadParametersXml(File fileToLoad)
             }
             if (element->hasTagName("STIMULATION"))
             {
+                double freq = element->getDoubleAttribute("freq");
+                double sd = element->getDoubleAttribute("sd");
+                int uni = element->getIntAttribute("uniform-gaussian");
 
-//                forEachXmlChildElement(*element, element2)
-//                {
-//                    int id = element2->getIntAttribute("id");
-//                    if (id<4) //pulse pal channels
-//                    {
-                        double freq = element->getDoubleAttribute("freq");
-                        double sd = element->getDoubleAttribute("sd");
-                        int uni = element->getIntAttribute("uniform-gaussian");
-                        //                        int biphasic = element2->getIntAttribute("biphasic");
-                        //                        int negfirst = element2->getIntAttribute("negative-positive");
-                        //                        double phase = element2->getDoubleAttribute("phase");
-                        //                        double interphase = element2->getDoubleAttribute("interphase");
-                        //                        double voltage = element2->getDoubleAttribute("voltage");
-                        //                        int rep = element2->getIntAttribute("repetitions");
-                        //                        double interpulse = element2->getDoubleAttribute("interpulse");
-                        //                        double trainduration = element2->getDoubleAttribute("trainduration");
+                m_stimFreq = freq;
+                m_stimSD = sd;
+                m_isUniform = uni;
 
-                        m_stimFreq = freq;
-                        m_stimSD = sd;
-                        m_isUniform = uni;
-                        //                        m_isBiphasic[id] = biphasic;
-                        //                        m_negativeFirst[id] = negfirst;
-                        //                        m_phaseDuration[id] = phase;
-                        //                        m_interPhaseInt[id] = interphase;
-                        //                        m_voltage[id] = voltage;
-                        //                        m_repetitions[id] = rep;
-                        //                        m_interPulseInt[id] = interpulse;
-                        //                        m_trainDuration[id] = trainduration;
-//                    }
-
-//                }
-//                break;
             }
         }
         return true;
@@ -685,15 +640,6 @@ void TrackingStimulator::saveCustomParametersToXml(XmlElement *parentElement)
         chan->setAttribute("freq", m_stimFreq);
         chan->setAttribute("sd", m_stimSD);
         chan->setAttribute("uniform-gaussian", m_isUniform);
-        //        chan->setAttribute("biphasic", m_isBiphasic[i]);
-        //        chan->setAttribute("negative-positive", m_negativeFirst[i]);
-        //        chan->setAttribute("phase", m_phaseDuration[i]);
-        //        chan->setAttribute("interphase", m_interPhaseInt[i]);
-        //        chan->setAttribute("voltage", m_voltage[i]);
-        //        chan->setAttribute("repetitions", m_repetitions[i]);
-        //        chan->setAttribute("trainduration", m_trainDuration[i]);
-        //        chan->setAttribute("interpulse", m_interPulseInt[i]);
-
         channels->addChildElement(chan);
     }
 
@@ -740,26 +686,10 @@ void TrackingStimulator::loadCustomParametersFromXml()
                                 double freq = element2->getDoubleAttribute("freq");
                                 double sd = element2->getDoubleAttribute("sd");
                                 int uni = element2->getIntAttribute("uniform-gaussian");
-                                //                                int biphasic = element2->getIntAttribute("biphasic");
-                                //                                int negfirst = element2->getIntAttribute("negative-positive");
-                                //                                double phase = element2->getDoubleAttribute("phase");
-                                //                                double interphase = element2->getDoubleAttribute("interphase");
-                                //                                double voltage = element2->getDoubleAttribute("voltage");
-                                //                                int rep = element2->getIntAttribute("repetitions");
-                                //                                double interpulse = element2->getDoubleAttribute("interpulse");
-                                //                                double trainduration = element2->getDoubleAttribute("trainduration");
 
                                 m_stimFreq = freq;
                                 m_stimSD = sd;
                                 m_isUniform = uni;
-                                //                                m_isBiphasic[id] = biphasic;
-                                //                                m_negativeFirst[id] = negfirst;
-                                //                                m_phaseDuration[id] = phase;
-                                //                                m_interPhaseInt[id] = interphase;
-                                //                                m_voltage[id] = voltage;
-                                //                                m_repetitions[id] = rep;
-                                //                                m_interPulseInt[id] = interpulse;
-                                //                                m_trainDuration[id] = trainduration;
                             }
 
                         }
