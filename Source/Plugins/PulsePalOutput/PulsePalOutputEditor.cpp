@@ -172,13 +172,23 @@ void ChannelTriggerInterface::updateSources()
         const EventChannel* event = processor->getEventChannel(i);
         if (event->getChannelType() == EventChannel::TTL)
         {
+            // Count how many processors of same type
+            int n = 0;
+            for (int j = 0; j < i; j++)
+            {
+                const EventChannel* event1 = processor->getEventChannel(j);
+                std::cout << event->getSourceName() << " " << event1->getSourceName() << std::endl;
+                if (!event->getSourceName().compare(event1->getSourceName()))
+                    n++;
+            }
+
             s.eventIndex = event->getSourceIndex();
             s.sourceId = event->getSourceNodeID();
             int nChans = event->getNumChannels();
             for (int c = 0; c < nChans; c++)
             {
                 s.channel = c;
-                name = event->getSourceName() + " " + String(event->getSourceIndex() + 1) + " (TTL" + String(c+1) + ")";
+                name = event->getSourceName() + " " + String(event->getSourceIndex() + n + 1) + " (TTL" + String(c+1) + ")";
                 processor->addEventSource(s);
                 triggerSelector->addItem(name, nextItemTrig++);
                 gateSelector->addItem(name, nextItemGate++);
