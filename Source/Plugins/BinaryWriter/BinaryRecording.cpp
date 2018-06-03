@@ -161,6 +161,8 @@ void BinaryRecording::openFiles(File rootFolder, int experimentNumber, int recor
 	Array<uint32> procIDs;
 	for (int i = 0; i < nChans; i++)
 	{
+		if (i == 0)
+			std::cout << "Start timestamp: " << getTimestamp(i) << std::endl;
 		m_startTS.add(getTimestamp(i));
 	}
 
@@ -521,13 +523,13 @@ void BinaryRecording::writeEvent(int eventIndex, const MidiMessage& event)
 	int64 ts = ev->getTimestamp();
 	rec->timestampFile->writeData(&ts, sizeof(int64));
 
-	uint16 chan = ev->getChannel();
+	uint16 chan = ev->getChannel() +1;
 	rec->channelFile->writeData(&chan, sizeof(uint16));
 
 	if (ev->getEventType() == EventChannel::TTL)
 	{
 		TTLEvent* ttl = static_cast<TTLEvent*>(ev.get());
-		int16 data = ttl->getChannel() * (ttl->getState() ? 1 : -1);
+		int16 data = (ttl->getChannel()+1) * (ttl->getState() ? 1 : -1);
 		rec->mainFile->writeData(&data, sizeof(int16));
 		if (rec->extraFile)
 			rec->extraFile->writeData(ttl->getTTLWordPointer(), info->getDataSize());
@@ -578,6 +580,7 @@ void BinaryRecording::writeSpike(int electrodeIndex, const SpikeEvent* spike)
 
 	uint16 sortedID = spike->getSortedID();
 	rec->extraFile->writeData(&sortedID, sizeof(uint16));
+	writeEventMetaData(spike, rec->metaDataFile);
 
 	increaseEventCounts(rec);
 }

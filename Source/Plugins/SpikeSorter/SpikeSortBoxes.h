@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>    // std::sort
 #include <list>
 #include <queue>
+#include <atomic>
 
 class SorterSpikeContainer : public ReferenceCountedObject
 {
@@ -176,11 +177,11 @@ class PCAjob
 public:
 PCAjob();
 };*/
-class PCAjob
+class PCAjob : public ReferenceCountedObject
 {
 public:
-    PCAjob(SorterSpikeArray _spikes, float* _pc1, float* _pc2,
-           float*, float*, float*, float*, bool* _reportDone);
+    PCAjob(SorterSpikeArray& _spikes, float* _pc1, float* _pc2,
+           std::atomic<float>&,  std::atomic<float>&,  std::atomic<float>&,  std::atomic<float>&, std::atomic<bool>& _reportDone);
     ~PCAjob();
     void computeCov();
     void computeSVD();
@@ -188,14 +189,16 @@ public:
     float** cov;
     SorterSpikeArray spikes;
     float* pc1, *pc2;
-    float* pc1min, *pc2min, *pc1max, *pc2max;
-    bool* reportDone;
+    std::atomic<float>& pc1min, &pc2min, &pc1max, &pc2max;
+    std::atomic<bool>& reportDone;
 private:
     int svdcmp(float** a, int nRows, int nCols, float* w, float** v);
     float pythag(float a, float b);
     int dim;
 };
 
+typedef ReferenceCountedObjectPtr<PCAjob> PCAJobPtr;
+typedef ReferenceCountedArray<PCAjob, CriticalSection> PCAJobArray;
 
 class cPolygon
 {
@@ -213,9 +216,11 @@ class PCAcomputingThread : juce::Thread
 public:
     PCAcomputingThread();
     void run(); // computes PCA on waveforms
-    void addPCAjob(PCAjob job);
+    void addPCAjob(PCAJobPtr job);
 
-    std::queue<PCAjob> jobs;
+private:
+    PCAJobArray jobs;
+	CriticalSection lock;
 };
 
 class PCAUnit
@@ -297,11 +302,12 @@ private:
     std::vector<BoxUnit> boxUnits;
     std::vector<PCAUnit> pcaUnits;
     float* pc1, *pc2;
-    float pc1min, pc2min, pc1max, pc2max;
+    std::atomic<float> pc1min, pc2min, pc1max, pc2max;
     SorterSpikeArray spikeBuffer;
     int bufferSize,spikeBufferIndex;
     PCAcomputingThread* computingThread;
-    bool bPCAJobSubmitted,bPCAcomputed,bRePCA,bPCAjobFinished ;
+    bool bPCAJobSubmitted,bPCAcomputed,bRePCA;
+    std::atomic<bool> bPCAjobFinished ;
 
 
 };

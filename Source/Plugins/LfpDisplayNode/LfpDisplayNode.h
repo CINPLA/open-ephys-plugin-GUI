@@ -21,14 +21,17 @@
 
 */
 
-#ifndef __LFPDISPLAYNODE_H_D969A379__
-#define __LFPDISPLAYNODE_H_D969A379__
+#ifndef __LFPDISPLAYNODE_H_Alpha__
+#define __LFPDISPLAYNODE_H_Alpha__
 
 #include <ProcessorHeaders.h>
 #include "LfpDisplayEditor.h"
 
+
 class DataViewport;
 
+namespace LfpViewer
+{
 
 /**
 
@@ -39,6 +42,7 @@ class DataViewport;
 
 */
 class LfpDisplayNode :  public GenericProcessor
+
 {
 public:
     LfpDisplayNode();
@@ -55,7 +59,7 @@ public:
     bool enable()   override;
     bool disable()  override;
 
-	void handleEvent(const EventChannel* eventInfo, const MidiMessage& event, int samplePosition = 0) override;
+	void handleEvent (const EventChannel* eventInfo, const MidiMessage& event, int samplePosition = 0) override;
 
     AudioSampleBuffer* getDisplayBufferAddress() const { return displayBuffer; }
 
@@ -63,9 +67,14 @@ public:
 
     CriticalSection* getMutex() { return &displayMutex; }
 
+	void setSubprocessor(int sp);
+	int getNumSubprocessorChannels();
+
+	float getSubprocessorSampleRate();
 
 private:
     void initializeEventChannels();
+    void finalizeEventChannels();
 
     ScopedPointer<AudioSampleBuffer> displayBuffer;
 
@@ -82,18 +91,25 @@ private:
 
     int64 bufferTimestamp;
     std::map<uint32, uint64> ttlState;
-    HeapBlock<float> arrayOfOnes;
+    float* arrayOfOnes;
     int totalSamples;
 
     bool resizeBuffer();
 
+	int subprocessorToDraw;
+	int numChannelsInSubprocessor;
+	int numSubprocessors;
+	float subprocessorSampleRate;
+
     CriticalSection displayMutex;
+	bool updateSubprocessorsFlag;
 
 	uint32 getChannelSourceID(const EventChannel* event) const;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LfpDisplayNode);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LfpDisplayNode);
+};
 };
 
 
 
-#endif  // __LFPDISPLAYNODE_H_D969A379__
+#endif  // __LFPDISPLAYNODE_H_Alpha__

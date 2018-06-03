@@ -90,7 +90,13 @@ void SpikeDetector::createSpikeChannels()
 		Array<const DataChannel*> chans;
 		for (int c = 0; c < nChans; c++)
 		{
-			chans.add(getDataChannel(elec->channels[c]));
+			const DataChannel* ch = getDataChannel(elec->channels[c]);
+			if (!ch)
+			{
+				//not enough channels for the electrodes
+				return;
+			}
+			chans.add(ch);
 		}
 		SpikeChannel* spk = new SpikeChannel(SpikeChannel::typeFromNumChannels(nChans), this, chans);
 		spk->setNumSamples(elec->prePeakSamples, elec->postPeakSamples);
@@ -101,8 +107,11 @@ void SpikeDetector::createSpikeChannels()
 
 void SpikeDetector::updateSettings()
 {
-    if (getNumInputs() > 0)
-        overflowBuffer.setSize (getNumInputs(), overflowBufferSize);
+	if (getNumInputs() > 0)
+	{
+		overflowBuffer.setSize(getNumInputs(), overflowBufferSize);
+		overflowBuffer.clear();
+	}
 
 }
 
@@ -516,7 +525,7 @@ float SpikeDetector::getNextSample (int& chan)
     }
     else
     {
-        if (sampleIndex < dataBuffer->getNumSamples())
+        if (sampleIndex < getNumSamples(chan))
             return *dataBuffer->getWritePointer (chan, sampleIndex);
         else
             return 0;
