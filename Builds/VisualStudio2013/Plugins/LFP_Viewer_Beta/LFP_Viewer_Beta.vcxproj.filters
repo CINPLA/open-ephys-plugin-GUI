@@ -15,31 +15,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\FileMemoryBlock.h">
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayCanvas.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\SequentialBlockFile.h">
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayEditor.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\BinaryRecording.h">
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayNode.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\NpyFile.h">
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\OpenEphysLib.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\SequentialBlockFile.cpp">
+    <ClInclude Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayCanvas.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\BinaryRecording.cpp">
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayEditor.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\OpenEphysLib.cpp">
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayNode.h">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\NpyFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9DB31964-F7E8-49B0-92E9-BAB2C35AF4B5}</ProjectGuid>
-    <RootNamespace>BinaryWriter</RootNamespace>
+    <ProjectGuid>{A6E2C4F0-63A3-496B-8929-1B2785FDBBFD}</ProjectGuid>
+    <RootNamespace>LFP_Viewer_Beta</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,6 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -94,6 +95,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,6 +109,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -115,16 +118,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\BinaryRecording.h" />
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\FileMemoryBlock.h" />
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\NpyFile.h" />
-    <ClInclude Include="..\..\..\..\Source\Plugins\BinaryWriter\SequentialBlockFile.h" />
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayCanvas.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayEditor.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayNode.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\OpenEphysLib.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\BinaryRecording.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\NpyFile.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\OpenEphysLib.cpp" />
-    <ClCompile Include="..\..\..\..\Source\Plugins\BinaryWriter\SequentialBlockFile.cpp" />
+    <ClInclude Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayCanvas.h" />
+    <ClInclude Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayEditor.h" />
+    <ClInclude Include="..\..\..\..\Source\Plugins\LfpDisplayNodeBeta\LfpDisplayNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
