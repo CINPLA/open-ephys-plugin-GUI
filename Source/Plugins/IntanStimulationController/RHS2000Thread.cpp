@@ -494,24 +494,9 @@ void RHS2000Thread::scanPorts()
 	evalBoard->setSpiLedDisplay(ledArray);
 
 	int delay, hs, id;
-	//int numChannelsOnPort[4] = {0, 0, 0, 0};
-
-
-//    Rhs2000EvalBoardUsb3::BoardDataSource initStreamDdrPorts[8] =
-//	{
-//        Rhs2000EvalBoardUsb3::PortA1,
-//        Rhs2000EvalBoardUsb3::PortA2,
-//        Rhs2000EvalBoardUsb3::PortB1,
-//        Rhs2000EvalBoardUsb3::PortB2,
-//        Rhs2000EvalBoardUsb3::PortC1,
-//        Rhs2000EvalBoardUsb3::PortC2,
-//        Rhs2000EvalBoardUsb3::PortD1,
-//        Rhs2000EvalBoardUsb3::PortD2
-//	};
-
 
 	chipId.clearQuick();
-	chipId.insertMultiple(0, -1, MAX_NUM_HEADSTAGES);
+    chipId.insertMultiple(0, -1, MAX_NUM_DATA_STREAMS);
 	Array<int> tmpChipId(chipId);
 
     setSampleRate(Rhs2000EvalBoardUsb3::SampleRate30000Hz, true); // set to 30 kHz temporarily
@@ -576,13 +561,13 @@ void RHS2000Thread::scanPorts()
 			dataBlock->print(hs);)
 
             id = deviceId(dataBlock, hs);
-//			S_DEBUG(
+            S_DEBUG(
             std::cout << "h " << hs << " id " << id << std::endl;
-//            )
+            )
 
             if (id == CHIP_ID_RHS2132 || id == CHIP_ID_RHS2116)
 			{
-                std::cout << "Device ID found: " << id << std::endl;
+                //std::cout << "Device ID found: " << id << std::endl;
 
 				sumGoodDelays.set(hs, sumGoodDelays[hs] + 1);
 
@@ -601,7 +586,7 @@ void RHS2000Thread::scanPorts()
 	}
 	PRINT_ARRAYS;
     S_DEBUG(
-	std::cout << "s: " << enabledStreams.size() << std::endl;
+    std::cout << "s: " << enabledStreams.size() << std::endl;
 	for (int i = 0; i < enabledStreams.size(); i++)
 		std::cout << "s " << enabledStreams[i];
 
@@ -611,6 +596,7 @@ void RHS2000Thread::scanPorts()
     )
     // Now, disable data streams where we did not find chips present.
     int chipIdx = 0;
+    int hsIdx = 0;
     for (hs = 0; hs < MAX_NUM_HEADSTAGES; ++hs)
     {
         if ((tmpChipId[hs] > 0) && (enabledStreams.size() < MAX_NUM_DATA_STREAMS))
@@ -623,7 +609,8 @@ void RHS2000Thread::scanPorts()
             }
             else if (tmpChipId[hs] == CHIP_ID_RHS2132)
             {
-                enableHeadstage(hs, true, 2, 16);
+                if (hs%2 == 0)
+                    enableHeadstage(hsIdx++, true, 2, 16);
             }
         }
         else
@@ -646,7 +633,6 @@ void RHS2000Thread::scanPorts()
 //	for (int i = 0; i < 16; i++)
 //		enableHeadstage(i, true, 2, 32);
 	updateBoardStreams();
-
 
     std::cout << "Number of enabled data streams: " << evalBoard->getNumEnabledDataStreams() << std::endl;
 
@@ -829,30 +815,23 @@ void RHS2000Thread::setDefaultChannelNames()
         }
     }
     //Aux channels
-    for (int i = 0; i < MAX_NUM_HEADSTAGES; i++)
+    for (int k = 0; k < 2; k++)
     {
-        if (headstagesArray[i]->isPlugged())
+        int chn = channelNumber - 1;
+
+        if (newScan || !channelInfo[chn].modified)
         {
-            for (int k = 0; k < 3; k++)
-            {
-                int chn = channelNumber - 1;
+            ChannelCustomInfo in;
+            in.name = "AUX" + String(k + 1);
+            in.gain = getBitVolts(sn->getDataChannel(chn));
+            channelInfo.set(chn, in);
 
-                if (newScan || !channelInfo[chn].modified)
-                {
-                    ChannelCustomInfo in;
-                    if (numberingScheme == 1)
-                        in.name = "AUX" + String(aux_counter);
-                    else
-                        in.name = "AUX_" + stream_prefix[i] + "_" + String(1 + k);
-                    in.gain = getBitVolts(sn->getDataChannel(chn));
-                    channelInfo.set(chn, in);
-
-                }
-                channelNumber++;
-                aux_counter++;
-            }
         }
+        channelNumber++;
+        aux_counter++;
     }
+
+
     //ADC channels
     if (acquireAdcChannels)
     {
@@ -874,7 +853,7 @@ void RHS2000Thread::setDefaultChannelNames()
 
 int RHS2000Thread::getNumChannels() const
 {
-	return getNumDataOutputs(DataChannel::HEADSTAGE_CHANNEL, 0) + getNumDataOutputs(DataChannel::AUX_CHANNEL, 0) + getNumDataOutputs(DataChannel::ADC_CHANNEL, 0);
+    return getNumDataOutputs(DataChannel::HEADSTAGE_CHANNEL, 0) + getNumDataOutputs(DataChannel::AUX_CHANNEL, 0); // + getNumDataOutputs(DataChannel::ADC_CHANNEL, 0);
 }
 
 int RHS2000Thread::getNumDataOutputs(DataChannel::DataChannelTypes type, int subproc) const
@@ -893,31 +872,24 @@ int RHS2000Thread::getNumDataOutputs(DataChannel::DataChannelTypes type, int sub
 
 		return newNumChannels;
 	}
-	if (type == DataChannel::AUX_CHANNEL)
-	{
-		int numAuxOutputs = 0;
+    // TODO add analog input channels
+    if (type == DataChannel::AUX_CHANNEL)
+    {
+        int numAuxOutputs = 2;
 
-		for (int i = 0; i < MAX_NUM_HEADSTAGES; ++i)
-		{
-			if (headstagesArray[i]->isPlugged() > 0)
-			{
-				numAuxOutputs += 3;
-			}
-		}
-
-		return numAuxOutputs;
-	}
-	if (type == DataChannel::ADC_CHANNEL)
-	{
-		if (acquireAdcChannels)
-		{
-			return 8;
-		}
-		else
-		{
-			return 0;
-		}
-	}
+        return numAuxOutputs;
+    }
+    if (type == DataChannel::ADC_CHANNEL)
+    {
+        if (acquireAdcChannels)
+        {
+            return 8;
+        }
+        else
+        {
+            return 0;
+        }
+    }
     return 0;
 }
 
@@ -1100,7 +1072,7 @@ void RHS2000Thread::updateBoardStreams()
     {
         if (enabledStreams.contains(i))
         {
-            evalBoard->enableDataStream(i,true);
+            evalBoard->enableDataStream(i, true);
         }
         else
         {
@@ -1260,8 +1232,8 @@ void RHS2000Thread::setSampleRate(int sampleRateIndex, bool isTemporary)
             break;
         default:
             sampleRate = Rhs2000EvalBoardUsb3::SampleRate40000Hz;
-            numUsbBlocksToRead = 16;
-            boardSampleRate = 40000.0f;
+            numUsbBlocksToRead = 6;
+            boardSampleRate = 10000.0f;
     }
 
 
@@ -1520,11 +1492,11 @@ bool RHS2000Thread::updateBuffer()
 		int channel = -1;
 
         if (!dataBlock->checkUsbHeader(bufferPtr, index))
-		{
+        {
             cerr << "Error in Rhs2000EvalBoard::readDataBlock: Incorrect header." << endl;
-			cerr << "Read code: " << return_code << endl;
-			break;
-		}
+            cerr << "Read code: " << return_code << endl;
+            break;
+        }
 
 		index += 8;
         timestamps.set(0, dataBlock->convertUsbTimeStamp(bufferPtr, index));
