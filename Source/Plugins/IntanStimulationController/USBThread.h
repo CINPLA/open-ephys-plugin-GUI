@@ -26,21 +26,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <BasicJuceHeader.h>
 #include <atomic>
 
-class Rhs2000EvalBoardUsb3;
+class Rhs2000EvalBoard;
 namespace IntanStimulationController
 {
 
 	class USBThread : Thread
 	{
 	public:
-        USBThread(Rhs2000EvalBoardUsb3*);
+        USBThread(Rhs2000EvalBoard*);
 		~USBThread();
 		void run() override;
 		void startAcquisition(int nBytes);
 		void stopAcquisition();
 		long usbRead(unsigned char*&);
 	private:
-        Rhs2000EvalBoardUsb3* const m_board;
+        Rhs2000EvalBoard* const m_board;
 		HeapBlock<unsigned char> m_buffers[2];
 		long m_lastRead[2];
 		unsigned short m_curBuffer{ 0 };

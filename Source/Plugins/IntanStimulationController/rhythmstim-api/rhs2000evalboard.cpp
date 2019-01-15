@@ -2,7 +2,7 @@
 // rhs2000evalboard.cpp
 //
 // Intan Technoloies RHS2000 Interface API
-// Rhs2000EvalBoardUsb3 Class
+// Rhs2000EvalBoard Class
 // Version 1.01 (28 March 2017)
 //
 // Copyright (c) 2013-2017 Intan Technologies LLC
@@ -26,9 +26,9 @@
 #include <cmath>
 #include <mutex>
 
-#include "rhs2000evalboardusb3.h"
-#include "rhs2000datablockusb3.h"
-#include "rhs2000registersusb3.h"
+#include "rhs2000evalboard.h"
+#include "rhs2000datablock.h"
+#include "rhs2000registers.h"
 
 #include "okFrontPanelDLL.h"
 
@@ -38,10 +38,10 @@ using namespace std;
 // interface board running the Rhythm interface Verilog code.
 
 // Constructor.  Set sampling rate variable to 30.0 kS/s/channel (FPGA default).
-Rhs2000EvalBoardUsb3::Rhs2000EvalBoardUsb3()
+Rhs2000EvalBoard::Rhs2000EvalBoard()
 {
     int i;
-    usbBufferSize = MAX_NUM_BLOCKS * 2 * Rhs2000DataBlockUsb3::calculateDataBlockSizeInWords(MAX_NUM_DATA_STREAMS);
+    usbBufferSize = MAX_NUM_BLOCKS * 2 * Rhs2000DataBlock::calculateDataBlockSizeInWords(MAX_NUM_DATA_STREAMS);
     cout << "Rhs2000EvalBoard: Allocating " << usbBufferSize / 1.0e6 << " MBytes for USB buffer." << endl;
     usbBuffer = new unsigned char [usbBufferSize];
     sampleRate = SampleRate30000Hz; // Rhythm FPGA boots up with 30.0 kS/s/channel sampling rate
@@ -56,14 +56,14 @@ Rhs2000EvalBoardUsb3::Rhs2000EvalBoardUsb3()
     numWordsHasBeenUpdated = false;
 }
 
-Rhs2000EvalBoardUsb3::~Rhs2000EvalBoardUsb3()
+Rhs2000EvalBoard::~Rhs2000EvalBoard()
 {
     delete [] usbBuffer;
 }
 
 // Find an Opal Kelly XEM6010-LX45 board attached to a USB port and open it.
 // Returns 1 if successful, -1 if FrontPanel cannot be loaded, and -2 if XEM6010 can't be found.
-int Rhs2000EvalBoardUsb3::open()
+int Rhs2000EvalBoard::open()
 {
     lock_guard<mutex> lockOk(okMutex);
     char dll_date[32], dll_time[32];
@@ -126,7 +126,7 @@ int Rhs2000EvalBoardUsb3::open()
 }
 
 // Uploads the configuration file (bitfile) to the FPGA.  Returns true if successful.
-bool Rhs2000EvalBoardUsb3::uploadFpgaBitfile(string filename)
+bool Rhs2000EvalBoard::uploadFpgaBitfile(string filename)
 {
     lock_guard<mutex> lockOk(okMutex);
     okCFrontPanel::ErrorCode errorCode = dev->ConfigureFPGA(filename);
@@ -186,7 +186,7 @@ bool Rhs2000EvalBoardUsb3::uploadFpgaBitfile(string filename)
 
 // Reads system clock frequency from Opal Kelly board (in MHz).  Should be 100 MHz for normal
 // Rhythm operation.
-double Rhs2000EvalBoardUsb3::getSystemClockFreq() const
+double Rhs2000EvalBoard::getSystemClockFreq() const
 {
     // Read back the CY22393 PLL configuation
     okCPLL22393 pll;
@@ -196,7 +196,7 @@ double Rhs2000EvalBoardUsb3::getSystemClockFreq() const
 }
 
 // Initialize Rhythm FPGA to default starting values.
-void Rhs2000EvalBoardUsb3::initialize()
+void Rhs2000EvalBoard::initialize()
 {
     int i;
 
@@ -329,7 +329,7 @@ void Rhs2000EvalBoardUsb3::initialize()
 }
 
 // Set the per-channel sampling rate of the RHS2116 chips connected to the FPGA.
-bool Rhs2000EvalBoardUsb3::setSampleRate(AmplifierSampleRate newSampleRate)
+bool Rhs2000EvalBoard::setSampleRate(AmplifierSampleRate newSampleRate)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -485,7 +485,7 @@ bool Rhs2000EvalBoardUsb3::setSampleRate(AmplifierSampleRate newSampleRate)
 }
 
 // Returns the current per-channel sampling rate (in Hz) as a floating-point number.
-double Rhs2000EvalBoardUsb3::getSampleRate() const
+double Rhs2000EvalBoard::getSampleRate() const
 {
     switch (sampleRate) {
     case SampleRate1000Hz:
@@ -547,13 +547,13 @@ double Rhs2000EvalBoardUsb3::getSampleRate() const
     }
 }
 
-Rhs2000EvalBoardUsb3::AmplifierSampleRate Rhs2000EvalBoardUsb3::getSampleRateEnum() const
+Rhs2000EvalBoard::AmplifierSampleRate Rhs2000EvalBoard::getSampleRateEnum() const
 {
     return sampleRate;
 }
 
 // Print a command list to the console in readable form.
-void Rhs2000EvalBoardUsb3::printCommandList(const vector<unsigned int> &commandList) const
+void Rhs2000EvalBoard::printCommandList(const vector<unsigned int> &commandList) const
 {
     unsigned int i;
     int channel, reg, data, uFlag, mFlag, dFlag, hFlag;
@@ -598,22 +598,22 @@ void Rhs2000EvalBoardUsb3::printCommandList(const vector<unsigned int> &commandL
 
 // Specify a command sequence length (endIndex = 0-8191) and command loop index (0-8191) for all
 // auxiliary command slots (AuxCmd1, AuxCmd2, AuxCmd3, and AuxCmd4).
-void Rhs2000EvalBoardUsb3::selectAuxCommandLength(AuxCmdSlot auxCommandSlot, int loopIndex, int endIndex)
+void Rhs2000EvalBoard::selectAuxCommandLength(AuxCmdSlot auxCommandSlot, int loopIndex, int endIndex)
 {
     lock_guard<mutex> lockOk(okMutex);
     if (loopIndex < 0 || loopIndex > 8191) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectAuxCommandLength: loopIndex out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectAuxCommandLength: loopIndex out of range." << endl;
         return;
     }
 
     if (endIndex < 0 || endIndex > 8191) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectAuxCommandLength: endIndex out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectAuxCommandLength: endIndex out of range." << endl;
         return;
     }
 
     int auxCommandIndex = (int)auxCommandSlot;
     if (auxCommandIndex < 0 || auxCommandIndex > 3) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectAuxCommandLength: auxCommandSlot out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectAuxCommandLength: auxCommandSlot out of range." << endl;
     }
 
     dev->SetWireInValue(WireInMultiUse, loopIndex);
@@ -626,7 +626,7 @@ void Rhs2000EvalBoardUsb3::selectAuxCommandLength(AuxCmdSlot auxCommandSlot, int
 
 // Reset FPGA.  This clears all auxiliary command RAM banks, clears the USB FIFO, and resets the
 // per-channel sampling rate to 30.0 kS/s/ch.
-void Rhs2000EvalBoardUsb3::resetBoard()
+void Rhs2000EvalBoard::resetBoard()
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -637,7 +637,7 @@ void Rhs2000EvalBoardUsb3::resetBoard()
 }
 
 // Low-level FPGA reset.  Call when closing application to make sure everything has stopped.
-void Rhs2000EvalBoardUsb3::resetFpga()
+void Rhs2000EvalBoard::resetFpga()
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -646,7 +646,7 @@ void Rhs2000EvalBoardUsb3::resetFpga()
 
 // Set the FPGA to run continuously once started (if continuousMode == true) or to run until
 // maxTimeStep is reached (if continuousMode == false).
-void Rhs2000EvalBoardUsb3::setContinuousRunMode(bool continuousMode)
+void Rhs2000EvalBoard::setContinuousRunMode(bool continuousMode)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -660,7 +660,7 @@ void Rhs2000EvalBoardUsb3::setContinuousRunMode(bool continuousMode)
 }
 
 // Set maxTimeStep for cases where continuousMode == false.
-void Rhs2000EvalBoardUsb3::setMaxTimeStep(unsigned int maxTimeStep)
+void Rhs2000EvalBoard::setMaxTimeStep(unsigned int maxTimeStep)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -675,7 +675,7 @@ void Rhs2000EvalBoardUsb3::setMaxTimeStep(unsigned int maxTimeStep)
 }
 
 // Initiate SPI data acquisition.
-void Rhs2000EvalBoardUsb3::run()
+void Rhs2000EvalBoard::run()
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -683,7 +683,7 @@ void Rhs2000EvalBoardUsb3::run()
 }
 
 // Is the FPGA currently running?
-bool Rhs2000EvalBoardUsb3::isRunning()
+bool Rhs2000EvalBoard::isRunning()
 {
     lock_guard<mutex> lockOk(okMutex);
     int value;
@@ -706,7 +706,7 @@ bool Rhs2000EvalBoardUsb3::isRunning()
 // Returns the number of 16-bit words in the USB FIFO.  The user should never attempt to read
 // more data than the FIFO currently contains, as it is not protected against underflow.
 // (Private method.)
-unsigned int Rhs2000EvalBoardUsb3::numWordsInFifo()
+unsigned int Rhs2000EvalBoard::numWordsInFifo()
 {
     dev->UpdateWireOuts();
     lastNumWordsInFifo = (dev->GetWireOutValue(WireOutNumWordsMsb) << 16) + dev->GetWireOutValue(WireOutNumWordsLsb);
@@ -717,7 +717,7 @@ unsigned int Rhs2000EvalBoardUsb3::numWordsInFifo()
 // Returns the number of 16-bit words in the USB FIFO.  The user should never attempt to read
 // more data than the FIFO currently contains, as it is not protected against underflow.
 // (Public, threadsafe method.)
-unsigned int Rhs2000EvalBoardUsb3::getNumWordsInFifo()
+unsigned int Rhs2000EvalBoard::getNumWordsInFifo()
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -727,7 +727,7 @@ unsigned int Rhs2000EvalBoardUsb3::getNumWordsInFifo()
 // Returns the most recently mesaured number of 16-bit words in the USB FIFO.  Does not directly
 // read this value from the USB port, and so may be out of date, but does not have to wait on
 // other USB access to finish in order to execute.
-unsigned int Rhs2000EvalBoardUsb3::getLastNumWordsInFifo()
+unsigned int Rhs2000EvalBoard::getLastNumWordsInFifo()
 {
     numWordsHasBeenUpdated = false;
     return lastNumWordsInFifo;
@@ -737,7 +737,7 @@ unsigned int Rhs2000EvalBoardUsb3::getLastNumWordsInFifo()
 // read this value from the USB port, and so may be out of date, but does not have to wait on
 // other USB access to finish in order to execute.  The boolean variable hasBeenUpdated indicates
 // if this value has been updated since the last time this function was called.
-unsigned int Rhs2000EvalBoardUsb3::getLastNumWordsInFifo(bool& hasBeenUpdated)
+unsigned int Rhs2000EvalBoard::getLastNumWordsInFifo(bool& hasBeenUpdated)
 {
     hasBeenUpdated = numWordsHasBeenUpdated;
     numWordsHasBeenUpdated = false;
@@ -747,7 +747,7 @@ unsigned int Rhs2000EvalBoardUsb3::getLastNumWordsInFifo(bool& hasBeenUpdated)
 // Returns the number of 16-bit words the USB SDRAM FIFO can hold.  The FIFO can actually hold a few
 // thousand words more than the number returned by this method due to FPGA "mini-FIFOs" interfacing
 // with the SDRAM, but this provides a conservative estimate of FIFO capacity.
-unsigned int Rhs2000EvalBoardUsb3::fifoCapacityInWords()
+unsigned int Rhs2000EvalBoard::fifoCapacityInWords()
 {
     return FIFO_CAPACITY_WORDS;
 }
@@ -756,13 +756,13 @@ unsigned int Rhs2000EvalBoardUsb3::fifoCapacityInWords()
 // steps, where each clock step is 1/2800 of a per-channel sampling period.
 // Note: Cable delay must be updated after sampleRate is changed, since cable delay calculations are
 // based on the clock frequency!
-void Rhs2000EvalBoardUsb3::setCableDelay(BoardPort port, int delay)
+void Rhs2000EvalBoard::setCableDelay(BoardPort port, int delay)
 {
     lock_guard<mutex> lockOk(okMutex);
     int bitShift;
 
     if (delay < 0 || delay > 15) {
-        cerr << "Warning in Rhs2000EvalBoardUsb3::setCableDelay: delay out of range: " << delay << endl;
+        cerr << "Warning in Rhs2000EvalBoard::setCableDelay: delay out of range: " << delay << endl;
     }
 
     if (delay < 0) delay = 0;
@@ -786,7 +786,7 @@ void Rhs2000EvalBoardUsb3::setCableDelay(BoardPort port, int delay)
         cableDelay[3] = delay;
         break;
     default:
-        cerr << "Error in Rhs2000EvalBoardUsb3::setCableDelay: unknown port." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setCableDelay: unknown port." << endl;
     }
 
     dev->SetWireInValue(WireInMisoDelay, delay << bitShift, 0x000f << bitShift);
@@ -797,7 +797,7 @@ void Rhs2000EvalBoardUsb3::setCableDelay(BoardPort port, int delay)
 // of the cable between the FPGA and the RHS2116 chip (in meters).
 // Note: Cable delay must be updated after sampleRate is changed, since cable delay calculations are
 // based on the clock frequency!
-void Rhs2000EvalBoardUsb3::setCableLengthMeters(BoardPort port, double lengthInMeters)
+void Rhs2000EvalBoard::setCableLengthMeters(BoardPort port, double lengthInMeters)
 {
     int delay;
     double tStep, cableVelocity, distance, timeDelay;
@@ -821,14 +821,14 @@ void Rhs2000EvalBoardUsb3::setCableLengthMeters(BoardPort port, double lengthInM
 }
 
 // Same function as above, but accepts lengths in feet instead of meters
-void Rhs2000EvalBoardUsb3::setCableLengthFeet(BoardPort port, double lengthInFeet)
+void Rhs2000EvalBoard::setCableLengthFeet(BoardPort port, double lengthInFeet)
 {
     setCableLengthMeters(port, 0.3048 * lengthInFeet);   // convert feet to meters
 }
 
 // Estimate cable length based on a particular delay used in setCableDelay.
 // (Note: Depends on sample rate.)
-double Rhs2000EvalBoardUsb3::estimateCableLengthMeters(int delay) const
+double Rhs2000EvalBoard::estimateCableLengthMeters(int delay) const
 {
     double tStep, cableVelocity, distance;
     const double speedOfLight = 299792458.0;  // units = meters per second
@@ -849,13 +849,13 @@ double Rhs2000EvalBoardUsb3::estimateCableLengthMeters(int delay) const
 }
 
 // Same function as above, but returns length in feet instead of meters
-double Rhs2000EvalBoardUsb3::estimateCableLengthFeet(int delay) const
+double Rhs2000EvalBoard::estimateCableLengthFeet(int delay) const
 {
     return 3.2808 * estimateCableLengthMeters(delay);
 }
 
 // Turn on or off DSP settle function in the FPGA.  (Only executes when CONVERT commands are sent.)
-void Rhs2000EvalBoardUsb3::setDspSettle(bool enabled)
+void Rhs2000EvalBoard::setDspSettle(bool enabled)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -864,12 +864,12 @@ void Rhs2000EvalBoardUsb3::setDspSettle(bool enabled)
 }
 
 // Enable or disable one of the eight available USB data streams (0-7).
-void Rhs2000EvalBoardUsb3::enableDataStream(int stream, bool enabled)
+void Rhs2000EvalBoard::enableDataStream(int stream, bool enabled)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (stream < 0 || stream >(MAX_NUM_DATA_STREAMS - 1)) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::enableDataStream: stream out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::enableDataStream: stream out of range." << endl;
         return;
     }
 
@@ -892,13 +892,13 @@ void Rhs2000EvalBoardUsb3::enableDataStream(int stream, bool enabled)
 }
 
 // Returns the number of enabled data streams.
-int Rhs2000EvalBoardUsb3::getNumEnabledDataStreams() const
+int Rhs2000EvalBoard::getNumEnabledDataStreams() const
 {
     return numDataStreams;
 }
 
 // Read the 16 bits of the digital TTL input lines on the FPGA into an integer array.
-void Rhs2000EvalBoardUsb3::getTtlIn(int ttlInArray[])
+void Rhs2000EvalBoard::getTtlIn(int ttlInArray[])
 {
     lock_guard<mutex> lockOk(okMutex);
     int i, ttlIn;
@@ -914,11 +914,11 @@ void Rhs2000EvalBoardUsb3::getTtlIn(int ttlInArray[])
 }
 
 // Set manual value for DACs.
-void Rhs2000EvalBoardUsb3::setDacManual(int value)
+void Rhs2000EvalBoard::setDacManual(int value)
 {
     lock_guard<mutex> lockOk(okMutex);
     if (value < 0 || value > 65535) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setDacManual: value out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setDacManual: value out of range." << endl;
         return;
     }
 
@@ -927,7 +927,7 @@ void Rhs2000EvalBoardUsb3::setDacManual(int value)
 }
 
 // Set the eight red LEDs on the XEM6010 board according to integer array.
-void Rhs2000EvalBoardUsb3::setLedDisplay(int ledArray[])
+void Rhs2000EvalBoard::setLedDisplay(int ledArray[])
 {
     lock_guard<mutex> lockOk(okMutex);
     int i, ledOut;
@@ -942,7 +942,7 @@ void Rhs2000EvalBoardUsb3::setLedDisplay(int ledArray[])
 }
 
 // Set the eight red LEDs on the front panel SPI ports according to integer array.
-void Rhs2000EvalBoardUsb3::setSpiLedDisplay(int ledArray[])
+void Rhs2000EvalBoard::setSpiLedDisplay(int ledArray[])
 {
     lock_guard<mutex> lockOk(okMutex);
     int i, ledOut;
@@ -957,11 +957,11 @@ void Rhs2000EvalBoardUsb3::setSpiLedDisplay(int ledArray[])
 }
 
 // Enable or disable AD5662 DAC channel (0-7)
-void Rhs2000EvalBoardUsb3::enableDac(int dacChannel, bool enabled)
+void Rhs2000EvalBoard::enableDac(int dacChannel, bool enabled)
 {
     lock_guard<mutex> lockOk(okMutex);
     if (dacChannel < 0 || dacChannel > 7) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::enableDac: dacChannel out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::enableDac: dacChannel out of range." << endl;
         return;
     }
 
@@ -995,11 +995,11 @@ void Rhs2000EvalBoardUsb3::enableDac(int dacChannel, bool enabled)
 }
 
 // Set the gain level of all eight DAC channels to 2^gain (gain = 0-7).
-void Rhs2000EvalBoardUsb3::setDacGain(int gain)
+void Rhs2000EvalBoard::setDacGain(int gain)
 {
     lock_guard<mutex> lockOk(okMutex);
     if (gain < 0 || gain > 7) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setDacGain: gain out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setDacGain: gain out of range." << endl;
         return;
     }
 
@@ -1009,12 +1009,12 @@ void Rhs2000EvalBoardUsb3::setDacGain(int gain)
 
 // Suppress the noise on DAC channels 0 and 1 (the audio channels) between
 // +16*noiseSuppress and -16*noiseSuppress LSBs.  (noiseSuppress = 0-127).
-void Rhs2000EvalBoardUsb3::setAudioNoiseSuppress(int noiseSuppress)
+void Rhs2000EvalBoard::setAudioNoiseSuppress(int noiseSuppress)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (noiseSuppress < 0 || noiseSuppress > 127) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setAudioNoiseSuppress: noiseSuppress out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setAudioNoiseSuppress: noiseSuppress out of range." << endl;
         return;
     }
 
@@ -1024,17 +1024,17 @@ void Rhs2000EvalBoardUsb3::setAudioNoiseSuppress(int noiseSuppress)
 
 // Assign a particular data stream (0-7) to a DAC channel (0-7).  Setting stream
 // to 8 selects DacManual value.
-void Rhs2000EvalBoardUsb3::selectDacDataStream(int dacChannel, int stream)
+void Rhs2000EvalBoard::selectDacDataStream(int dacChannel, int stream)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (dacChannel < 0 || dacChannel > 7) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectDacDataStream: dacChannel out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectDacDataStream: dacChannel out of range." << endl;
         return;
     }
 
     if (stream < 0 || stream > 8) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectDacDataStream: stream out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectDacDataStream: stream out of range." << endl;
         return;
     }
 
@@ -1068,17 +1068,17 @@ void Rhs2000EvalBoardUsb3::selectDacDataStream(int dacChannel, int stream)
 }
 
 // Assign a particular amplifier channel (0-31) to a DAC channel (0-7).
-void Rhs2000EvalBoardUsb3::selectDacDataChannel(int dacChannel, int dataChannel)
+void Rhs2000EvalBoard::selectDacDataChannel(int dacChannel, int dataChannel)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (dacChannel < 0 || dacChannel > 7) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectDacDataChannel: dacChannel out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectDacDataChannel: dacChannel out of range." << endl;
         return;
     }
 
     if (dataChannel < 0 || dataChannel > 31) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::selectDacDataChannel: dataChannel out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::selectDacDataChannel: dataChannel out of range." << endl;
         return;
     }
 
@@ -1111,7 +1111,7 @@ void Rhs2000EvalBoardUsb3::selectDacDataChannel(int dacChannel, int dataChannel)
     dev->UpdateWireIns();
 }
 
-void Rhs2000EvalBoardUsb3::enableDcAmpConvert(bool enable)
+void Rhs2000EvalBoard::enableDcAmpConvert(bool enable)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1119,7 +1119,7 @@ void Rhs2000EvalBoardUsb3::enableDcAmpConvert(bool enable)
     dev->UpdateWireIns();
 }
 
-void Rhs2000EvalBoardUsb3::setExtraStates(unsigned int extraStates)
+void Rhs2000EvalBoard::setExtraStates(unsigned int extraStates)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1132,7 +1132,7 @@ void Rhs2000EvalBoardUsb3::setExtraStates(unsigned int extraStates)
 // while viewing only spikes without LFPs on the DAC outputs, for example.  This is useful when
 // using the low-latency FPGA thresholds to detect spikes and produce digital pulses on the TTL
 // outputs, for example.
-void Rhs2000EvalBoardUsb3::enableDacHighpassFilter(bool enable)
+void Rhs2000EvalBoard::enableDacHighpassFilter(bool enable)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1146,7 +1146,7 @@ void Rhs2000EvalBoardUsb3::enableDacHighpassFilter(bool enable)
 // to record wideband neural data while viewing only spikes without LFPs on the DAC outputs,
 // for example.  This is useful when using the low-latency FPGA thresholds to detect spikes
 // and produce digital pulses on the TTL outputs, for example.
-void Rhs2000EvalBoardUsb3::setDacHighpassFilter(double cutoff)
+void Rhs2000EvalBoard::setDacHighpassFilter(double cutoff)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1178,17 +1178,17 @@ void Rhs2000EvalBoardUsb3::setDacHighpassFilter(double cutoff)
 // in the range of 0 to 65535, where the 'zero' level is 32768.
 // If trigPolarity is true, voltages equaling or rising above the threshold produce a high TTL output.
 // If trigPolarity is false, voltages equaling or falling below the threshold produce a high TTL output.
-void Rhs2000EvalBoardUsb3::setDacThreshold(int dacChannel, int threshold, bool trigPolarity)
+void Rhs2000EvalBoard::setDacThreshold(int dacChannel, int threshold, bool trigPolarity)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (dacChannel < 0 || dacChannel > 7) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setDacThreshold: dacChannel out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setDacThreshold: dacChannel out of range." << endl;
         return;
     }
 
     if (threshold < 0 || threshold > 65535) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setDacThreshold: threshold out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setDacThreshold: threshold out of range." << endl;
         return;
     }
 
@@ -1204,7 +1204,7 @@ void Rhs2000EvalBoardUsb3::setDacThreshold(int dacChannel, int threshold, bool t
 }
 
 // Is variable-frequency clock DCM programming done?
-bool Rhs2000EvalBoardUsb3::isDcmProgDone() const
+bool Rhs2000EvalBoard::isDcmProgDone() const
 {
     int value;
 
@@ -1215,7 +1215,7 @@ bool Rhs2000EvalBoardUsb3::isDcmProgDone() const
 }
 
 // Is variable-frequency clock PLL locked?
-bool Rhs2000EvalBoardUsb3::isDataClockLocked() const
+bool Rhs2000EvalBoard::isDataClockLocked() const
 {
     int value;
 
@@ -1227,7 +1227,7 @@ bool Rhs2000EvalBoardUsb3::isDataClockLocked() const
 
 // Flush all remaining data out of the FIFO.  (This function should only be called when SPI
 // data acquisition has been stopped.)
-void Rhs2000EvalBoardUsb3::flush()
+void Rhs2000EvalBoard::flush()
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1241,7 +1241,7 @@ void Rhs2000EvalBoardUsb3::flush()
 
 // Read data block from the USB interface, if one is available.  Returns true if data block
 // was available.
-bool Rhs2000EvalBoardUsb3::readDataBlock(Rhs2000DataBlockUsb3 *dataBlock)
+bool Rhs2000EvalBoard::readDataBlock(Rhs2000DataBlock *dataBlock)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1250,7 +1250,7 @@ bool Rhs2000EvalBoardUsb3::readDataBlock(Rhs2000DataBlockUsb3 *dataBlock)
     numBytesToRead = 2 * dataBlock->calculateDataBlockSizeInWords(numDataStreams);
 
     if (numBytesToRead > USB_BUFFER_SIZE) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::readDataBlock: USB buffer size exceeded.  " <<
+        cerr << "Error in Rhs2000EvalBoard::readDataBlock: USB buffer size exceeded.  " <<
             "Increase value of USB_BUFFER_SIZE." << endl;
         return false;
     }
@@ -1264,11 +1264,11 @@ bool Rhs2000EvalBoardUsb3::readDataBlock(Rhs2000DataBlockUsb3 *dataBlock)
 
 // Reads a certain number of USB data blocks, if the specified number is available, and writes the raw bytes
 // to a buffer.  Returns total number of bytes read.
-long Rhs2000EvalBoardUsb3::readDataBlocksRaw(int numBlocks, unsigned char* buffer)
+long Rhs2000EvalBoard::readDataBlocksRaw(int numBlocks, unsigned char* buffer)
 {
     lock_guard<mutex> lockOk(okMutex);
 
-    unsigned int numWordsToRead = numBlocks * Rhs2000DataBlockUsb3::calculateDataBlockSizeInWords(numDataStreams);
+    unsigned int numWordsToRead = numBlocks * Rhs2000DataBlock::calculateDataBlockSizeInWords(numDataStreams);
 
     if (numWordsInFifo() < numWordsToRead)
         return 0;
@@ -1286,13 +1286,13 @@ long Rhs2000EvalBoardUsb3::readDataBlocksRaw(int numBlocks, unsigned char* buffe
 
 // Reads a certain number of USB data blocks, if the specified number is available, and appends them
 // to queue.  Returns true if data blocks were available.
-bool Rhs2000EvalBoardUsb3::readDataBlocks(int numBlocks, queue<Rhs2000DataBlockUsb3> &dataQueue)
+bool Rhs2000EvalBoard::readDataBlocks(int numBlocks, queue<Rhs2000DataBlock> &dataQueue)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     unsigned int numWordsToRead, numBytesToRead;
     int i;
-    Rhs2000DataBlockUsb3 *dataBlock;
+    Rhs2000DataBlock *dataBlock;
 
     numWordsToRead = numBlocks * dataBlock->calculateDataBlockSizeInWords(numDataStreams);
 
@@ -1302,14 +1302,14 @@ bool Rhs2000EvalBoardUsb3::readDataBlocks(int numBlocks, queue<Rhs2000DataBlockU
     numBytesToRead = 2 * numWordsToRead;
 
     if (numBytesToRead > USB_BUFFER_SIZE) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::readDataBlocks: USB buffer size exceeded.  " <<
+        cerr << "Error in Rhs2000EvalBoard::readDataBlocks: USB buffer size exceeded.  " <<
             "Increase value of USB_BUFFER_SIZE." << endl;
         return false;
     }
 
     dev->ReadFromPipeOut(PipeOutData, numBytesToRead, usbBuffer);
 
-    dataBlock = new Rhs2000DataBlockUsb3(numDataStreams);
+    dataBlock = new Rhs2000DataBlock(numDataStreams);
     for (i = 0; i < numBlocks; ++i) {
         dataBlock->fillFromUsbBuffer(usbBuffer, i, numDataStreams);
         dataQueue.push(*dataBlock);
@@ -1321,7 +1321,7 @@ bool Rhs2000EvalBoardUsb3::readDataBlocks(int numBlocks, queue<Rhs2000DataBlockU
 
 // Writes the contents of a data block queue (dataQueue) to a binary output stream (saveOut).
 // Returns the number of data blocks written.
-int Rhs2000EvalBoardUsb3::queueToFile(queue<Rhs2000DataBlockUsb3> &dataQueue, ofstream &saveOut)
+int Rhs2000EvalBoard::queueToFile(queue<Rhs2000DataBlock> &dataQueue, ofstream &saveOut)
 {
     int count = 0;
 
@@ -1335,7 +1335,7 @@ int Rhs2000EvalBoardUsb3::queueToFile(queue<Rhs2000DataBlockUsb3> &dataQueue, of
 }
 
 // Return name of Opal Kelly board based on model code.
-string Rhs2000EvalBoardUsb3::opalKellyModelName(int model) const
+string Rhs2000EvalBoard::opalKellyModelName(int model) const
 {
     switch (model) {
     case OK_PRODUCT_XEM3001V1:
@@ -1398,7 +1398,7 @@ string Rhs2000EvalBoardUsb3::opalKellyModelName(int model) const
 }
 
 // Return 4-bit "board mode" input.
-int Rhs2000EvalBoardUsb3::getBoardMode()
+int Rhs2000EvalBoard::getBoardMode()
 {
     lock_guard<mutex> lockOk(okMutex);
     int mode;
@@ -1412,7 +1412,7 @@ int Rhs2000EvalBoardUsb3::getBoardMode()
 }
 
 // Return FPGA cable delay for selected SPI port.
-int Rhs2000EvalBoardUsb3::getCableDelay(BoardPort port) const
+int Rhs2000EvalBoard::getCableDelay(BoardPort port) const
 {
     switch (port) {
     case PortA:
@@ -1430,7 +1430,7 @@ int Rhs2000EvalBoardUsb3::getCableDelay(BoardPort port) const
 }
 
 // Return FPGA cable delays for all SPI ports.
-void Rhs2000EvalBoardUsb3::getCableDelay(vector<int> &delays) const
+void Rhs2000EvalBoard::getCableDelay(vector<int> &delays) const
 {
     if (delays.size() != 4) {
         delays.resize(4);
@@ -1441,7 +1441,7 @@ void Rhs2000EvalBoardUsb3::getCableDelay(vector<int> &delays) const
 }
 
 // Set all DACs to midline value (zero).  Must run SPI commands for this to take effect.
-void Rhs2000EvalBoardUsb3::setAllDacsToZero()
+void Rhs2000EvalBoard::setAllDacsToZero()
 {
     int i;
 
@@ -1452,7 +1452,7 @@ void Rhs2000EvalBoardUsb3::setAllDacsToZero()
 }
 
 // Run 128 dummy commands (i.e., reading from ROM registers)
-void Rhs2000EvalBoardUsb3::runDummyCommands(Rhs2000RegistersUsb3 *chipRegisters)
+void Rhs2000EvalBoard::runDummyCommands(Rhs2000Registers *chipRegisters)
 {
     // Create command lists to be uploaded.
     int commandSequenceLength;
@@ -1476,7 +1476,7 @@ void Rhs2000EvalBoardUsb3::runDummyCommands(Rhs2000RegistersUsb3 *chipRegisters)
 }
 
 // Create a command list to program chip registers, and execute it.
-void Rhs2000EvalBoardUsb3::configureChip(Rhs2000RegistersUsb3 *chipRegisters)
+void Rhs2000EvalBoard::configureChip(Rhs2000Registers *chipRegisters)
 {
     // Create command lists to be uploaded.
     int commandSequenceLength;
@@ -1498,7 +1498,7 @@ void Rhs2000EvalBoardUsb3::configureChip(Rhs2000RegistersUsb3 *chipRegisters)
     while (isRunning()) { }
 
     // Read the resulting single data block from the USB interface.
-    // Rhs2000DataBlockUsb3 *dataBlock = new Rhs2000DataBlockUsb3();
+    // Rhs2000DataBlock *dataBlock = new Rhs2000DataBlock();
     // readDataBlock(dataBlock);
 
     // cout << "Number of 16-bit words in FIFO: " << numWordsInFifo() << endl;
@@ -1507,7 +1507,7 @@ void Rhs2000EvalBoardUsb3::configureChip(Rhs2000RegistersUsb3 *chipRegisters)
 }
 
 // Create a command list to program single chip register, and execute it.
-void Rhs2000EvalBoardUsb3::configureRegister(Rhs2000RegistersUsb3 *chipRegisters, int reg)
+void Rhs2000EvalBoard::configureRegister(Rhs2000Registers *chipRegisters, int reg)
 {
     // Create command lists to be uploaded.
     int commandSequenceLength;
@@ -1532,7 +1532,7 @@ void Rhs2000EvalBoardUsb3::configureRegister(Rhs2000RegistersUsb3 *chipRegisters
 
 // Upload an auxiliary command list to a particular auxiliary command slot (AuxCmd1, AuxCmd2,
 // AuxCmd3, or AuxCmd4) in the FPGA.
-void Rhs2000EvalBoardUsb3::uploadCommandList(const vector<unsigned int> &commandList, AuxCmdSlot auxCommandSlot)
+void Rhs2000EvalBoard::uploadCommandList(const vector<unsigned int> &commandList, AuxCmdSlot auxCommandSlot)
 {
     lock_guard<mutex> lockOk(okMutex);
     unsigned int i;
@@ -1574,17 +1574,17 @@ void Rhs2000EvalBoardUsb3::uploadCommandList(const vector<unsigned int> &command
 }
 
 // Selects an amplifier channel from a particular data stream to be subtracted from all DAC signals.
-void Rhs2000EvalBoardUsb3::setDacRerefSource(int stream, int channel)
+void Rhs2000EvalBoard::setDacRerefSource(int stream, int channel)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (stream < 0 || stream > (MAX_NUM_DATA_STREAMS - 1)) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setDacRerefSource: stream out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setDacRerefSource: stream out of range." << endl;
         return;
     }
 
     if (channel < 0 || channel > 15) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setDacRerefSource: channel out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setDacRerefSource: channel out of range." << endl;
         return;
     }
 
@@ -1593,7 +1593,7 @@ void Rhs2000EvalBoardUsb3::setDacRerefSource(int stream, int channel)
 }
 
 // Enables DAC rereferencing, where a selected amplifier channel is subtracted from all DACs in real time.
-void Rhs2000EvalBoardUsb3::enableDacReref(bool enabled)
+void Rhs2000EvalBoard::enableDacReref(bool enabled)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1602,7 +1602,7 @@ void Rhs2000EvalBoardUsb3::enableDacReref(bool enabled)
 }
 
 // Turn on or off automatic stimulation command mode in the FPGA.
-void Rhs2000EvalBoardUsb3::setStimCmdMode(bool enabled)
+void Rhs2000EvalBoard::setStimCmdMode(bool enabled)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1611,7 +1611,7 @@ void Rhs2000EvalBoardUsb3::setStimCmdMode(bool enabled)
 }
 
 // Set a particular stimulation control register.
-void Rhs2000EvalBoardUsb3::programStimReg(int stream, int channel, StimRegister reg, int value)
+void Rhs2000EvalBoard::programStimReg(int stream, int channel, StimRegister reg, int value)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1622,17 +1622,17 @@ void Rhs2000EvalBoardUsb3::programStimReg(int stream, int channel, StimRegister 
 }
 
 // Configure a particular stimulation trigger.
-void Rhs2000EvalBoardUsb3::configureStimTrigger(int stream, int channel, int triggerSource, bool triggerEnabled, bool edgeTriggered, bool triggerOnLow)
+void Rhs2000EvalBoard::configureStimTrigger(int stream, int channel, int triggerSource, bool triggerEnabled, bool edgeTriggered, bool triggerOnLow)
 {
     int value = (triggerEnabled ? (1 << 7) : 0) + (triggerOnLow ? (1 << 6) : 0) + (edgeTriggered ? (1 << 5) : 0) + triggerSource;
     programStimReg(stream, channel, TriggerParams, value);
 }
 
 // Configure the shape, polarity, and number of pulses for a particular stimulation control unit.
-void Rhs2000EvalBoardUsb3::configureStimPulses(int stream, int channel, int numPulses, StimShape shape, bool negStimFirst)
+void Rhs2000EvalBoard::configureStimPulses(int stream, int channel, int numPulses, StimShape shape, bool negStimFirst)
 {
     if (numPulses < 1) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::configureStimPulses: numPulses out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::configureStimPulses: numPulses out of range." << endl;
         return;
     }
 
@@ -1642,7 +1642,7 @@ void Rhs2000EvalBoardUsb3::configureStimPulses(int stream, int channel, int numP
 }
 
 // Returns number of SPI ports (4 or 8) and if I/O expander board is present
-int Rhs2000EvalBoardUsb3::readDigitalInManual(bool& expanderBoardDetected)
+int Rhs2000EvalBoard::readDigitalInManual(bool& expanderBoardDetected)
 {
     lock_guard<mutex> lockOk(okMutex);
     int expanderBoardIdNumber;
@@ -1800,7 +1800,7 @@ int Rhs2000EvalBoardUsb3::readDigitalInManual(bool& expanderBoardDetected)
     return numPorts;
 }
 
-void Rhs2000EvalBoardUsb3::readDigitalInExpManual()
+void Rhs2000EvalBoard::readDigitalInExpManual()
 {
     lock_guard<mutex> lockOk(okMutex);
     int ttlIn[16];
@@ -1939,7 +1939,7 @@ void Rhs2000EvalBoardUsb3::readDigitalInExpManual()
 }
 
 // Set the voltage threshold to be used for digital triggers on Analog In ports.
-void Rhs2000EvalBoardUsb3::setAnalogInTriggerThreshold(double voltageThreshold)
+void Rhs2000EvalBoard::setAnalogInTriggerThreshold(double voltageThreshold)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1955,12 +1955,12 @@ void Rhs2000EvalBoardUsb3::setAnalogInTriggerThreshold(double voltageThreshold)
 }
 
 // Set state of manual stimulation trigger 0-7 (e.g., from keypresses).
-void Rhs2000EvalBoardUsb3::setManualStimTrigger(int trigger, bool triggerOn)
+void Rhs2000EvalBoard::setManualStimTrigger(int trigger, bool triggerOn)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (trigger < 0 || trigger > 7) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::setManualStimTrigger: trigger out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::setManualStimTrigger: trigger out of range." << endl;
         return;
     }
 
@@ -1970,7 +1970,7 @@ void Rhs2000EvalBoardUsb3::setManualStimTrigger(int trigger, bool triggerOn)
 
 // Enable auxiliary commands slots 0-3 on all data streams (0-7).  This disables automatic stimulation
 // control on all data streams.
-void Rhs2000EvalBoardUsb3::enableAuxCommandsOnAllStreams()
+void Rhs2000EvalBoard::enableAuxCommandsOnAllStreams()
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -1981,12 +1981,12 @@ void Rhs2000EvalBoardUsb3::enableAuxCommandsOnAllStreams()
 // Enable auxiliary commands slots 0-3 on one selected data stream, and disable auxiliary command slots on
 // all other data streams.  This disables automatic stimulation control on the selected stream and enables
 // automatic stimulation control on all other streams.
-void Rhs2000EvalBoardUsb3::enableAuxCommandsOnOneStream(int stream)
+void Rhs2000EvalBoard::enableAuxCommandsOnOneStream(int stream)
 {
     lock_guard<mutex> lockOk(okMutex);
 
     if (stream < 0 || stream >(MAX_NUM_DATA_STREAMS - 1)) {
-        cerr << "Error in Rhs2000EvalBoardUsb3::enableAuxCommandsOnOneStream: stream out of range." << endl;
+        cerr << "Error in Rhs2000EvalBoard::enableAuxCommandsOnOneStream: stream out of range." << endl;
         return;
     }
 
@@ -1999,7 +1999,7 @@ void Rhs2000EvalBoardUsb3::enableAuxCommandsOnOneStream(int stream)
 // channel asserts amp settle.
 // If the last boolean parameter is set true, global settling will be applied across all headstages: if any one channel
 // asserts amp settle, then amp settle will be asserted on all channels, across all connected headstages.
-void Rhs2000EvalBoardUsb3::setGlobalSettlePolicy(bool settleWholeHeadstageA, bool settleWholeHeadstageB, bool settleWholeHeadstageC,
+void Rhs2000EvalBoard::setGlobalSettlePolicy(bool settleWholeHeadstageA, bool settleWholeHeadstageB, bool settleWholeHeadstageC,
                                              bool settleWholeHeadstageD, bool settleAllHeadstages)
 {
     lock_guard<mutex> lockOk(okMutex);
@@ -2017,7 +2017,7 @@ void Rhs2000EvalBoardUsb3::setGlobalSettlePolicy(bool settleWholeHeadstageA, boo
 // true = Digital Out port controlled by DAC threshold-based spike detector
 // false = Digital Out port controlled by digital sequencer
 // Note: Digital Out ports 9-16 are always controlled by a digital sequencer.
-void Rhs2000EvalBoardUsb3::setTtlOutMode(bool mode1, bool mode2, bool mode3, bool mode4, bool mode5, bool mode6, bool mode7, bool mode8)
+void Rhs2000EvalBoard::setTtlOutMode(bool mode1, bool mode2, bool mode3, bool mode4, bool mode5, bool mode6, bool mode7, bool mode8)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -2038,7 +2038,7 @@ void Rhs2000EvalBoardUsb3::setTtlOutMode(bool mode1, bool mode2, bool mode3, boo
 // Select amp settle mode for all connected chips:
 // useFastSettle false = amplifier low frequency cutoff select (recommended mode)
 // useFastSettle true = amplifier fast settle (legacy mode from RHD2000 series chips)
-void Rhs2000EvalBoardUsb3::setAmpSettleMode(bool useFastSettle)
+void Rhs2000EvalBoard::setAmpSettleMode(bool useFastSettle)
 {
     lock_guard<mutex> lockOk(okMutex);
 
@@ -2049,7 +2049,7 @@ void Rhs2000EvalBoardUsb3::setAmpSettleMode(bool useFastSettle)
 // Select charge recovery mode for all connected chips:
 // useSwitch false = current-limited charge recovery drivers
 // useSwitch true = charge recovery switch
-void Rhs2000EvalBoardUsb3::setChargeRecoveryMode(bool useSwitch)
+void Rhs2000EvalBoard::setChargeRecoveryMode(bool useSwitch)
 {
     dev->SetWireInValue(WireInResetRun, (useSwitch ? 0x10 : 0x00), 0x10); // set charge_recov_mode (0 = current-limited charge recovery drivers; 1 = charge recovery switch)
     dev->UpdateWireIns();
@@ -2059,7 +2059,7 @@ void Rhs2000EvalBoardUsb3::setChargeRecoveryMode(bool useSwitch)
 // It is possible that a stimulation sequencer could be in the middle of playing out a long
 // pulse train (e.g., 100 stimulation pulses).  If this function is not called, the pulse train
 // will resume after data acquisition is restarted.
-void Rhs2000EvalBoardUsb3::resetSequencers()
+void Rhs2000EvalBoard::resetSequencers()
 {
     lock_guard<mutex> lockOk(okMutex);
 

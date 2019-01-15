@@ -2,7 +2,7 @@
 // rhs2000datablock.h
 //
 // Intan Technoloies RHS2000 Interface API
-// Rhs2000DataBlockUsb3 Class Header File
+// Rhs2000DataBlock Class Header File
 // Version 1.01 (28 March 2017)
 //
 // Copyright (c) 2013-2017 Intan Technologies LLC
@@ -18,8 +18,8 @@
 // See http://www.intantech.com for documentation and product information.
 //----------------------------------------------------------------------------------
 
-#ifndef RHS2000DATABLOCKUSB3_H
-#define RHS2000DATABLOCKUSB3_H
+#ifndef RHS2000DATABLOCK_H
+#define RHS2000DATABLOCK_H
 
 #define SAMPLES_PER_DATA_BLOCK 128
 #define CHANNELS_PER_STREAM 16
@@ -27,18 +27,18 @@
 
 using namespace std;
 
-class Rhs2000EvalBoardUsb3;
+class Rhs2000EvalBoard;
 
-class Rhs2000DataBlockUsb3
+class Rhs2000DataBlock
 {
 public:
-    Rhs2000DataBlockUsb3(int numDataStreams);
-    ~Rhs2000DataBlockUsb3();
-    Rhs2000DataBlockUsb3(const Rhs2000DataBlockUsb3 &obj); // copy constructor
+    Rhs2000DataBlock(int numDataStreams);
+    ~Rhs2000DataBlock();
+    Rhs2000DataBlock(const Rhs2000DataBlock &obj); // copy constructor
 
     vector<unsigned int> timeStamp;
     int* amplifierDataFast;
-    // vector<vector<vector<int> > > amplifierData;
+//    vector<vector<vector<int> > > amplifierDataFast;
     vector<vector<vector<int> > > dcAmplifierData;
     vector<vector<vector<int> > > auxiliaryData;
     vector<vector<vector<int> > > complianceLimit;
@@ -77,4 +77,4 @@ private:
     int convertUsbWord(unsigned char usbBuffer[], int index);
 };
 
-#endif // RHS2000DATABLOCKUSB3_H
+#endif // RHS2000DATABLOCK_H

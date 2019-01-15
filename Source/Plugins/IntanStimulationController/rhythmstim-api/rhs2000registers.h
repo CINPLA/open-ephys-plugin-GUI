@@ -2,7 +2,7 @@
 // rhs2000registers.h
 //
 // Intan Technoloies RHS2000 Interface API
-// Rhs2000RegistersUsb3 Class Header File
+// Rhs2000Registers Class Header File
 // Version 1.01 (28 March 2017)
 //
 // Copyright (c) 2013-2017 Intan Technologies LLC
@@ -18,12 +18,12 @@
 // See http://www.intantech.com for documentation and product information.
 //----------------------------------------------------------------------------------
 
-#ifndef RHS2000REGISTERSUSB3_H
-#define RHS2000REGISTERSUSB3_H
+#ifndef RHS2000REGISTERS_H
+#define RHS2000REGISTERS_H
 
 using namespace std;
 
-class Rhs2000RegistersUsb3
+class Rhs2000Registers
 {
 
 public:
@@ -42,7 +42,7 @@ public:
         StimStepSizeMax = 11
     };
 
-    Rhs2000RegistersUsb3(double sampleRate, StimStepSize stimStep_);
+    Rhs2000Registers(double sampleRate, StimStepSize stimStep_);
 
     void defineSampleRate(double newSampleRate);
 
@@ -255,4 +255,4 @@ private:
 
 };
 
-#endif // RHS2000REGISTERSUSB3_H
+#endif // RHS2000REGISTERS_H

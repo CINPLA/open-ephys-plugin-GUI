@@ -22,11 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "USBThread.h"
-#include "rhythmstim-api/rhs2000evalboardusb3.h"
+#include "rhythmstim-api/rhs2000evalboard.h"
 
 using namespace IntanStimulationController;
 
-USBThread::USBThread(Rhs2000EvalBoardUsb3* b)
+USBThread::USBThread(Rhs2000EvalBoard* b)
 	: m_board(b), Thread("USBThread")
 {
 }
@@ -84,10 +84,10 @@ void USBThread::run()
 		{
 			m_lock.exit();
             long read;
-            m_board->setStimCmdMode(true);
-            m_board->setContinuousRunMode(true);
-            m_board->setMaxTimeStep(0);
-            m_board->run();
+//            m_board->setStimCmdMode(true);
+//            m_board->setContinuousRunMode(true);
+//            m_board->setMaxTimeStep(0);
+//            m_board->run();
 			do
 			{
 				if (threadShouldExit())
@@ -100,10 +100,10 @@ void USBThread::run()
 				m_curBuffer = ++m_curBuffer % 2;
 				m_canRead = false;
 			}
-            m_board->setContinuousRunMode(false);
-            m_board->setStimCmdMode(false);
-            m_board->setMaxTimeStep(0);
-            m_board->flush();  // Flush USB FIFO on XEM6310
+//            m_board->setContinuousRunMode(false);
+//            m_board->setStimCmdMode(false);
+//            m_board->setMaxTimeStep(0);
+//            m_board->flush();  // Flush USB FIFO on XEM6310
 		}
 		else
 			m_lock.exit();

@@ -29,9 +29,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "rhythmstim-api/rhs2000evalboardusb3.h"
-#include "rhythmstim-api/rhs2000registersusb3.h"
-#include "rhythmstim-api/rhs2000datablockusb3.h"
+#include "rhythmstim-api/rhs2000evalboard.h"
+#include "rhythmstim-api/rhs2000registers.h"
+#include "rhythmstim-api/rhs2000datablock.h"
 #include "rhythmstim-api/okFrontPanelDLL.h"
 
 #define MAX_NUM_HEADSTAGES 4
@@ -153,9 +153,9 @@ namespace IntanStimulationController
 		bool startAcquisition() override;
 		bool stopAcquisition()  override;
 
-        ScopedPointer<Rhs2000EvalBoardUsb3> evalBoard;
-        Rhs2000RegistersUsb3 chipRegisters;
-        ScopedPointer<Rhs2000DataBlockUsb3> dataBlock;
+        ScopedPointer<Rhs2000EvalBoard> evalBoard;
+        Rhs2000Registers chipRegisters;
+        ScopedPointer<Rhs2000DataBlock> dataBlock;
 
 		int numChannels;
 		bool deviceFound;
@@ -196,7 +196,7 @@ namespace IntanStimulationController
 
 		void updateRegisters();
 
-        int deviceId(Rhs2000DataBlockUsb3* dataBlock, int stream);
+        int deviceId(Rhs2000DataBlock* dataBlock, int stream);
 
 		double cableLengthPortA, cableLengthPortB, cableLengthPortC, cableLengthPortD;
 		double cableLengthPortE, cableLengthPortF, cableLengthPortG, cableLengthPortH;
@@ -286,7 +286,7 @@ namespace IntanStimulationController
 			double boardSampleRate);
 
 		float updateImpedanceFrequency(float desiredImpedanceFreq, bool& impedanceFreqValid);
-        int loadAmplifierData(queue<Rhs2000DataBlockUsb3>& dataQueue,
+        int loadAmplifierData(queue<Rhs2000DataBlock>& dataQueue,
 			int numBlocks, int numDataStreams);
 
 		std::vector<std::vector<std::vector<double>>> amplifierPreFilter;

@@ -2,7 +2,7 @@
 // rhs2000evalboard.h
 //
 // Intan Technoloies RHS2000 Interface API
-// Rhs2000EvalBoardUsb3 Class Header File
+// Rhs2000EvalBoard Class Header File
 // Version 1.01 (28 March 2017)
 //
 // Copyright (c) 2013-2017 Intan Technologies LLC
@@ -18,8 +18,8 @@
 // See http://www.intantech.com for documentation and product information.
 //----------------------------------------------------------------------------------
 
-#ifndef RHS2000EVALBOARDUSB3_H
-#define RHS2000EVALBOARDUSB3_H
+#ifndef RHS2000EVALBOARD_H
+#define RHS2000EVALBOARD_H
 
 #define MAX_NUM_SPI_PORTS 4
 #define USB_BUFFER_SIZE 2400000
@@ -28,7 +28,7 @@
 #define FIFO_CAPACITY_WORDS 67108864
 #define RHS_BOARD_MODE 14
 
-// The maximum number of Rhs2000DataBlockUsb3 objects we will need is set by the need
+// The maximum number of Rhs2000DataBlock objects we will need is set by the need
 // to perform electrode impedance measurements at very low frequencies.
 // (Maximum command length = 1024 for one period; seven periods required in worst case.)
 #define MAX_NUM_BLOCKS 60
@@ -39,15 +39,15 @@
 using namespace std;
 
 class okCFrontPanel;
-class Rhs2000DataBlockUsb3;
-class Rhs2000RegistersUsb3;
+class Rhs2000DataBlock;
+class Rhs2000Registers;
 
-class Rhs2000EvalBoardUsb3
+class Rhs2000EvalBoard
 {
 
 public:
-    Rhs2000EvalBoardUsb3();
-    ~Rhs2000EvalBoardUsb3();
+    Rhs2000EvalBoard();
+    ~Rhs2000EvalBoard();
 
     int open();
     bool uploadFpgaBitfile(string filename);
@@ -147,19 +147,19 @@ public:
     void setDacThreshold(int dacChannel, int threshold, bool trigPolarity);
 
     void flush();
-    bool readDataBlock(Rhs2000DataBlockUsb3 *dataBlock);
+    bool readDataBlock(Rhs2000DataBlock *dataBlock);
     long readDataBlocksRaw(int numBlocks, unsigned char* buffer);
-    bool readDataBlocks(int numBlocks, queue<Rhs2000DataBlockUsb3> &dataQueue);
-    int queueToFile(queue<Rhs2000DataBlockUsb3> &dataQueue, std::ofstream &saveOut);
+    bool readDataBlocks(int numBlocks, queue<Rhs2000DataBlock> &dataQueue);
+    int queueToFile(queue<Rhs2000DataBlock> &dataQueue, std::ofstream &saveOut);
     int getBoardMode();
     int getCableDelay(BoardPort port) const;
     void getCableDelay(vector<int> &delays) const;
     void enableDcAmpConvert(bool enable);
     void setExtraStates(unsigned int extraStates);
 
-    void configureChip(Rhs2000RegistersUsb3 *chipRegisters);
-    void runDummyCommands(Rhs2000RegistersUsb3 *chipRegisters);
-    void configureRegister(Rhs2000RegistersUsb3 *chipRegisters, int reg);
+    void configureChip(Rhs2000Registers *chipRegisters);
+    void runDummyCommands(Rhs2000Registers *chipRegisters);
+    void configureRegister(Rhs2000Registers *chipRegisters, int reg);
 
     int readDigitalInManual(bool& expanderBoardDetected);
     void readDigitalInExpManual();
@@ -307,4 +307,4 @@ private:
     unsigned int numWordsInFifo();
 };
 
-#endif // RHS2000EVALBOARDUSB3_H
+#endif // RHS2000EVALBOARD_H

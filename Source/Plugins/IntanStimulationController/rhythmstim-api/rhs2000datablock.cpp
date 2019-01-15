@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------------------
-// rhs2000datablockusb3.cpp
+// rhs2000datablock.cpp
 //
 // Intan Technoloies RHS2000 Interface API
-// Rhs2000DataBlockUsb3 Class
+// Rhs2000DataBlock Class
 // Version 1.01 (28 March 2017)
 //
 // Copyright (c) 2013-2017 Intan Technologies LLC
@@ -23,7 +23,7 @@
 #include <iomanip>
 #include <vector>
 
-#include "rhs2000datablockusb3.h"
+#include "rhs2000datablock.h"
 
 using namespace std;
 
@@ -31,11 +31,11 @@ using namespace std;
 // from a Rhythm FPGA interface controlling up to eight RHS2116 chips.
 
 // Constructor.  Allocates memory for data block.
-Rhs2000DataBlockUsb3::Rhs2000DataBlockUsb3(int numDataStreams)
+Rhs2000DataBlock::Rhs2000DataBlock(int numDataStreams)
 {
     numDataStreamsStored = numDataStreams;
     allocateUIntArray1D(timeStamp, SAMPLES_PER_DATA_BLOCK);
-    // allocateIntArray3D(amplifierData, numDataStreams, CHANNELS_PER_STREAM, SAMPLES_PER_DATA_BLOCK);
+//    allocateIntArray3D(amplifierDataFast, numDataStreams, CHANNELS_PER_STREAM, SAMPLES_PER_DATA_BLOCK);
     amplifierDataFast = new int [numDataStreams * CHANNELS_PER_STREAM * SAMPLES_PER_DATA_BLOCK];
     allocateIntArray3D(dcAmplifierData, numDataStreams, CHANNELS_PER_STREAM, SAMPLES_PER_DATA_BLOCK);
     allocateIntArray3D(auxiliaryData, numDataStreams, 4, SAMPLES_PER_DATA_BLOCK);
@@ -50,13 +50,13 @@ Rhs2000DataBlockUsb3::Rhs2000DataBlockUsb3(int numDataStreams)
     allocateIntArray1D(ttlOut, SAMPLES_PER_DATA_BLOCK);
 }
 
-Rhs2000DataBlockUsb3::~Rhs2000DataBlockUsb3()
+Rhs2000DataBlock::~Rhs2000DataBlock()
 {
     delete [] amplifierDataFast;
 }
 
 // Copy constructor
-Rhs2000DataBlockUsb3::Rhs2000DataBlockUsb3(const Rhs2000DataBlockUsb3 &obj)
+Rhs2000DataBlock::Rhs2000DataBlock(const Rhs2000DataBlock &obj)
 {
     int size = obj.numDataStreamsStored * CHANNELS_PER_STREAM * SAMPLES_PER_DATA_BLOCK;
     amplifierDataFast = new int [size];
@@ -81,19 +81,19 @@ Rhs2000DataBlockUsb3::Rhs2000DataBlockUsb3(const Rhs2000DataBlockUsb3 &obj)
 }
 
 // Allocates memory for a 1-D array of integers.
-void Rhs2000DataBlockUsb3::allocateIntArray1D(vector<int> &array1D, int xSize)
+void Rhs2000DataBlock::allocateIntArray1D(vector<int> &array1D, int xSize)
 {
     array1D.resize(xSize);
 }
 
 // Allocates memory for a 1-D array of unsigned integers.
-void Rhs2000DataBlockUsb3::allocateUIntArray1D(vector<unsigned int> &array1D, int xSize)
+void Rhs2000DataBlock::allocateUIntArray1D(vector<unsigned int> &array1D, int xSize)
 {
     array1D.resize(xSize);
 }
 
 // Allocates memory for a 2-D array of integers.
-void Rhs2000DataBlockUsb3::allocateIntArray2D(vector<vector<int> > & array2D, int xSize, int ySize)
+void Rhs2000DataBlock::allocateIntArray2D(vector<vector<int> > & array2D, int xSize, int ySize)
 {
     int i;
 
@@ -103,7 +103,7 @@ void Rhs2000DataBlockUsb3::allocateIntArray2D(vector<vector<int> > & array2D, in
 }
 
 // Allocates memory for a 3-D array of integers.
-void Rhs2000DataBlockUsb3::allocateIntArray3D(vector<vector<vector<int> > > &array3D, int xSize, int ySize, int zSize)
+void Rhs2000DataBlock::allocateIntArray3D(vector<vector<vector<int> > > &array3D, int xSize, int ySize, int zSize)
 {
     int i, j;
 
@@ -118,13 +118,13 @@ void Rhs2000DataBlockUsb3::allocateIntArray3D(vector<vector<vector<int> > > &arr
 }
 
 // Returns the number of samples in a USB data block.
-unsigned int Rhs2000DataBlockUsb3::getSamplesPerDataBlock()
+unsigned int Rhs2000DataBlock::getSamplesPerDataBlock()
 {
     return SAMPLES_PER_DATA_BLOCK;
 }
 
 // Returns the number of 16-bit words in a USB data block with numDataStreams data streams enabled.
-unsigned int Rhs2000DataBlockUsb3::calculateDataBlockSizeInWords(int numDataStreams)
+unsigned int Rhs2000DataBlock::calculateDataBlockSizeInWords(int numDataStreams)
 {
     return SAMPLES_PER_DATA_BLOCK * (4 + 2 + numDataStreams * (2 * (CHANNELS_PER_STREAM + 4) + 4) + 8 + 8 + 2);
     // 4 = magic number; 2 = time stamp; 20 = (16 amp channels + 4 aux commands, each 32 bit results);
@@ -132,7 +132,7 @@ unsigned int Rhs2000DataBlockUsb3::calculateDataBlockSizeInWords(int numDataStre
 }
 
 // Check first 64 bits of USB header against the fixed Rhythm "magic number" to verify data sync.
-bool Rhs2000DataBlockUsb3::checkUsbHeader(unsigned char usbBuffer[], int index)
+bool Rhs2000DataBlock::checkUsbHeader(unsigned char usbBuffer[], int index)
 {
     unsigned long long x1, x2, x3, x4, x5, x6, x7, x8;
     unsigned long long header;
@@ -152,7 +152,7 @@ bool Rhs2000DataBlockUsb3::checkUsbHeader(unsigned char usbBuffer[], int index)
 }
 
 // Read 32-bit time stamp from USB data frame.
-unsigned int Rhs2000DataBlockUsb3::convertUsbTimeStamp(unsigned char usbBuffer[], int index)
+unsigned int Rhs2000DataBlock::convertUsbTimeStamp(unsigned char usbBuffer[], int index)
 {
     unsigned int x1, x2, x3, x4;
     x1 = usbBuffer[index];
@@ -164,7 +164,7 @@ unsigned int Rhs2000DataBlockUsb3::convertUsbTimeStamp(unsigned char usbBuffer[]
 }
 
 // Convert two USB bytes into 16-bit word.
-int Rhs2000DataBlockUsb3::convertUsbWord(unsigned char usbBuffer[], int index)
+int Rhs2000DataBlock::convertUsbWord(unsigned char usbBuffer[], int index)
 {
     unsigned int x1, x2, result;
 
@@ -177,7 +177,7 @@ int Rhs2000DataBlockUsb3::convertUsbWord(unsigned char usbBuffer[], int index)
 }
 
 // Fill data block with raw data from USB input buffer.
-void Rhs2000DataBlockUsb3::fillFromUsbBuffer(unsigned char usbBuffer[], int blockIndex, int numDataStreams)
+void Rhs2000DataBlock::fillFromUsbBuffer(unsigned char usbBuffer[], int blockIndex, int numDataStreams)
 {
     int index, t, channel, stream, i, highWord;
 
@@ -185,7 +185,7 @@ void Rhs2000DataBlockUsb3::fillFromUsbBuffer(unsigned char usbBuffer[], int bloc
     index = blockIndex * 2 * calculateDataBlockSizeInWords(numDataStreams);
     for (t = 0; t < SAMPLES_PER_DATA_BLOCK; ++t) {
         if (!checkUsbHeader(usbBuffer, index)) {
-            cerr << "Error in Rhs2000EvalBoard::readDataBlockUsb3: Incorrect header." << endl;
+            cerr << "Error in Rhs2000EvalBoard::readDataBlock: Incorrect header." << endl;
         }
         index += 8;
         timeStamp[t] = convertUsbTimeStamp(usbBuffer, index);
@@ -218,7 +218,7 @@ void Rhs2000DataBlockUsb3::fillFromUsbBuffer(unsigned char usbBuffer[], int bloc
             for (stream = 0; stream < numDataStreams; ++stream) {
                 dcAmplifierData[stream][channel][t] = convertUsbWord(usbBuffer, index);  // lower 16 bits (10 bits, actually) contain DC amplifier results
                 index += 2;
-                // amplifierData[stream][channel][t] = convertUsbWord(usbBuffer, index);    // top 16 bits contain AC amplifier results
+//                amplifierData[stream][channel][t] = convertUsbWord(usbBuffer, index);    // top 16 bits contain AC amplifier results
                 amplifierDataFast[ampIndex++] = convertUsbWord(usbBuffer, index);
                 index += 2;
             }
@@ -278,7 +278,7 @@ void Rhs2000DataBlockUsb3::fillFromUsbBuffer(unsigned char usbBuffer[], int bloc
 
 // Print the contents of RHS2116 registers from a selected USB data stream (0-7)
 // to the console.
-void Rhs2000DataBlockUsb3::print(int stream) const
+void Rhs2000DataBlock::print(int stream) const
 {
     const int RomOffset = 57; // 56
     const int RamOffset = 62; // 61
@@ -548,7 +548,7 @@ void Rhs2000DataBlockUsb3::print(int stream) const
 // the processor running the operating system.
 //
 // (See "Endianness" article in Wikipedia for more information.)
-void Rhs2000DataBlockUsb3::writeWordLittleEndian(ofstream &outputStream, int dataWord) const
+void Rhs2000DataBlock::writeWordLittleEndian(ofstream &outputStream, int dataWord) const
 {
     unsigned short msb, lsb;
 
@@ -560,7 +560,7 @@ void Rhs2000DataBlockUsb3::writeWordLittleEndian(ofstream &outputStream, int dat
 }
 
 // Write contents of data block to a binary output stream (saveOut) in little endian format.
-void Rhs2000DataBlockUsb3::write(ofstream &saveOut, int numDataStreams) const
+void Rhs2000DataBlock::write(ofstream &saveOut, int numDataStreams) const
 {
     int t, channel, stream, i;
 
@@ -593,7 +593,7 @@ void Rhs2000DataBlockUsb3::write(ofstream &saveOut, int numDataStreams) const
 }
 
 // Write ADC sample data from of data block from RHS2116 to a vector.
-void Rhs2000DataBlockUsb3::writeToVector(vector<int> &dataOut) const
+void Rhs2000DataBlock::writeToVector(vector<int> &dataOut) const
 {
     for (int t = 0; t < SAMPLES_PER_DATA_BLOCK; ++t) {
         dataOut.push_back(amplifierDataFast[fastIndex(0, 0, t)]);
