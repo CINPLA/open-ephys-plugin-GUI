@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\oscpack">
+      <UniqueIdentifier>{85f89eb3-d3bd-46ef-b060-8940442b8ed2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oscpack\osc">
+      <UniqueIdentifier>{898766bc-4198-4952-a772-c5b80b894a24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oscpack\ip">
+      <UniqueIdentifier>{efe12243-3088-4d5e-af21-1da4a726aa3a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\OpenEphysLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingNodeEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingStimulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingStimulatorCanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingStimulatorEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingVisualizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingVisualizerCanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\TrackingVisualizerEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\IpEndpointName.cpp">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\NetworkingUtils.cpp">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\UdpSocket.cpp">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscOutboundPacketStream.cpp">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscPrintReceivedElements.cpp">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscReceivedElements.cpp">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscTypes.cpp">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingMessage.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingNode.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingNodeEditor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingStimulator.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingStimulatorCanvas.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingStimulatorEditor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingVisualizer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingVisualizerCanvas.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\TrackingVisualizerEditor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\IpEndpointName.h">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\NetworkingUtils.h">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\PacketListener.h">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\TimerListener.h">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\ip\UdpSocket.h">
+      <Filter>Source Files\oscpack\ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\MessageMappingOscPacketListener.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscException.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscHostEndianness.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscOutboundPacketStream.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscPacketListener.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscPrintReceivedElements.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscReceivedElements.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Plugins\Tracking\oscpack\osc\OscTypes.h">
+      <Filter>Source Files\oscpack\osc</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

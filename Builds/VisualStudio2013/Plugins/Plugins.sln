@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KWIKFormat", "KWIKFormat\KWIKFormat.vcxproj", "{554C8744-32CD-427C-A9E5-BF9A44440CED}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -65,6 +65,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IntanRecordingController", "IntanRecordingController\IntanRecordingController.vcxproj", "{6BA7767C-DBDA-44DF-8095-220FD1E2D91A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LFP_Viewer_Beta", "LFP_Viewer_Beta\LFP_Viewer_Beta.vcxproj", "{A6E2C4F0-63A3-496B-8929-1B2785FDBBFD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sync", "Sync\Sync.vcxproj", "{67DFF83A-4399-4C02-B24B-1268833B46C6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogicGate", "LogicGate\LogicGate.vcxproj", "{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tracking", "Tracking\Tracking.vcxproj", "{CE9D9435-E31B-48FD-9ACC-25A20712075A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -364,6 +370,36 @@ Global
 		{A6E2C4F0-63A3-496B-8929-1B2785FDBBFD}.Release|Win32.Build.0 = Release|Win32
 		{A6E2C4F0-63A3-496B-8929-1B2785FDBBFD}.Release|x64.ActiveCfg = Release|x64
 		{A6E2C4F0-63A3-496B-8929-1B2785FDBBFD}.Release|x64.Build.0 = Release|x64
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Debug|Win32.Build.0 = Debug|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Debug|x64.ActiveCfg = Debug|x64
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Release|Win32.ActiveCfg = Release|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Release|Win32.Build.0 = Release|Win32
+		{67DFF83A-4399-4C02-B24B-1268833B46C6}.Release|x64.ActiveCfg = Release|x64
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Debug|Win32.Build.0 = Debug|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Debug|x64.ActiveCfg = Debug|x64
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Release|Win32.ActiveCfg = Release|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Release|Win32.Build.0 = Release|Win32
+		{1CC0EF4B-9756-4D15-85EA-0AA9E64C6DDA}.Release|x64.ActiveCfg = Release|x64
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Debug|Win32.Build.0 = Debug|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Debug|x64.ActiveCfg = Debug|x64
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Release|Win32.ActiveCfg = Release|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Release|Win32.Build.0 = Release|Win32
+		{CE9D9435-E31B-48FD-9ACC-25A20712075A}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
